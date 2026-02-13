@@ -28,6 +28,7 @@ const SearchContainer = styled(Paper)`
   /* Increase width on desktop to fit full placeholder text */
   @media (min-width: 1024px) {
     min-width: 350px;
+    max-width: calc(100% - 115px);
   }
 
   .MuiTextField-root {
@@ -188,7 +189,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
         ]);
 
         const sortedLocations = locationData.sort((a, b) =>
-          (ADDRESS_TYPE_PRIORITY[a.addresstype] || 99) - (ADDRESS_TYPE_PRIORITY[b.addresstype] || 99)
+            (ADDRESS_TYPE_PRIORITY[a.addresstype] || 99) - (ADDRESS_TYPE_PRIORITY[b.addresstype] || 99)
         );
 
         setLocationResults(sortedLocations);
