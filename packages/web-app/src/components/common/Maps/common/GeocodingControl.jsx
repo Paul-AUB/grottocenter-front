@@ -73,16 +73,30 @@ const GeocodingControl = ({ onLocationSelect }) => {
   const [loading, setLoading] = useState(false);
   const [selectedEntrance, setSelectedEntrance] = useState(null);
 
+  const hasResults = locationResults.length > 0 || entranceResults.length > 0;
+
   useEffect(() => {
+    if (!hasResults) return undefined;
+
     const container = map.getContainer();
-    const handleWheel = e => {
+
+    // Prevent map interactions when scrolling/touching the results list
+    const handleEvent = e => {
       if (e.target.closest('.results-list')) {
         e.stopPropagation();
       }
     };
-    container.addEventListener('wheel', handleWheel, { capture: true });
-    return () => container.removeEventListener('wheel', handleWheel, { capture: true });
-  }, [map]);
+
+    container.addEventListener('wheel', handleEvent, { capture: true });
+    container.addEventListener('touchstart', handleEvent, { capture: true, passive: true });
+    container.addEventListener('touchmove', handleEvent, { capture: true, passive: true });
+
+    return () => {
+      container.removeEventListener('wheel', handleEvent, { capture: true });
+      container.removeEventListener('touchstart', handleEvent, { capture: true });
+      container.removeEventListener('touchmove', handleEvent, { capture: true });
+    };
+  }, [map, hasResults]);
 
   // Open popup on the entrance marker once it appears on the map
   useEffect(() => {
