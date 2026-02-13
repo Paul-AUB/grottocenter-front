@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
+import * as L from 'leaflet';
 import { styled } from '@mui/material/styles';
 import { TextField, Paper, List, ListItem, ListItemText, CircularProgress, InputAdornment } from '@mui/material';
+import { LocationOn } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
   NOMINATIM_API_URL,
   AUTOCOMPLETE_DEBOUNCE_DELAY,
-  AUTOCOMPLETE_MIN_CHARACTERS
+  AUTOCOMPLETE_MIN_CHARACTERS,
+  ADVANCED_SEARCH_TYPES
 } from '../../../../conf/config';
+import { advancedSearchUrl } from '../../../../conf/apiRoutes';
+import CustomIcon from '../../CustomIcon';
 
 const SearchContainer = styled(Paper)`
   position: absolute;
@@ -17,6 +22,13 @@ const SearchContainer = styled(Paper)`
   z-index: 1000;
   padding: 4px;
   min-width: 250px;
+  /* Let some space for the eye button and prevent overflow on small screens */
+  max-width: calc(100% - 115px);
+
+  /* Increase width on desktop to fit full placeholder text */
+  @media (min-width: 1024px) {
+    min-width: 350px;
+  }
 
   .MuiTextField-root {
     .MuiInputBase-root {
@@ -37,6 +49,9 @@ const StyledListItem = styled(ListItem)`
   cursor: pointer !important;
   padding: 0 14px;
   margin: 0;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
 `;
 
 const ADDRESS_TYPE_PRIORITY = {
@@ -53,8 +68,10 @@ const GeocodingControl = ({ onLocationSelect }) => {
   const map = useMap();
   const { formatMessage, locale } = useIntl();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+  const [locationResults, setLocationResults] = useState([]);
+  const [entranceResults, setEntranceResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedEntrance, setSelectedEntrance] = useState(null);
 
   useEffect(() => {
     const container = map.getContainer();
@@ -67,9 +84,56 @@ const GeocodingControl = ({ onLocationSelect }) => {
     return () => container.removeEventListener('wheel', handleWheel, { capture: true });
   }, [map]);
 
+  // Open popup on the entrance marker once it appears on the map
+  useEffect(() => {
+    if (!selectedEntrance) return undefined;
+
+    const { lat, lng } = selectedEntrance;
+
+    const isTargetMarker = layer =>
+      layer instanceof L.Marker &&
+      Math.abs(layer.getLatLng().lat - lat) < 0.001 &&
+      Math.abs(layer.getLatLng().lng - lng) < 0.001;
+
+    // Check markers already on the map
+    let found = false;
+    map.eachLayer(layer => {
+      if (!found && isTargetMarker(layer)) {
+        layer.openPopup();
+        found = true;
+      }
+    });
+    if (found) {
+      setSelectedEntrance(null);
+      return undefined;
+    }
+
+    // Otherwise listen for new layers being added
+    const onLayerAdd = e => {
+      if (isTargetMarker(e.layer)) {
+        e.layer.openPopup();
+        setSelectedEntrance(null);
+        map.off('layeradd', onLayerAdd);
+      }
+    };
+    map.on('layeradd', onLayerAdd);
+
+    // Safety timeout to stop listening after 5s
+    const timeout = setTimeout(() => {
+      map.off('layeradd', onLayerAdd);
+      setSelectedEntrance(null);
+    }, 5000);
+
+    return () => {
+      map.off('layeradd', onLayerAdd);
+      clearTimeout(timeout);
+    };
+  }, [selectedEntrance, map]);
+
   useEffect(() => {
     if (query.length < AUTOCOMPLETE_MIN_CHARACTERS) {
-      setResults([]);
+      setLocationResults([]);
+      setEntranceResults([]);
       setLoading(false);
       return;
     }
@@ -79,14 +143,46 @@ const GeocodingControl = ({ onLocationSelect }) => {
       try {
         const bounds = map.getBounds();
         const viewbox = `${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}`;
-        const response = await fetch(
-          `${NOMINATIM_API_URL}?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${locale}&viewbox=${viewbox}`
+
+        // Parallel API calls
+        const [locationData, entranceData] = await Promise.all([
+          fetch(
+            `${NOMINATIM_API_URL}?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${locale}&viewbox=${viewbox}`
+          )
+            .then(res => res.json())
+            .catch(error => {
+              console.error('Failed to fetch location data:', error);
+              return [];
+            }),
+          fetch(advancedSearchUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query,
+              entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
+              matchAllFields: false,
+              page: 0,
+              size: 5
+            })
+          })
+            .then(res => res.json())
+            .then(data => data.results || [])
+            .catch(error => {
+              console.error('Failed to fetch entrance data:', error);
+              return [];
+            })
+        ]);
+
+        const sortedLocations = locationData.sort((a, b) =>
+          (ADDRESS_TYPE_PRIORITY[a.addresstype] || 99) - (ADDRESS_TYPE_PRIORITY[b.addresstype] || 99)
         );
-        const data = await response.json();
-        const sorted = data.sort((a, b) => (ADDRESS_TYPE_PRIORITY[a.addresstype] || 99) - (ADDRESS_TYPE_PRIORITY[b.addresstype] || 99));
-        setResults(sorted);
+
+        setLocationResults(sortedLocations);
+        setEntranceResults(entranceData);
       } catch (error) {
-        console.error('Geocoding error:', error);
+        console.error('Search error:', error);
+        setLocationResults([]);
+        setEntranceResults([]);
       } finally {
         setLoading(false);
       }
@@ -100,31 +196,63 @@ const GeocodingControl = ({ onLocationSelect }) => {
 
   const handleSelect = result => {
     setQuery('');
-    setResults([]);
-    
-    const lat = parseFloat(result.lat);
-    const lng = parseFloat(result.lon);
-    
-    if (onLocationSelect) {
-      onLocationSelect({ lat, lng });
-    }
-    
-    setTimeout(() => {
-      if (result.boundingbox) {
-        const [south, north, west, east] = result.boundingbox.map(parseFloat);
-        map.fitBounds([[south, west], [north, east]]);
-      } else {
-        map.setView([lat, lng], map.getZoom());
+    setLocationResults([]);
+    setEntranceResults([]);
+
+    if (result.resultType === 'entrance') {
+      // For entrances: zoom to focused view and store selection for popup opening
+      const lat = result.latitude;
+      const lng = result.longitude;
+
+      // Store the selected entrance for popup opening via layeradd listener
+      setSelectedEntrance({ lat, lng });
+
+      if (onLocationSelect) {
+        onLocationSelect({ lat, lng });
       }
-    }, 100);
+
+      setTimeout(() => {
+        const targetZoom = 16;
+
+        // setView triggers moveend/zoomend natively which MapClusters listens to.
+        // When zoom doesn't change, force a dragend so markers reload for the new bounds.
+        const needsDragEnd = map.getZoom() === targetZoom;
+        map.setView([lat, lng], targetZoom);
+        if (needsDragEnd) {
+          map.fire('dragend');
+        }
+      }, 150);
+    } else {
+      // For locations: use existing bounding box logic
+      const lat = parseFloat(result.lat);
+      const lng = parseFloat(result.lon);
+
+      if (onLocationSelect) {
+        onLocationSelect({ lat, lng });
+      }
+
+      setTimeout(() => {
+        if (result.boundingbox) {
+          const [south, north, west, east] = result.boundingbox.map(parseFloat);
+          map.fitBounds([[south, west], [north, east]]);
+        } else {
+          map.setView([lat, lng], map.getZoom());
+        }
+      }, 100);
+    }
   };
+
+  const allResults = useMemo(() => [
+    ...entranceResults.map(e => ({ ...e, resultType: 'entrance' })),
+    ...locationResults.map(l => ({ ...l, resultType: 'location' }))
+  ], [entranceResults, locationResults]);
 
   return (
     <SearchContainer elevation={3}>
       <TextField
         size="small"
         fullWidth
-        placeholder={formatMessage({ id: 'Search location...' })}
+        placeholder={formatMessage({ id: 'Search location or entrance...' })}
         value={query}
         onChange={e => setQuery(e.target.value)}
         slotProps={{
@@ -137,18 +265,35 @@ const GeocodingControl = ({ onLocationSelect }) => {
           }
         }}
       />
-      {results.length > 0 && (
+      {allResults.length > 0 && (
         <ResultsList className="results-list">
-          {results.map(result => (
-            <StyledListItem
-              key={result.place_id}
-              onClick={() => handleSelect(result)}>
-              <ListItemText 
-                primary={result.display_name}
-                secondary={formatMessage({ id: `addresstype.${result.addresstype}`, defaultMessage: result.addresstype })}
-              />
-            </StyledListItem>
-          ))}
+          {allResults.map(result => {
+            if (result.resultType === 'entrance') {
+              return (
+                <StyledListItem
+                  key={`entrance-${result.id}`}
+                  onClick={() => handleSelect(result)}>
+                  <CustomIcon type="entry" size={20} />
+                  <ListItemText
+                    primary={result.name}
+                    secondary={`Entrance • ${[result.city, result.region].filter(Boolean).join(', ')}`}
+                  />
+                </StyledListItem>
+              );
+            } else {
+              return (
+                <StyledListItem
+                  key={result.place_id}
+                  onClick={() => handleSelect(result)}>
+                  <LocationOn fontSize="small" color="action" />
+                  <ListItemText
+                    primary={result.display_name}
+                    secondary={formatMessage({ id: `addresstype.${result.addresstype}`, defaultMessage: result.addresstype })}
+                  />
+                </StyledListItem>
+              );
+            }
+          })}
         </ResultsList>
       )}
     </SearchContainer>
