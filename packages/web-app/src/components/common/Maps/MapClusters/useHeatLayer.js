@@ -54,6 +54,10 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
 
   // On zoom lvl, hex opacity and size can change
   const map = useMapEvent('zoomend', () => {
+    // Always remove orphaned tooltips, the hex may disappear mid-hover
+    // leaving no mouseout to clean up the tooltip
+    d3.selectAll('.hexbin-tooltip').remove();
+
     if (!isNil(hexLayer)) {
       if (map.getZoom() > HEX_DETAILS_ZOOM) {
         hexLayer
