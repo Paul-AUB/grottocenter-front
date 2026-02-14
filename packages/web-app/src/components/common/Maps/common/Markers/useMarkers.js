@@ -3,10 +3,7 @@ import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router';
-import {
-  ThemeProvider,
-  StyledEngineProvider
-} from '@mui/material/styles';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import { GlobalStyles } from '@mui/material';
 import { IntlProvider } from 'react-intl';
 import { useSelector } from 'react-redux';
@@ -78,6 +75,9 @@ const useMarkers = ({
 
       if (tooltipContent) {
         markerEl.bindTooltip(`${tooltipContent(marker)}`, {});
+        // On touch devices a tap fires both tooltip and popup; hide tooltip on click
+        // (fires before popupopen, works reliably for both L.marker and L.circleMarker)
+        markerEl.on('click', () => markerEl.closeTooltip());
       }
 
       return markerEl;
@@ -118,7 +118,11 @@ const useMarkers = ({
       }
 
       // Fit bounds on initial load if requested
-      if (shouldFitMapBound && currentMap.size > 0 && addedMarkers.length === currentMap.size) {
+      if (
+        shouldFitMapBound &&
+        currentMap.size > 0 &&
+        addedMarkers.length === currentMap.size
+      ) {
         map.fitBounds(
           Array.from(currentMap.values()).map(m => m.getLatLng()),
           { padding: [40, 40], maxZoom: 16 }
