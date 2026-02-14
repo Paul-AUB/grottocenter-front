@@ -1169,6 +1169,12 @@ const newCave = R.set(depthLens, 250, cave);
 
 ## 🤖 Guide for AI Agents
 
+### Philosophy
+
+> "La perfection est atteinte non pas lorsqu'il n'y a plus rien à ajouter, mais lorsqu'il n'y a plus rien à enlever." - Antoine de Saint-Exupéry
+
+Always favor the simplest solution. Do not add code or complexity unless it is strictly necessary. Before adding a new abstraction, helper, or wrapper, ask yourself if the existing code can solve the problem with minimal changes.
+
 ### Task Analysis
 
 Before starting a task, identify:
