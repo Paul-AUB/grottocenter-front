@@ -1,35 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router';
 import {
   ThemeProvider,
-  StyledEngineProvider,
-  keyframes,
-  css
+  StyledEngineProvider
 } from '@mui/material/styles';
 import { GlobalStyles } from '@mui/material';
 import { IntlProvider } from 'react-intl';
 import { useSelector } from 'react-redux';
 import grottoTheme from '../../../../../conf/grottoTheme';
 
-const fadeIn = keyframes`
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-`;
-
 export const MarkerGlobalCss = (
   <GlobalStyles
-    styles={css`
-      & .fade-in-markers {
-        animation: 0.3s ${fadeIn} ease-out;
-      }
-
+    styles={`
       .leaflet-container {
         font-size: 1rem;
       }
@@ -44,14 +29,15 @@ const useMarkers = ({
   shouldFitMapBound = false
 }) => {
   const map = useMap();
-  const [canvas] = useState(L.canvas());
-  const [markers, setMarkers] = useState([]);
+  const canvasRef = useRef(L.canvas());
+  // Map<id, L.Marker> for O(1) lookups during diff
+  const markersRef = useRef(new Map());
   const { locale, messages } = useSelector(state => state.intl);
-  const options = { icon, renderer: canvas };
 
-  const makeMarkers = newMarkers =>
-    newMarkers.map(marker => {
+  const createLeafletMarker = useCallback(
+    marker => {
       const { latitude, longitude } = marker;
+      const options = { icon, renderer: canvasRef.current };
       const markerEl = L.marker([latitude, longitude], options);
 
       if (popupContent) {
@@ -78,24 +64,54 @@ const useMarkers = ({
       }
 
       return markerEl;
-    });
+    },
+    [icon, popupContent, tooltipContent, locale, messages]
+  );
 
-  useEffect(() => {
-    for (const marker of markers) marker.addTo(map);
+  const updateMarkers = useCallback(
+    newMarkers => {
+      const currentMap = markersRef.current;
 
-    if (shouldFitMapBound && markers.length > 0) {
-      map.fitBounds(
-        markers.map(e => e.getLatLng()),
-        { padding: [40, 40], maxZoom: 16 }
-      );
-    }
-  }, [markers, map, shouldFitMapBound]);
+      if (!newMarkers || newMarkers.length === 0) {
+        // Remove all markers
+        for (const m of currentMap.values()) m.remove();
+        currentMap.clear();
+        return;
+      }
 
-  return newMarkers => {
-    for (const marker of markers) marker.remove(map);
-    if (newMarkers && newMarkers.length > 0)
-      setMarkers(makeMarkers(newMarkers));
-  };
+      const newIds = new Set(newMarkers.map(m => m.id));
+
+      // Remove markers no longer present
+      for (const [id, leafletMarker] of currentMap) {
+        if (!newIds.has(id)) {
+          leafletMarker.remove();
+          currentMap.delete(id);
+        }
+      }
+
+      // Add markers that are new
+      const addedMarkers = [];
+      for (const marker of newMarkers) {
+        if (!currentMap.has(marker.id)) {
+          const leafletMarker = createLeafletMarker(marker);
+          leafletMarker.addTo(map);
+          currentMap.set(marker.id, leafletMarker);
+          addedMarkers.push(leafletMarker);
+        }
+      }
+
+      // Fit bounds on initial load if requested
+      if (shouldFitMapBound && currentMap.size > 0 && addedMarkers.length === currentMap.size) {
+        map.fitBounds(
+          Array.from(currentMap.values()).map(m => m.getLatLng()),
+          { padding: [40, 40], maxZoom: 16 }
+        );
+      }
+    },
+    [map, createLeafletMarker, shouldFitMapBound]
+  );
+
+  return updateMarkers;
 };
 
 export default useMarkers;
