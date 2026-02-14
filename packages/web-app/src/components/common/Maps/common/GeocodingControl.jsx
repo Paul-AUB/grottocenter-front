@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
-import * as L from 'leaflet';
 import { styled } from '@mui/material/styles';
 import { TextField, Paper, List, ListItem, ListItemText, CircularProgress, InputAdornment } from '@mui/material';
 import { LocationOn } from '@mui/icons-material';
@@ -105,16 +104,25 @@ const GeocodingControl = ({ onLocationSelect }) => {
 
     const { lat, lng } = selectedEntrance;
 
-    const isTargetMarker = layer =>
-      layer instanceof L.Marker &&
-      Math.abs(layer.getLatLng().lat - lat) < 0.001 &&
-      Math.abs(layer.getLatLng().lng - lng) < 0.001;
+    const isTargetMarker = layer => {
+      if (!layer.getLatLng || !layer.getPopup || !layer.getPopup()) return false;
+      const pos = layer.getLatLng();
+      return (
+        Math.abs(pos.lat - lat) < 0.001 &&
+        Math.abs(pos.lng - lng) < 0.001
+      );
+    };
+
+    const safeOpenPopup = layer => {
+      // RAF ensures canvas-rendered CircleMarkers are drawn before popup opens
+      requestAnimationFrame(() => layer.openPopup());
+    };
 
     // Check markers already on the map
     let found = false;
     map.eachLayer(layer => {
       if (!found && isTargetMarker(layer)) {
-        layer.openPopup();
+        safeOpenPopup(layer);
         found = true;
       }
     });
@@ -126,7 +134,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
     // Otherwise listen for new layers being added
     const onLayerAdd = e => {
       if (isTargetMarker(e.layer)) {
-        e.layer.openPopup();
+        safeOpenPopup(e.layer);
         setSelectedEntrance(null);
         map.off('layeradd', onLayerAdd);
       }
