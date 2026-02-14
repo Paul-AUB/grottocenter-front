@@ -14,10 +14,11 @@ import LocateControl from './LocateControl';
 const Wrapper = styled('div', {
   shouldForwardProp: (prop) => !prop.startsWith('$')
 })(({ theme, $wholePage }) => `
-  width: calc(100% - 10px);
+  width: 100%;
   height: 400px;
 
   ${theme.breakpoints.up('md')} {
+    width: calc(100%);
     ${!$wholePage && `margin-right: ${theme.spacing(2)};`}
   }
 ${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
@@ -42,9 +43,9 @@ const handleResize = map => {
   const myObserver = new ResizeObserver(() => {
     setTimeout(() => {
       try {
-          map.invalidateSize(true);
+        map.invalidateSize(true);
       } catch (e) {
-          // Silently ignore errors during invalidateSize
+        // Silently ignore errors during invalidateSize
       }
     }, 100);
   });
