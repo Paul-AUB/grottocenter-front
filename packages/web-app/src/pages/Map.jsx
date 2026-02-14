@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, Suspense } from 'react';
+import React, { useEffect, useRef, useCallback, Suspense } from 'react';
 import { includes } from 'ramda';
 import { useNavigate, generatePath, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -42,54 +42,61 @@ const Map = () => {
   const params = useParams();
   const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
-  const {
-    location,
-    zoom,
-    // TODO handle loading
-    // eslint-disable-next-line no-unused-vars
-    loadings,
-    networks,
-    networksCoordinates,
-    organizations,
-    entrances,
-    entrancesCoordinates
-  } = useSelector(state => state.map);
+  const location = useSelector(state => state.map.location);
+  const zoom = useSelector(state => state.map.zoom);
+  const networks = useSelector(state => state.map.networks);
+  const networksCoordinates = useSelector(state => state.map.networksCoordinates);
+  const organizations = useSelector(state => state.map.organizations);
+  const entrances = useSelector(state => state.map.entrances);
+  const entrancesCoordinates = useSelector(state => state.map.entrancesCoordinates);
   const { open } = useSelector(state => state.sideMenu);
   const { projections } = useSelector(state => state.projections);
 
-  const handleUpdate = ({ heat, markers, zoom: newZoom, center, bounds }) => {
-    const newPath = generatePath('/ui/map/:target', {
-      target: encodeMapTarget(center, newZoom)
-    });
-    navigate(newPath, { replace: true });
-    dispatch(changeLocation(center));
-    dispatch(changeZoom(newZoom));
+  // Defer map update work so it never blocks Leaflet's animation loop.
+  // Rapid events (zoom + pan) are coalesced: only the last one runs.
+  const pendingUpdate = useRef(null);
+  const rafId = useRef(null);
 
-    const criteria = {
-      /* eslint-disable no-underscore-dangle */
-      sw_lat: bounds._southWest.wrap().lat,
-      sw_lng: bounds._southWest.wrap().lng,
-      ne_lat: bounds._northEast.wrap().lat,
-      ne_lng: bounds._northEast.wrap().lng,
-      /* eslint-enable no-underscore-dangle */
-      zoom: newZoom
-    };
-    if (includes('organizations', markers)) {
-      dispatch(fetchOrganizations(criteria));
-    }
-    if (includes('networks', markers)) {
-      dispatch(fetchNetworks(criteria));
-    }
-    if (includes('entrances', markers)) {
-      dispatch(fetchEntrances(criteria));
-    }
-    if (heat === 'networks') {
-      dispatch(fetchNetworksCoordinates(criteria));
-    }
-    if (heat === 'entrances') {
-      dispatch(fetchEntrancesCoordinates(criteria));
-    }
-  };
+  const handleUpdate = useCallback(args => {
+    pendingUpdate.current = args;
+    if (rafId.current) return; // already scheduled
+    rafId.current = requestAnimationFrame(() => {
+      rafId.current = null;
+      const { heat, markers, zoom: newZoom, center, bounds } = pendingUpdate.current;
+
+      navigate(
+        generatePath('/ui/map/:target', { target: encodeMapTarget(center, newZoom) }),
+        { replace: true }
+      );
+      dispatch(changeLocation(center));
+      dispatch(changeZoom(newZoom));
+
+      const criteria = {
+        /* eslint-disable no-underscore-dangle */
+        sw_lat: bounds._southWest.wrap().lat,
+        sw_lng: bounds._southWest.wrap().lng,
+        ne_lat: bounds._northEast.wrap().lat,
+        ne_lng: bounds._northEast.wrap().lng,
+        /* eslint-enable no-underscore-dangle */
+        zoom: newZoom
+      };
+      if (includes('organizations', markers)) {
+        dispatch(fetchOrganizations(criteria));
+      }
+      if (includes('networks', markers)) {
+        dispatch(fetchNetworks(criteria));
+      }
+      if (includes('entrances', markers)) {
+        dispatch(fetchEntrances(criteria));
+      }
+      if (heat === 'networks') {
+        dispatch(fetchNetworksCoordinates(criteria));
+      }
+      if (heat === 'entrances') {
+        dispatch(fetchEntrancesCoordinates(criteria));
+      }
+    });
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     dispatch(fetchProjections());
