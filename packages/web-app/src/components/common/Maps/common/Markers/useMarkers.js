@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
@@ -24,39 +24,56 @@ export const MarkerGlobalCss = (
 
 const useMarkers = ({
   icon,
+  circleMarkerStyle,
   popupContent = null,
   tooltipContent = null,
   shouldFitMapBound = false
 }) => {
   const map = useMap();
-  const canvasRef = useRef(L.canvas());
   // Map<id, L.Marker> for O(1) lookups during diff
   const markersRef = useRef(new Map());
   const { locale, messages } = useSelector(state => state.intl);
 
+  // Store locale/messages in refs so renderPopupHtml never goes stale
+  // but doesn't invalidate the callback chain either
+  const localeRef = useRef(locale);
+  const messagesRef = useRef(messages);
+  localeRef.current = locale;
+  messagesRef.current = messages;
+
+  const renderPopupHtml = useCallback(
+    marker => {
+      const loc = localeRef.current;
+      const msgs = messagesRef.current;
+      return renderToString(
+        <IntlProvider locale={loc} messages={msgs[loc]}>
+          <StaticRouter location="/">
+            <StyledEngineProvider injectFirst>
+              <ThemeProvider theme={grottoTheme}>
+                {popupContent(marker)}
+              </ThemeProvider>
+            </StyledEngineProvider>
+          </StaticRouter>
+        </IntlProvider>
+      );
+    },
+    [popupContent]
+  );
+
   const createLeafletMarker = useCallback(
     marker => {
       const { latitude, longitude } = marker;
-      const options = { icon, renderer: canvasRef.current };
-      const markerEl = L.marker([latitude, longitude], options);
 
+      let markerEl;
+      if (circleMarkerStyle) {
+        markerEl = L.circleMarker([latitude, longitude], circleMarkerStyle);
+      } else {
+        markerEl = L.marker([latitude, longitude], { icon });
+      }
+
+      // Lazy popup: content is rendered only when the popup is opened
       if (popupContent) {
-        markerEl.bindPopup(
-          renderToString(
-            // Without theme provider the CSS doesn't work properly
-            // It's makes the map slower when there is a lot of markers
-            // One way to optimize it would be to not use MUI for the markers
-            <IntlProvider locale={locale} messages={messages[locale]}>
-              <StaticRouter location="/">
-                <StyledEngineProvider injectFirst>
-                  <ThemeProvider theme={grottoTheme}>
-                    {popupContent(marker)}
-                  </ThemeProvider>
-                </StyledEngineProvider>
-              </StaticRouter>
-            </IntlProvider>
-          )
-        );
+        markerEl.bindPopup(() => renderPopupHtml(marker));
       }
 
       if (tooltipContent) {
@@ -65,7 +82,7 @@ const useMarkers = ({
 
       return markerEl;
     },
-    [icon, popupContent, tooltipContent, locale, messages]
+    [icon, circleMarkerStyle, popupContent, renderPopupHtml, tooltipContent]
   );
 
   const updateMarkers = useCallback(
@@ -110,6 +127,15 @@ const useMarkers = ({
     },
     [map, createLeafletMarker, shouldFitMapBound]
   );
+
+  // Cleanup all markers on unmount
+  useEffect(() => {
+    const currentMarkers = markersRef.current;
+    return () => {
+      for (const m of currentMarkers.values()) m.remove();
+      currentMarkers.clear();
+    };
+  }, []);
 
   return updateMarkers;
 };
