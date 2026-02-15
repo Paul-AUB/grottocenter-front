@@ -38,7 +38,7 @@ const HydratedMap = ({
     setSelectedMarkers(newSelection);
     if (zoomState.current === ZOOM_STATE.MARKERS) {
       setVisibleMarkers(
-        pipe(append(selectedHeat), uniq, without('none'))(newSelection)
+        pipe(append(selectedHeat), uniq, without(['none']))(newSelection)
       );
     } else {
       setVisibleMarkers(newSelection);
@@ -50,7 +50,7 @@ const HydratedMap = ({
       setVisibleHeat(newHeat);
     } else {
       setVisibleMarkers(
-        pipe(append(newHeat), uniq, without('none'))(selectedMarkers)
+        pipe(append(newHeat), uniq, without(['none']))(selectedMarkers)
       );
     }
   };
@@ -64,7 +64,7 @@ const HydratedMap = ({
       // do not update visible markers if it's already displayed
       if (zoomState.current !== ZOOM_STATE.MARKERS) {
         setVisibleMarkers(
-          pipe(append(selectedHeat), uniq, without('none'))(selectedMarkers)
+          pipe(append(selectedHeat), uniq, without(['none']))(selectedMarkers)
         );
         setVisibleHeat('none');
         zoomState.current = ZOOM_STATE.MARKERS;

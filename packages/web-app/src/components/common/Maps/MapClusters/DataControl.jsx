@@ -84,7 +84,7 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
 
   const handleMarkerToggle = value => {
     setSelectedMarkers(prev =>
-      includes(value, prev) ? without(value, prev) : [...prev, value]
+      includes(value, prev) ? without([value], prev) : [...prev, value]
     );
   };
 
