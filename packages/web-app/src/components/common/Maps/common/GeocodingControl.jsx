@@ -258,7 +258,10 @@ const GeocodingControl = ({ onLocationSelect }) => {
   };
 
   const allResults = useMemo(() => [
-    ...entranceResults.map(e => ({ ...e, resultType: 'entrance' })),
+    ...entranceResults
+      // Explicitly filter out entrances without coordinates to avoid showing results that can't be displayed on the map
+      .filter(e => e.latitude != null && e.longitude != null)
+      .map(e => ({ ...e, resultType: 'entrance' })),
     ...locationResults.map(l => ({ ...l, resultType: 'location' }))
   ], [entranceResults, locationResults]);
 
