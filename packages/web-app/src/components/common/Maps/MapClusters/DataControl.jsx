@@ -1,16 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import {
-  Menu,
-  MenuItem,
-  IconButton as MuiIconButton,
-  FormControlLabel,
-  RadioGroup,
-  Radio,
-  Checkbox,
-  FormGroup
-} from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
@@ -26,42 +16,76 @@ const markerTypes = {
   ORGANIZATIONS: 'organizations'
 };
 
-const Wrapper = styled('div')`
-  background: white;
+const ToggleLink = styled('a')`
+  background-image: none !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  .leaflet-control-layers-expanded & {
+    display: none !important;
+  }
 `;
 
-const IconButton = styled(MuiIconButton)`
-  // override leaflet properties
-  background-image: none !important;
-  padding: 9px;
+const SectionTitle = styled('div')`
+  font-weight: bold;
+  font-size: 12px;
+  padding: 4px 0 2px;
+  color: #333;
+
+  &:not(:first-of-type) {
+    margin-top: 6px;
+  }
+`;
+
+const OptionLabel = styled('label')`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 0;
+  white-space: nowrap;
 `;
 
 const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
   const { fullScreen } = useFullScreen();
   const { formatMessage } = useIntl();
-  const [anchorEl, setAnchorEl] = useState(null);
+  const wrapperRef = useRef(null);
   const [selectedHeat, setSelectedHeat] = useState(heatmapTypes.ENTRANCES);
   const [selectedMarkers, setSelectedMarkers] = useState([]);
 
-  const handleOpenMenu = event => {
-    setAnchorEl(event.currentTarget);
+  const toggleExpanded = useCallback((expanded) => {
+    const container = wrapperRef.current?.closest('.leaflet-control-layers');
+    if (container) {
+      container.classList.toggle('leaflet-control-layers-expanded', expanded);
+    }
+  }, []);
+
+  // Remove expanded class on unmount
+  useEffect(() => {
+    return () => toggleExpanded(false);
+  }, [toggleExpanded]);
+
+  // Close panel when touching outside on mobile
+  useEffect(() => {
+    const handleClickOutside = e => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        toggleExpanded(false);
+      }
+    };
+    document.addEventListener('pointerdown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
+  }, [toggleExpanded]);
+
+  const handleHeatChange = value => {
+    setSelectedHeat(value);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleChange = (type, selection) => () => {
-    if (type === 'heat') {
-      setSelectedHeat(selection);
-    }
-    if (type === 'markers') {
-      setSelectedMarkers(
-        includes(selection, selectedMarkers)
-          ? without(selection, selectedMarkers)
-          : [...selectedMarkers, selection]
-      );
-    }
+  const handleMarkerToggle = value => {
+    setSelectedMarkers(prev =>
+      includes(value, prev) ? without(value, prev) : [...prev, value]
+    );
   };
 
   useEffect(() => {
@@ -74,71 +98,62 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
   }, [selectedMarkers]);
 
   return (
-    <CustomControl {...props}>
-      <Wrapper>
-        <IconButton
+    <CustomControl
+      {...props}
+      containerClassName="leaflet-control-layers leaflet-control">
+      <div
+        ref={wrapperRef}
+        onMouseEnter={() => !fullScreen && toggleExpanded(true)}
+        onMouseLeave={() => toggleExpanded(false)}>
+        <ToggleLink
           className="leaflet-control-layers-toggle"
+          role="button"
+          tabIndex={0}
+          title={formatMessage({ id: 'data-control' })}
           aria-label={formatMessage({ id: 'data-control' })}
-          onMouseOver={handleOpenMenu}
-          onClick={handleOpenMenu}
-          // TODO enable on fullscreen as it's currently hidden
-          disabled={fullScreen}
-          size="large">
-          <VisibilityIcon fontSize="inherit" />
-        </IconButton>
-      </Wrapper>
-      <Menu
-        container={() => document.getElementsByClassName('fullscreen')[0]}
-        id="data-menu-selection"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        MenuListProps={{ onMouseLeave: handleClose }}>
-        <MenuItem disabled>
-          {formatMessage({ id: 'heat map' }).toUpperCase()}
-        </MenuItem>
-        <RadioGroup
-          aria-label={formatMessage({ id: 'heatmap' })}
-          name="heatmap"
-          value={selectedHeat}>
-          <MenuItem onClick={handleChange('heat', heatmapTypes.ENTRANCES)}>
-            <FormControlLabel
-              value={heatmapTypes.ENTRANCES}
-              control={<Radio size="small" />}
-              label={formatMessage({ id: heatmapTypes.ENTRANCES })}
-            />
-          </MenuItem>
-          <MenuItem onClick={handleChange('heat', heatmapTypes.NETWORKS)}>
-            <FormControlLabel
-              value={heatmapTypes.NETWORKS}
-              control={<Radio size="small" />}
-              label={formatMessage({ id: heatmapTypes.NETWORKS })}
-            />
-          </MenuItem>
-          <MenuItem onClick={handleChange('heat', heatmapTypes.NONE)}>
-            <FormControlLabel
-              value={heatmapTypes.NONE}
-              control={<Radio size="small" />}
-              label={formatMessage({ id: heatmapTypes.NONE })}
-            />
-          </MenuItem>
-        </RadioGroup>
-        <MenuItem disabled>
-          {formatMessage({ id: 'markers' }).toUpperCase()}
-        </MenuItem>
-        <FormGroup>
-          <MenuItem
-            onChange={handleChange('markers', markerTypes.ORGANIZATIONS)}>
-            <FormControlLabel
-              control={
-                <Checkbox size="small" name={markerTypes.ORGANIZATIONS} />
-              }
-              label={formatMessage({ id: markerTypes.ORGANIZATIONS })}
-            />
-          </MenuItem>
-        </FormGroup>
-      </Menu>
+          onClick={() => !fullScreen && toggleExpanded(true)}
+          onKeyDown={e => e.key === 'Enter' && !fullScreen && toggleExpanded(true)}
+          style={{
+            cursor: fullScreen ? 'default' : 'pointer',
+            opacity: fullScreen ? 0.5 : 1,
+            pointerEvents: fullScreen ? 'none' : 'auto'
+          }}>
+          <VisibilityIcon htmlColor="#333" />
+        </ToggleLink>
+
+        <section className="leaflet-control-layers-list">
+          <div className="leaflet-control-layers-overlays">
+            <SectionTitle>
+              {formatMessage({ id: 'heat map' }).toUpperCase()}
+            </SectionTitle>
+            {Object.values(heatmapTypes).map(type => (
+              <OptionLabel key={type}>
+                <input
+                  type="radio"
+                  name="heatmap"
+                  value={type}
+                  checked={selectedHeat === type}
+                  onChange={() => handleHeatChange(type)}
+                />
+                <span>{formatMessage({ id: type })}</span>
+              </OptionLabel>
+            ))}
+
+            <SectionTitle>
+              {formatMessage({ id: 'markers' }).toUpperCase()}
+            </SectionTitle>
+            <OptionLabel>
+              <input
+                type="checkbox"
+                name={markerTypes.ORGANIZATIONS}
+                checked={includes(markerTypes.ORGANIZATIONS, selectedMarkers)}
+                onChange={() => handleMarkerToggle(markerTypes.ORGANIZATIONS)}
+              />
+              <span>{formatMessage({ id: markerTypes.ORGANIZATIONS })}</span>
+            </OptionLabel>
+          </div>
+        </section>
+      </div>
     </CustomControl>
   );
 };

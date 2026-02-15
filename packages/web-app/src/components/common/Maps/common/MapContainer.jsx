@@ -22,6 +22,14 @@ const Wrapper = styled('div', {
     ${!$wholePage && `margin-right: ${theme.spacing(2)};`}
   }
 ${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
+
+  .leaflet-control-layers-list label {
+    font-size: 14px;
+  }
+
+  .leaflet-top.leaflet-right {
+    z-index: 1001;
+  }
 `);
 
 // The Map, once mounted, doesn't change its center: this Centerer forces it
@@ -151,7 +159,7 @@ const CustomMapContainer = ({
         {forceCentering && <Centerer center={center} zoom={zoom} />}
         {isLocateControl && <LocateControl />}
         <ScaleControl position="bottomright" />
-        <LayersControl />
+        <LayersControl position="topright" />
         {children}
       </MapContainer>
     </Wrapper>

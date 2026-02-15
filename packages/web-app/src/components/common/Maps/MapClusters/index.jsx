@@ -123,6 +123,7 @@ const HydratedMap = ({
       <DataControl
         updateHeatmap={handleUpdateHeat}
         updateMarkers={handleUpdateMarkers}
+        useLeafletControl
       />
       <ConverterControl projectionsList={projectionsList} />
       <Markers
