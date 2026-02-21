@@ -179,6 +179,19 @@ const Convert = ({
     if (!valueXInput || !valueYInput || !inputProjection || !outputProjection)
       return;
 
+    // Special case to avoid weird edge cases in proj4 when converting
+    // between the same UTM zones or between a UTM zone and its base projection
+    if (keyGPSInput === keyGPSOutput) {
+      setValueXOutput(valueXInput);
+      setValueYOutput(valueYInput);
+      if (utmInput) {
+        setZoneOutput(zoneInput);
+        setHemiOutput(hemiInput);
+      }
+      if (onConvert) onConvert();
+      return;
+    }
+
     try {
       // proj4 expects [x, y] = [easting/lng, northing/lat]
       // For degree-based systems, our UI shows Lat as X and Lng as Y,
@@ -247,6 +260,8 @@ const Convert = ({
   }, [
     valueXInput,
     valueYInput,
+    keyGPSInput,
+    keyGPSOutput,
     inputProjection,
     outputProjection,
     inputUnits,
