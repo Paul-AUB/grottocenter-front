@@ -63,7 +63,7 @@ const ConverterControl = ({
                 <Skeleton width={100} />
               </>
             }>
-            <Convert list={projectionsList} formatMessage={formatMessage} map={map} hideOutput={hideOutput} onConvert={hideOutput ? handleClose : undefined} />
+            <Convert list={projectionsList} map={map} hideOutput={hideOutput} onConvert={hideOutput ? handleClose : undefined} />
           </Suspense>
         </StandardDialog>
       )}
