@@ -66,7 +66,7 @@ const HydratedMap = ({
   useEffect(() => {
     if (zoomState.current === ZOOM_STATE.MARKERS) {
       setVisibleMarkers(
-        pipe(append(selectedHeat), uniq, without('none'))(selectedMarkersList)
+        pipe(append(selectedHeat), uniq, without(['none']))(selectedMarkersList)
       );
     } else {
       setVisibleMarkers(selectedMarkersList);
@@ -90,7 +90,7 @@ const HydratedMap = ({
         pipe(
           append(newHeat),
           uniq,
-          without('none')
+          without(['none'])
         )(selectedMarkersListRef.current)
       );
     }
@@ -110,7 +110,7 @@ const HydratedMap = ({
           pipe(
             append(selectedHeatRef.current),
             uniq,
-            without('none')
+            without(['none'])
           )(selectedMarkersListRef.current)
         );
         setVisibleHeat('none');
