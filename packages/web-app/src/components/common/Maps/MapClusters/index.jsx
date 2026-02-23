@@ -161,6 +161,7 @@ const HydratedMap = ({
         updateHeatmap={handleUpdateHeat}
         selectedMarkers={selectedMarkers}
         setSelectedMarkers={setSelectedMarkers}
+        useLeafletControl
       />
       <ConverterControl projectionsList={projectionsList} />
       <Markers
