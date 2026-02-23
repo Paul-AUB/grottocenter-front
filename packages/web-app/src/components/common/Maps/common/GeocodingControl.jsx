@@ -319,6 +319,7 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
   }, [query, locale, map]);
 
   const handleSelect = result => {
+    document.activeElement?.blur();
     setQuery('');
     setLocationResults([]);
     setEntranceResults([]);
