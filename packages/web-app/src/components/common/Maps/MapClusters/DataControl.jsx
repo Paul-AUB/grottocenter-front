@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
 
 import CustomControl, { customControlProps } from '../common/CustomControl';
+import { CAVE_SIZE_STYLE } from './constants';
 
 export const heatmapTypes = {
   ENTRANCES: 'entrances',
@@ -48,10 +49,33 @@ const OptionLabel = styled('label')`
   white-space: nowrap;
 `;
 
+const CaveSizeDot = ({ caveSize }) => {
+  const { radius, fillColor, color, weight } = CAVE_SIZE_STYLE[caveSize];
+  return (
+    <svg width="20" height="20" viewBox="0 0 32 32" style={{ flexShrink: 0 }}>
+      <circle
+        cx="16"
+        cy="16"
+        r={radius}
+        fill={fillColor}
+        stroke={color}
+        strokeWidth={weight}
+      />
+    </svg>
+  );
+};
+
+CaveSizeDot.propTypes = {
+  caveSize: PropTypes.string.isRequired
+};
+
 const DataControl = ({
   updateHeatmap,
   selectedMarkers,
   setSelectedMarkers,
+  entranceFilters,
+  activeEntranceFilters,
+  setActiveEntranceFilters,
   ...props
 }) => {
   const { fullScreen } = useFullScreen();
@@ -95,6 +119,8 @@ const DataControl = ({
     updateHeatmap(selectedHeat);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedHeat]);
+
+  const filtersDisabled = selectedHeat !== heatmapTypes.ENTRANCES;
 
   return (
     <CustomControl
@@ -152,6 +178,29 @@ const DataControl = ({
               />
               <span>{formatMessage({ id: markerTypes.ORGANIZATIONS })}</span>
             </OptionLabel>
+            {entranceFilters.map(filter => (
+              <OptionLabel
+                key={filter.id}
+                style={{
+                  opacity: filtersDisabled ? 0.4 : 1,
+                  cursor: filtersDisabled ? 'not-allowed' : 'pointer'
+                }}>
+                <input
+                  type="checkbox"
+                  name={filter.id}
+                  checked={activeEntranceFilters[filter.id] ?? false}
+                  disabled={filtersDisabled}
+                  onChange={() =>
+                    setActiveEntranceFilters(prev => ({
+                      ...prev,
+                      [filter.id]: !prev[filter.id]
+                    }))
+                  }
+                />
+                <CaveSizeDot caveSize={filter.id} />
+                <span>{filter.label}</span>
+              </OptionLabel>
+            ))}
           </div>
         </section>
       </div>
@@ -165,6 +214,14 @@ DataControl.propTypes = {
   updateHeatmap: PropTypes.func.isRequired,
   selectedMarkers: PropTypes.objectOf(PropTypes.bool).isRequired,
   setSelectedMarkers: PropTypes.func.isRequired,
+  entranceFilters: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired
+    })
+  ).isRequired,
+  activeEntranceFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
+  setActiveEntranceFilters: PropTypes.func.isRequired,
   ...customControlProps
 };
 

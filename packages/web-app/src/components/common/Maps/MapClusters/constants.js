@@ -7,7 +7,7 @@ export const CAVE_SIZE = {
 };
 
 // Circle marker styles per cave size category (radius in px, colors from brown palette).
-const CAVE_SIZE_STYLE = {
+export const CAVE_SIZE_STYLE = {
   [CAVE_SIZE.SMALL]: {
     radius: 6,
     color: brown[700],
@@ -42,6 +42,12 @@ export const getCaveSize = entrance => {
 
 export const getEntranceCircleStyle = entrance =>
   CAVE_SIZE_STYLE[getCaveSize(entrance)];
+
+export const ENTRANCE_MARKER_FILTERS = [
+  { id: CAVE_SIZE.SMALL, label: 'Small cave' },
+  { id: CAVE_SIZE.MEDIUM, label: 'Medium cave' },
+  { id: CAVE_SIZE.LARGE, label: 'Large cave' }
+];
 
 export const MARKERS_LIMIT = 13;
 

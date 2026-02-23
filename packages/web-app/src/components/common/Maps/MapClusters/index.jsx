@@ -9,7 +9,7 @@ import GeocodingControl from '../common/GeocodingControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
 import CustomMapContainer from '../common/MapContainer';
-import { MARKERS_LIMIT } from './constants';
+import { MARKERS_LIMIT, ENTRANCE_MARKER_FILTERS, getCaveSize, CAVE_SIZE } from './constants';
 
 const ZOOM_STATE = {
   MARKERS: 1,
@@ -30,6 +30,14 @@ const HydratedMap = ({
   const [selectedMarkers, setSelectedMarkers] = useState(
     Object.fromEntries(Object.values(markerTypes).map(type => [type, false]))
   );
+  const [activeEntranceFilters, setActiveEntranceFilters] = useState(
+    Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true]))
+  );
+  const filteredEntranceMarkers = useMemo(
+    () => entranceMarkers.filter(e => activeEntranceFilters[getCaveSize(e)]),
+    [entranceMarkers, activeEntranceFilters]
+  );
+
   const selectedMarkersList = useMemo(
     () =>
       Object.entries(selectedMarkers)
@@ -161,6 +169,9 @@ const HydratedMap = ({
         updateHeatmap={handleUpdateHeat}
         selectedMarkers={selectedMarkers}
         setSelectedMarkers={setSelectedMarkers}
+        entranceFilters={ENTRANCE_MARKER_FILTERS}
+        activeEntranceFilters={activeEntranceFilters}
+        setActiveEntranceFilters={setActiveEntranceFilters}
         useLeafletControl
       />
       <ConverterControl projectionsList={projectionsList} />
@@ -168,7 +179,7 @@ const HydratedMap = ({
         visibleMarkers={visibleMarkers}
         organizations={organizations}
         networks={networkMarkers}
-        entrances={entranceMarkers}
+        entrances={filteredEntranceMarkers}
       />
     </>
   );
