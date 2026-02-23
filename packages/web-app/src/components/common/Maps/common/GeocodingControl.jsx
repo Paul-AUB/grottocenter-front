@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
 import { styled } from '@mui/material/styles';
 import {
@@ -23,6 +23,12 @@ import {
 } from '../../../../conf/config';
 import { advancedSearchUrl, getCaveUrl } from '../../../../conf/apiRoutes';
 import CustomIcon from '../../CustomIcon';
+import useRenderPopup from './Markers/useRenderPopup';
+import {
+  EntrancePopup,
+  NetworkPopup,
+  OrganizationPopup
+} from './Markers/Components';
 
 const SearchContainer = styled(Paper)`
   position: absolute;
@@ -117,63 +123,37 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
   const [networkResults, setNetworkResults] = useState([]);
   const [organizationResults, setOrganizationResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedEntrance, setSelectedEntrance] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const popupCleanupRef = useRef(null);
+  const renderPopup = useRenderPopup();
 
-  // Open popup on the entrance marker once it appears on the map
-  useEffect(() => {
-    if (!selectedEntrance) return undefined;
+  // Cleanup any pending popup operation on unmount
+  useEffect(
+    () => () => {
+      popupCleanupRef.current?.();
+    },
+    []
+  );
 
-    const { lat, lng } = selectedEntrance;
-
-    const isTargetMarker = layer => {
-      if (!layer.getLatLng || !layer.getPopup || !layer.getPopup())
-        return false;
-      const pos = layer.getLatLng();
-      return Math.abs(pos.lat - lat) < 0.001 && Math.abs(pos.lng - lng) < 0.001;
+  // Open the result's popup at its coordinates once the map has finished moving.
+  // Note that is NOT the marker pop content, because the marker may not exist or is not displayed
+  // doing this improve UX (popup appears immediately with the animation,
+  // instead of waiting for the marker to load and its popupopen event)
+  const schedulePopup = (lat, lng, result) => {
+    popupCleanupRef.current?.();
+    const onMoveEnd = () => {
+      popupCleanupRef.current = null;
+      let content;
+      if (result.resultType === 'entrance')
+        content = renderPopup(<EntrancePopup entrance={result} />);
+      else if (result.resultType === 'network')
+        content = renderPopup(<NetworkPopup network={result} />);
+      else content = renderPopup(<OrganizationPopup organization={result} />);
+      map.openPopup(content, [lat, lng]);
     };
-
-    const safeOpenPopup = layer => {
-      // RAF ensures canvas-rendered CircleMarkers are drawn before popup opens
-      requestAnimationFrame(() => layer.openPopup());
-    };
-
-    // Check markers already on the map
-    let found = false;
-    map.eachLayer(layer => {
-      if (!found && isTargetMarker(layer)) {
-        safeOpenPopup(layer);
-        found = true;
-      }
-    });
-    if (found) {
-      setSelectedEntrance(null);
-      return undefined;
-    }
-
-    // Otherwise listen for new layers being added
-    const onLayerAdd = e => {
-      if (isTargetMarker(e.layer)) {
-        safeOpenPopup(e.layer);
-        setSelectedEntrance(null);
-        map.off('layeradd', onLayerAdd);
-      }
-    };
-    map.on('layeradd', onLayerAdd);
-
-    // Safety timeout: if the marker never appears (e.g. filtered out by zoom/bounds),
-    // stop listening after 5s to avoid a permanent leak. 5s is enough for the map
-    // to finish animating, loading tiles, and rendering the new markers.
-    const timeout = setTimeout(() => {
-      map.off('layeradd', onLayerAdd);
-      setSelectedEntrance(null);
-    }, 5000);
-
-    return () => {
-      map.off('layeradd', onLayerAdd);
-      clearTimeout(timeout);
-    };
-  }, [selectedEntrance, map]);
+    map.once('moveend', onMoveEnd);
+    popupCleanupRef.current = () => map.off('moveend', onMoveEnd);
+  };
 
   useEffect(() => {
     if (query.length < AUTOCOMPLETE_MIN_CHARACTERS) {
@@ -334,9 +314,6 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
       const lat = result.latitude;
       const lng = result.longitude;
 
-      // Store the selected marker for popup opening via layeradd listener
-      setSelectedEntrance({ lat, lng });
-
       if (onLocationSelect) {
         onLocationSelect({ lat, lng });
       }
@@ -349,6 +326,7 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
         // setView triggers moveend/zoomend natively which MapClusters listens to.
         // When zoom doesn't change, force a dragend so markers reload for the new bounds.
         const needsDragEnd = map.getZoom() === targetZoom;
+        schedulePopup(lat, lng, result);
         map.setView([lat, lng], targetZoom);
         if (needsDragEnd) {
           map.fire('dragend');
