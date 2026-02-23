@@ -114,7 +114,7 @@ const ADDRESS_TYPE_PRIORITY = {
   continent: 22
 };
 
-const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
+const GeocodingControl = ({ onLocationSelect }) => {
   const map = useMap();
   const { formatMessage, locale } = useIntl();
   const [query, setQuery] = useState('');
@@ -331,9 +331,6 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
         if (needsDragEnd) {
           map.fire('dragend');
         }
-        if (result.resultType === 'organization' && onOrganizationSelect) {
-          onOrganizationSelect();
-        }
       }, 150);
     } else {
       // For locations: use existing bounding box logic
@@ -500,8 +497,7 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
 };
 
 GeocodingControl.propTypes = {
-  onLocationSelect: PropTypes.func,
-  onOrganizationSelect: PropTypes.func
+  onLocationSelect: PropTypes.func
 };
 
 export default GeocodingControl;

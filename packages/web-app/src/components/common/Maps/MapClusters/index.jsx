@@ -82,13 +82,6 @@ const HydratedMap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMarkers]);
 
-  const handleOrganizationSelect = useCallback(() => {
-    setSelectedMarkers(prev => ({
-      ...prev,
-      [markerTypes.ORGANIZATIONS]: true
-    }));
-  }, []);
-
   const handleUpdateHeat = useCallback(newHeat => {
     setSelectedHeat(newHeat);
     if (zoomState.current === ZOOM_STATE.HEAT) {
@@ -164,7 +157,7 @@ const HydratedMap = ({
   return (
     <>
       {HexGlobalCss}
-      <GeocodingControl onOrganizationSelect={handleOrganizationSelect} />
+      <GeocodingControl />
       <DataControl
         updateHeatmap={handleUpdateHeat}
         selectedMarkers={selectedMarkers}
