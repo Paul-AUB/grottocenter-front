@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import LayersClearIcon from '@mui/icons-material/LayersClear';
 import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
 
@@ -52,7 +53,11 @@ const OptionLabel = styled('label')`
 const CaveSizeDot = ({ caveSize }) => {
   const { radius, fillColor, color, weight } = CAVE_SIZE_STYLE[caveSize];
   return (
-    <svg width="20" height="20" viewBox="0 0 32 32" style={{ flexShrink: 0 }}>
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 32 32"
+      style={{ flexShrink: 0, marginRight: 4 }}>
       <circle
         cx="16"
         cy="16"
@@ -67,6 +72,38 @@ const CaveSizeDot = ({ caveSize }) => {
 
 CaveSizeDot.propTypes = {
   caveSize: PropTypes.string.isRequired
+};
+
+const MARKER_ICON = {
+  [heatmapTypes.ENTRANCES]: '/images/iconsV3/entry.svg',
+  [heatmapTypes.NETWORKS]: '/images/iconsV3/cave_system.svg',
+  [markerTypes.ORGANIZATIONS]: '/images/club.svg'
+};
+
+const MarkerIcon = ({ type }) => {
+  const src = MARKER_ICON[type];
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt=""
+        height="22"
+        style={{ flexShrink: 0, marginRight: 4 }}
+      />
+    );
+  }
+  if (type === heatmapTypes.NONE) {
+    return (
+      <LayersClearIcon
+        sx={{ fontSize: 20, flexShrink: 0, mr: '4px', color: '#777' }}
+      />
+    );
+  }
+  return null;
+};
+
+MarkerIcon.propTypes = {
+  type: PropTypes.string.isRequired
 };
 
 const DataControl = ({
@@ -162,6 +199,7 @@ const DataControl = ({
                   checked={selectedHeat === type}
                   onChange={() => handleHeatChange(type)}
                 />
+                <MarkerIcon type={type} />
                 <span>{formatMessage({ id: type })}</span>
               </OptionLabel>
             ))}
@@ -176,6 +214,7 @@ const DataControl = ({
                 checked={selectedMarkers[markerTypes.ORGANIZATIONS]}
                 onChange={() => handleMarkerChange(markerTypes.ORGANIZATIONS)}
               />
+              <MarkerIcon type={markerTypes.ORGANIZATIONS} />
               <span>{formatMessage({ id: markerTypes.ORGANIZATIONS })}</span>
             </OptionLabel>
             {entranceFilters.map(filter => (
