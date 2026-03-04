@@ -1,12 +1,10 @@
-import React, { useEffect, useRef, Suspense } from 'react';
+import React, { useEffect, useRef, Suspense, useState } from 'react';
 import { includes } from 'ramda';
 import { useNavigate, generatePath, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PageLoader from '../components/common/PageLoader';
 
 import {
-  changeLocation,
-  changeZoom,
   fetchNetworks,
   fetchAllNetworksCoordinates,
   fetchOrganizations,
@@ -42,8 +40,8 @@ const Map = () => {
   const params = useParams();
   const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
-  const location = useSelector(state => state.map.location);
-  const zoom = useSelector(state => state.map.zoom);
+  const [location, setLocation] = useState(defaultCoord);
+  const [zoom, setZoom] = useState(defaultZoom);
   const networks = useSelector(state => state.map.networks);
   const networksCoordinates = useSelector(
     state => state.map.networksCoordinates
@@ -114,13 +112,13 @@ const Map = () => {
   useEffect(() => {
     const target = decodeMapTarget(initialTargetRef.current);
     if (target) {
-      dispatch(changeLocation({ lat: target.lat, lng: target.lng }));
-      dispatch(changeZoom(target.zoom));
+      setLocation({ lat: target.lat, lng: target.lng });
+      setZoom(target.zoom);
     } else {
-      dispatch(changeLocation(geoLocation));
-      dispatch(changeZoom(defaultZoom));
+      setLocation(geoLocation);
+      setZoom(defaultZoom);
     }
-  }, [dispatch, geoLocation]);
+  }, [geoLocation]);
 
   useEffect(() => {
     const target = decodeMapTarget(params.target);
