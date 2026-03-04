@@ -63,7 +63,11 @@ const useMarkers = ({
 
       let markerEl;
       if (circleMarkerStyle) {
-        markerEl = L.circleMarker([latitude, longitude], circleMarkerStyle);
+        const style =
+          typeof circleMarkerStyle === 'function'
+            ? circleMarkerStyle(marker)
+            : circleMarkerStyle;
+        markerEl = L.circleMarker([latitude, longitude], style);
       } else {
         markerEl = L.marker([latitude, longitude], { icon });
       }

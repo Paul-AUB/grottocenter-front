@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
-import { brown } from '@mui/material/colors';
-
 import { heatmapTypes } from './DataControl';
 import useMarkers, { MarkerGlobalCss } from '../common/Markers/useMarkers';
+import { getEntranceCircleStyle } from './constants';
 import {
   OrganizationMarker,
   OrganizationPopup,
@@ -22,14 +21,6 @@ const isEntrances = includes(markerTypes.ENTRANCES);
 const isNetworks = includes(markerTypes.NETWORKS);
 const isOrganizations = includes(markerTypes.ORGANIZATIONS);
 
-const ENTRANCE_CIRCLE_STYLE = {
-  radius: 10,
-  color: brown[900],
-  weight: 1,
-  fillColor: brown[700],
-  fillOpacity: 0.85
-};
-
 const entrancePopup = entrance => <EntrancePopup entrance={entrance} />;
 const entranceTip = entrance => entrance?.name;
 const networkPopup = network => <NetworkPopup network={network} />;
@@ -46,7 +37,7 @@ const Markers = ({
   networks = []
 }) => {
   const updateEntranceMarkers = useMarkers({
-    circleMarkerStyle: ENTRANCE_CIRCLE_STYLE,
+    circleMarkerStyle: getEntranceCircleStyle,
     popupContent: entrancePopup,
     tooltipContent: entranceTip
   });

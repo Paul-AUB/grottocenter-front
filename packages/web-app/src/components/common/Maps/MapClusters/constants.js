@@ -1,5 +1,49 @@
 import { blue, brown } from '@mui/material/colors';
 
+export const CAVE_SIZE = {
+  SMALL: 'small',
+  MEDIUM: 'medium',
+  LARGE: 'large'
+};
+
+// Circle marker styles per cave size category (radius in px, colors from brown palette).
+const CAVE_SIZE_STYLE = {
+  [CAVE_SIZE.SMALL]: {
+    radius: 6,
+    color: brown[700],
+    weight: 1,
+    fillColor: brown[400],
+    fillOpacity: 0.85
+  },
+  [CAVE_SIZE.MEDIUM]: {
+    radius: 10,
+    color: brown[900],
+    weight: 1,
+    fillColor: brown[700],
+    fillOpacity: 0.85
+  },
+  [CAVE_SIZE.LARGE]: {
+    radius: 14,
+    color: brown[900],
+    weight: 1,
+    fillColor: brown[900],
+    fillOpacity: 0.85
+  }
+};
+
+export const getCaveSize = entrance => {
+  const depth = entrance.depth ?? 0;
+  const length = entrance.length ?? 0;
+  // Define thresholds for cave size categories based on depth and length.
+  if (depth > 100 || length > 1000) return CAVE_SIZE.LARGE;
+  if ((depth >= 20 && depth <= 100) || (length >= 50 && length <= 200))
+    return CAVE_SIZE.MEDIUM;
+  return CAVE_SIZE.SMALL;
+};
+
+export const getEntranceCircleStyle = entrance =>
+  CAVE_SIZE_STYLE[getCaveSize(entrance)];
+
 export const MARKERS_LIMIT = 13;
 
 // Related to Heat map
