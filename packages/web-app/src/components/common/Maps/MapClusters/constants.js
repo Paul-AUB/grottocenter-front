@@ -35,9 +35,8 @@ export const getCaveSize = entrance => {
   const depth = entrance.depth ?? 0;
   const length = entrance.length ?? 0;
   // Define thresholds for cave size categories based on depth and length.
-  if (depth > 100 || length > 1000) return CAVE_SIZE.LARGE;
-  if ((depth >= 20 && depth <= 100) || (length >= 50 && length <= 200))
-    return CAVE_SIZE.MEDIUM;
+  if (depth >= 100 || length >= 1000) return CAVE_SIZE.LARGE;
+  if (depth >= 20 || length >= 50) return CAVE_SIZE.MEDIUM;
   return CAVE_SIZE.SMALL;
 };
 
