@@ -42,29 +42,26 @@ const Map = () => {
   const params = useParams();
   const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
-  const {
-    location,
-    zoom,
-    // TODO handle loading
-    // eslint-disable-next-line no-unused-vars
-    loadings,
-    networks,
-    networksCoordinates,
-    organizations,
-    entrances,
-    entrancesCoordinates
-  } = useSelector(state => state.map);
+  const location = useSelector(state => state.map.location);
+  const zoom = useSelector(state => state.map.zoom);
+  const networks = useSelector(state => state.map.networks);
+  const networksCoordinates = useSelector(
+    state => state.map.networksCoordinates
+  );
+  const organizations = useSelector(state => state.map.organizations);
+  const entrances = useSelector(state => state.map.entrances);
+  const entrancesCoordinates = useSelector(
+    state => state.map.entrancesCoordinates
+  );
   const { open } = useSelector(state => state.sideMenu);
   const { projections } = useSelector(state => state.projections);
 
-  const handleUpdate = ({ heat, markers, zoom: newZoom, center, bounds }) => {
-    const newPath = generatePath('/ui/map/:target', {
-      target: encodeMapTarget(center, newZoom)
-    });
-    navigate(newPath, { replace: true });
-    dispatch(changeLocation(center));
-    dispatch(changeZoom(newZoom));
+  // urlDebounceRef: update the URL only once the user has truly settled,
+  // avoiding lagging due to URL updates.
+  // Leaflet always handles the visual movement immediately on its own.
+  const urlDebounceRef = useRef(null);
 
+  const handleUpdate = ({ heat, markers, zoom: newZoom, center, bounds }) => {
     const criteria = {
       /* eslint-disable no-underscore-dangle */
       sw_lat: bounds._southWest.wrap().lat,
@@ -89,7 +86,25 @@ const Map = () => {
     if (heat === 'entrances') {
       dispatch(fetchEntrancesCoordinates(criteria));
     }
+
+    // Update the shareable URL after the user has settled
+    if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
+    urlDebounceRef.current = setTimeout(() => {
+      urlDebounceRef.current = null;
+      navigate(
+        generatePath('/ui/map/:target', {
+          target: encodeMapTarget(center, newZoom)
+        }),
+        { replace: true }
+      );
+    }, 1000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     dispatch(fetchProjections());
@@ -113,8 +128,11 @@ const Map = () => {
 
   useEffect(() => {
     const target = decodeMapTarget(params.target);
-    const isDefaultTarget = target?.lat === defaultCoord.lat && target?.lng === defaultCoord.lng && target?.zoom === defaultZoom;
-    
+    const isDefaultTarget =
+      target?.lat === defaultCoord.lat &&
+      target?.lng === defaultCoord.lng &&
+      target?.zoom === defaultZoom;
+
     if (hasLocation && (!params.target || isDefaultTarget) && mapRef.current) {
       mapRef.current.setView([geoLocation.lat, geoLocation.lng], focusZoom);
     }
