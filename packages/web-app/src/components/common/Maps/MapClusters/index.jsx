@@ -54,13 +54,12 @@ const HydratedMap = ({
 
   const handleUpdate = useCallback(() => {
     onUpdateRef.current({
-      heat: visibleHeat === 'none' ? null : visibleHeat,
       markers: visibleMarkers,
       zoom: map.getZoom(),
       center: map.getCenter(),
       bounds: map.getBounds()
     });
-  }, [visibleHeat, visibleMarkers, map]);
+  }, [visibleMarkers, map]);
 
   useEffect(() => {
     if (zoomState.current === ZOOM_STATE.MARKERS) {
@@ -131,8 +130,8 @@ const HydratedMap = ({
   useMapEvent('moveend', handleUpdate);
 
   // Called when visibility changes (zoom threshold crossing or DataControl change).
-  // handleUpdate is stable as long as visibleHeat/visibleMarkers don't change,
-  // so this effect only re-runs when the data to fetch actually changes.
+  // handleUpdate is stable as long as visibleMarkers doesn't change,
+  // so this effect only re-runs when the markers to fetch actually change.
   useEffect(() => {
     handleUpdate();
   }, [handleUpdate]);

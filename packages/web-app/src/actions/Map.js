@@ -39,51 +39,52 @@ export const LOADINGS = {
   ORGANIZATIONS: 'organizations'
 };
 
-export const fetchNetworksCoordinates = criteria => {
-  const thunkToDebounce = function (dispatch) {
-    dispatch({
-      type: FETCH_MAP_START_LOADING,
-      key: LOADINGS.NETWORKS_COORDINATES
-    });
-    const completedUrl = makeUrl(getMapCavesCoordinatesUrl, criteria);
-    return fetch(completedUrl)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => {
-        dispatch({
-          type: FETCH_MAP_NETWORKS_COORDINATES_SUCCESS,
-          data: JSON.parse(text)
-        });
-      })
-      .catch(error => {
-        dispatch({
-          type: FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
-          error: makeErrorMessage(
-            error.message,
-            `Fetching networks coordinates`
-          )
-        });
-      })
-      .finally(() => {
-        dispatch({
-          type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.NETWORKS_COORDINATES
-        });
+// Heatmap coordinates are fetched once at startup with world-wide bounds rather than
+// on every moveend. The @asymmetrik/leaflet-d3 hexbin layer filters points client-side,
+// so it only renders hexagons visible in the current viewport regardless of dataset size.
+//
+// Benchmark (2025): ~130k entrances → ~2.6 MB uncompressed, ~700 KB gzipped.
+// One-time cost on page load vs. a bounded API call on every pan/zoom
+const MAX_BOUNDS = {
+  sw_lat: -90,
+  sw_lng: -180,
+  ne_lat: 90,
+  ne_lng: 180
+};
+
+export const fetchAllNetworksCoordinates = () => dispatch => {
+  dispatch({
+    type: FETCH_MAP_START_LOADING,
+    key: LOADINGS.NETWORKS_COORDINATES
+  });
+  return fetch(makeUrl(getMapCavesCoordinatesUrl, MAX_BOUNDS))
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.text();
+    })
+    .then(text => {
+      dispatch({
+        type: FETCH_MAP_NETWORKS_COORDINATES_SUCCESS,
+        data: JSON.parse(text)
       });
-  };
-
-  thunkToDebounce.meta = {
-    debounce: {
-      time: 500,
-      key: 'FETCH_MAP_NETWORKS_COORDINATES'
-    }
-  };
-
-  return thunkToDebounce;
+    })
+    .catch(error => {
+      dispatch({
+        type: FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
+        error: makeErrorMessage(
+          error.message,
+          `Fetching all networks coordinates`
+        )
+      });
+    })
+    .finally(() => {
+      dispatch({
+        type: FETCH_MAP_END_LOADING,
+        key: LOADINGS.NETWORKS_COORDINATES
+      });
+    });
 };
 
 export const fetchNetworks = criteria => {
@@ -124,51 +125,39 @@ export const fetchNetworks = criteria => {
   return thunkToDebounce;
 };
 
-export const fetchEntrancesCoordinates = criteria => {
-  const thunkToDebounce = function (dispatch) {
-    dispatch({
-      type: FETCH_MAP_START_LOADING,
-      key: LOADINGS.ENTRANCES_COORDINATES
-    });
-    const completedUrl = makeUrl(getMapEntrancesCoordinatesUrl, criteria);
-    return fetch(completedUrl)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => {
-        dispatch({
-          type: FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
-          data: JSON.parse(text)
-        });
-      })
-      .catch(error => {
-        dispatch({
-          type: FETCH_MAP_ENTRANCES_COORDINATES_FAILURE,
-          error: makeErrorMessage(
-            error.message,
-            `Fetching entrances coordinates`
-          )
-        });
-      })
-      .finally(() => {
-        dispatch({
-          type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.ENTRANCES_COORDINATES
-        });
+export const fetchAllEntrancesCoordinates = () => dispatch => {
+  dispatch({
+    type: FETCH_MAP_START_LOADING,
+    key: LOADINGS.ENTRANCES_COORDINATES
+  });
+  return fetch(makeUrl(getMapEntrancesCoordinatesUrl, MAX_BOUNDS))
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.text();
+    })
+    .then(text => {
+      dispatch({
+        type: FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
+        data: JSON.parse(text)
       });
-  };
-
-  thunkToDebounce.meta = {
-    debounce: {
-      time: 500,
-      key: 'FETCH_MAP_ENTRANCES'
-    }
-  };
-
-  return thunkToDebounce;
+    })
+    .catch(error => {
+      dispatch({
+        type: FETCH_MAP_ENTRANCES_COORDINATES_FAILURE,
+        error: makeErrorMessage(
+          error.message,
+          `Fetching all entrances coordinates`
+        )
+      });
+    })
+    .finally(() => {
+      dispatch({
+        type: FETCH_MAP_END_LOADING,
+        key: LOADINGS.ENTRANCES_COORDINATES
+      });
+    });
 };
 
 export const fetchEntrances = criteria => {

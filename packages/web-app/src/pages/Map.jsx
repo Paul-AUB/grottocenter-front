@@ -8,10 +8,10 @@ import {
   changeLocation,
   changeZoom,
   fetchNetworks,
-  fetchNetworksCoordinates,
+  fetchAllNetworksCoordinates,
   fetchOrganizations,
   fetchEntrances,
-  fetchEntrancesCoordinates
+  fetchAllEntrancesCoordinates
 } from '../actions/Map';
 import { fetchProjections } from '../actions/Projections';
 import useGeolocation from '../hooks/useGeolocation';
@@ -61,7 +61,7 @@ const Map = () => {
   // Leaflet always handles the visual movement immediately on its own.
   const urlDebounceRef = useRef(null);
 
-  const handleUpdate = ({ heat, markers, zoom: newZoom, center, bounds }) => {
+  const handleUpdate = ({ markers, zoom: newZoom, center, bounds }) => {
     const criteria = {
       /* eslint-disable no-underscore-dangle */
       sw_lat: bounds._southWest.wrap().lat,
@@ -79,12 +79,6 @@ const Map = () => {
     }
     if (includes('entrances', markers)) {
       dispatch(fetchEntrances(criteria));
-    }
-    if (heat === 'networks') {
-      dispatch(fetchNetworksCoordinates(criteria));
-    }
-    if (heat === 'entrances') {
-      dispatch(fetchEntrancesCoordinates(criteria));
     }
 
     // Update the shareable URL after the user has settled
@@ -108,6 +102,8 @@ const Map = () => {
 
   useEffect(() => {
     dispatch(fetchProjections());
+    dispatch(fetchAllEntrancesCoordinates());
+    dispatch(fetchAllNetworksCoordinates());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
