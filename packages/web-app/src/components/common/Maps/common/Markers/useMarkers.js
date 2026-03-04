@@ -96,7 +96,8 @@ const useMarkers = ({
         return;
       }
 
-      const newIds = new Set(newMarkers.map(m => m.id));
+      const newIds = new Set();
+      for (const m of newMarkers) newIds.add(m.id);
 
       // Remove markers no longer present
       for (const [id, leafletMarker] of currentMap) {
@@ -107,13 +108,13 @@ const useMarkers = ({
       }
 
       // Add markers that are new
-      const addedMarkers = [];
+      let addedCount = 0;
       for (const marker of newMarkers) {
         if (!currentMap.has(marker.id)) {
           const leafletMarker = createLeafletMarker(marker);
           leafletMarker.addTo(map);
           currentMap.set(marker.id, leafletMarker);
-          addedMarkers.push(leafletMarker);
+          addedCount += 1;
         }
       }
 
@@ -121,7 +122,7 @@ const useMarkers = ({
       if (
         shouldFitMapBound &&
         currentMap.size > 0 &&
-        addedMarkers.length === currentMap.size
+        addedCount === currentMap.size
       ) {
         map.fitBounds(
           Array.from(currentMap.values()).map(m => m.getLatLng()),

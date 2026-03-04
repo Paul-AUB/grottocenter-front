@@ -107,7 +107,7 @@ const CustomMapContainer = ({
 
     let resizeTimer = null;
     const observer = new ResizeObserver(() => {
-      if (resizeTimer) return;
+      clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         resizeTimer = null;
         try {
