@@ -37,11 +37,13 @@ const HydratedMap = ({
         .map(([k]) => k),
     [selectedMarkers]
   );
-  const [visibleHeat, setVisibleHeat] = useState(selectedHeat);
-  const [visibleMarkers, setVisibleMarkers] = useState([]);
   const map = useMap();
-  const zoomState = useRef(ZOOM_STATE.HEAT);
-  const prevZoom = useRef(map.getZoom());
+  const initialZoom = map.getZoom();
+  const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
+  const [visibleHeat, setVisibleHeat] = useState(isInitiallyZoomedIn ? heatmapTypes.NONE : selectedHeat);
+  const [visibleMarkers, setVisibleMarkers] = useState(isInitiallyZoomedIn ? [selectedHeat] : []);
+  const zoomState = useRef(isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.HEAT);
+  const prevZoom = useRef(initialZoom);
   // Refs to avoid stale closures in event handlers (zoomend, handleUpdateHeat)
   const selectedHeatRef = useRef(selectedHeat);
   selectedHeatRef.current = selectedHeat;
