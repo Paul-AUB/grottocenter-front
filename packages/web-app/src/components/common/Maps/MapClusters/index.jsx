@@ -23,7 +23,6 @@ const HydratedMap = ({
   networkMarkers = [],
   organizations,
   projectionsList,
-  zoom,
   onUpdate
 }) => {
   const { updateHeatData } = useHeatLayer(entrances);
@@ -42,7 +41,7 @@ const HydratedMap = ({
   const [visibleMarkers, setVisibleMarkers] = useState([]);
   const map = useMap();
   const zoomState = useRef(ZOOM_STATE.HEAT);
-  const prevZoom = useRef(zoom);
+  const prevZoom = useRef(map.getZoom());
   // Refs to avoid stale closures in event handlers (zoomend, handleUpdateHeat)
   const selectedHeatRef = useRef(selectedHeat);
   selectedHeatRef.current = selectedHeat;
@@ -181,7 +180,7 @@ const Index = ({ center, zoom, isSideMenuOpen, mapRef, ...props }) => (
     isSideMenuOpen={isSideMenuOpen}
     isLocateControl
     mapRef={mapRef}>
-    <HydratedMap {...props} zoom={zoom} />
+    <HydratedMap {...props} />
   </CustomMapContainer>
 );
 
@@ -199,13 +198,13 @@ HydratedMap.propTypes = {
   networkMarkers: PropTypes.arrayOf(markerType),
   organizations: PropTypes.arrayOf(markerType),
   projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
-  zoom: PropTypes.number.isRequired,
   onUpdate: PropTypes.func
 };
 
 Index.propTypes = {
   isSideMenuOpen: PropTypes.bool,
   center: PropTypes.arrayOf(PropTypes.number),
+  zoom: PropTypes.number,
   mapRef: PropTypes.shape({ current: PropTypes.any }),
   ...HydratedMap.propTypes
 };
