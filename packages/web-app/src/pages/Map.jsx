@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, Suspense, useState } from 'react';
+import React, { useCallback, useEffect, useRef, Suspense, useState } from 'react';
 import { includes } from 'ramda';
 import { useNavigate, generatePath, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -59,7 +59,7 @@ const Map = () => {
   // Leaflet always handles the visual movement immediately on its own.
   const urlDebounceRef = useRef(null);
 
-  const handleUpdate = ({ markers, zoom: newZoom, center, bounds }) => {
+  const handleUpdate = useCallback(({ markers, zoom: newZoom, center, bounds }) => {
     const criteria = {
       /* eslint-disable no-underscore-dangle */
       sw_lat: bounds._southWest.wrap().lat,
@@ -90,7 +90,7 @@ const Map = () => {
         { replace: true }
       );
     }, 1000);
-  };
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     return () => {
