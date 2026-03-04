@@ -30,6 +30,15 @@ const ENTRANCE_CIRCLE_STYLE = {
   fillOpacity: 0.85
 };
 
+const entrancePopup = entrance => <EntrancePopup entrance={entrance} />;
+const entranceTip = entrance => entrance?.name;
+const networkPopup = network => <NetworkPopup network={network} />;
+const networkTip = network => network?.name;
+const organizationPopup = organization => (
+  <OrganizationPopup organization={organization} />
+);
+const organizationTip = organization => organization?.name;
+
 const Markers = ({
   visibleMarkers,
   organizations = [],
@@ -38,48 +47,33 @@ const Markers = ({
 }) => {
   const updateEntranceMarkers = useMarkers({
     circleMarkerStyle: ENTRANCE_CIRCLE_STYLE,
-    popupContent: entrance => <EntrancePopup entrance={entrance} />,
-    tooltipContent: entrance => entrance?.name
+    popupContent: entrancePopup,
+    tooltipContent: entranceTip
   });
   const updateNetworkMarkers = useMarkers({
     icon: NetworkMarker,
-    popupContent: network => <NetworkPopup network={network} />,
-    tooltipContent: network => network?.name
+    popupContent: networkPopup,
+    tooltipContent: networkTip
   });
   const updateOrganizationMarkers = useMarkers({
     icon: OrganizationMarker,
-    popupContent: organization => (
-      <OrganizationPopup organization={organization} />
-    ),
-    tooltipContent: organization => organization?.name
+    popupContent: organizationPopup,
+    tooltipContent: organizationTip
   });
 
   useEffect(() => {
-    if (isEntrances(visibleMarkers)) {
-      updateEntranceMarkers(entrances);
-    } else {
-      updateEntranceMarkers(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entrances, visibleMarkers]);
+    updateEntranceMarkers(isEntrances(visibleMarkers) ? entrances : null);
+  }, [entrances, visibleMarkers, updateEntranceMarkers]);
 
   useEffect(() => {
-    if (isNetworks(visibleMarkers)) {
-      updateNetworkMarkers(networks);
-    } else {
-      updateNetworkMarkers(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [networks, visibleMarkers]);
+    updateNetworkMarkers(isNetworks(visibleMarkers) ? networks : null);
+  }, [networks, visibleMarkers, updateNetworkMarkers]);
 
   useEffect(() => {
-    if (isOrganizations(visibleMarkers)) {
-      updateOrganizationMarkers(organizations);
-    } else {
-      updateOrganizationMarkers(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizations, visibleMarkers]);
+    updateOrganizationMarkers(
+      isOrganizations(visibleMarkers) ? organizations : null
+    );
+  }, [organizations, visibleMarkers, updateOrganizationMarkers]);
 
   return MarkerGlobalCss;
 };

@@ -105,8 +105,11 @@ const CustomMapContainer = ({
       observerRef.current.disconnect();
     }
 
+    let resizeTimer = null;
     const observer = new ResizeObserver(() => {
-      setTimeout(() => {
+      if (resizeTimer) return;
+      resizeTimer = setTimeout(() => {
+        resizeTimer = null;
         try {
           map.invalidateSize(true);
         } catch (e) {
@@ -120,12 +123,11 @@ const CustomMapContainer = ({
     map.on('baselayerchange', baseLayerChange);
   }, []);
 
-  // Disconnect observer on unmount
+  // Disconnect observer and remove listeners on unmount
   useEffect(() => {
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      observerRef.current?.disconnect();
+      mapInstanceRef.current?.off('baselayerchange', baseLayerChange);
     };
   }, []);
 
