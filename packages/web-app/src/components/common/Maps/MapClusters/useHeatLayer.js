@@ -56,6 +56,7 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
   const isDraggingRef = useRef(false);
   // Pending requestAnimationFrame id - coalesces rapid .data() calls into one frame.
   const rafRef = useRef(null);
+  const dragEndTimerRef = useRef(null);
   // Skip colorRange + hoverHandler re-registration when the type hasn't changed.
   const lastTypeRef = useRef(null);
 
@@ -130,7 +131,8 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
   useMapEvent('dragend', () => {
     // Defer reset past the click event that may fire synchronously on the
     // mouseup/touchend that ends the drag, preventing a spurious flyTo.
-    setTimeout(() => {
+    dragEndTimerRef.current = setTimeout(() => {
+      dragEndTimerRef.current = null;
       isDraggingRef.current = false;
     }, 0);
   });
@@ -153,6 +155,7 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     setHexLayer(L.hexbinLayer(HEX_LAYER_OPTIONS).addTo(map));
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (dragEndTimerRef.current) clearTimeout(dragEndTimerRef.current);
       // Remove tooltip
       d3.selectAll('.hexbin-tooltip').remove();
     };
