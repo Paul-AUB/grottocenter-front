@@ -412,7 +412,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
           let secondary;
 
           if (result.resultType === 'entrance') {
-            icon = <CustomIcon type="entry" size={28} />;
+            icon = <CustomIcon type="entrance" size={28} />;
             primary = result.name;
             secondary = [
               [result.city, result.region].filter(Boolean).join(', '),
@@ -428,11 +428,11 @@ const GeocodingControl = ({ onLocationSelect }) => {
               .filter(Boolean)
               .join(' • ');
           } else if (result.resultType === 'network') {
-            icon = <CustomIcon type="cave_system" size={28} />;
+            icon = <CustomIcon type="network" size={28} />;
             primary = result.name;
             secondary = formatMessage({ id: 'Network' });
           } else if (result.resultType === 'organization') {
-            icon = <CustomIcon type="club" size={28} />;
+            icon = <CustomIcon type="organization" size={28} />;
             primary = result.name;
             secondary = formatMessage({ id: 'Organization' });
           } else {

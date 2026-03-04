@@ -8,6 +8,11 @@ import { useFullScreen } from 'react-browser-hooks';
 
 import CustomControl, { customControlProps } from '../common/CustomControl';
 import { CAVE_SIZE_STYLE } from './constants';
+import {
+  entranceIcon,
+  networkIcon,
+  organizationIcon
+} from '../../../../assets/icons';
 
 export const heatmapTypes = {
   ENTRANCES: 'entrances',
@@ -75,9 +80,9 @@ CaveSizeDot.propTypes = {
 };
 
 const MARKER_ICON = {
-  [heatmapTypes.ENTRANCES]: '/images/iconsV3/entry.svg',
-  [heatmapTypes.NETWORKS]: '/images/iconsV3/cave_system.svg',
-  [markerTypes.ORGANIZATIONS]: '/images/club.svg'
+  [heatmapTypes.ENTRANCES]: entranceIcon,
+  [heatmapTypes.NETWORKS]: networkIcon,
+  [markerTypes.ORGANIZATIONS]: organizationIcon
 };
 
 const MarkerIcon = ({ type }) => {
