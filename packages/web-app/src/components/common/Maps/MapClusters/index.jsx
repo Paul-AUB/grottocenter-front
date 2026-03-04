@@ -38,7 +38,7 @@ const HydratedMap = ({
     [selectedMarkers]
   );
   const map = useMap();
-  const initialZoom = map.getZoom();
+  const initialZoom = useRef(map.getZoom()).current;
   const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
   const [visibleHeat, setVisibleHeat] = useState(isInitiallyZoomedIn ? heatmapTypes.NONE : selectedHeat);
   const [visibleMarkers, setVisibleMarkers] = useState(isInitiallyZoomedIn ? [selectedHeat] : []);
