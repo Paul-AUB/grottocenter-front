@@ -9,8 +9,8 @@ import {
 import makeErrorMessage from '../helpers/makeErrorMessage';
 import { makeUrl } from './utils';
 
-export const FETCH_MAP_START_LOADING = 'FETCH_MAP_LOADING';
-export const FETCH_MAP_END_LOADING = 'FETCH_MAP_LOADING';
+export const FETCH_MAP_START_LOADING = 'FETCH_MAP_START_LOADING';
+export const FETCH_MAP_END_LOADING = 'FETCH_MAP_END_LOADING';
 export const FETCH_MAP_NETWORKS_SUCCESS = 'FETCH_MAP_NETWORKS_SUCCESS';
 export const FETCH_MAP_NETWORKS_FAILURE = 'FETCH_MAP_NETWORKS_FAILURE';
 export const FETCH_MAP_NETWORKS_COORDINATES_SUCCESS =
