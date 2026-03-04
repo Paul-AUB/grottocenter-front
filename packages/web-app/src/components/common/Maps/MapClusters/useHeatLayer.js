@@ -25,6 +25,9 @@ import {
 export const HexGlobalCss = (
   <GlobalStyles
     styles="
+& .hexbin-grid {
+  cursor: pointer;
+}
 & .hexbin-hexagon {
   stroke: #000;
   stroke-width: .5px;
@@ -50,7 +53,7 @@ export const HexGlobalCss = (
 const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
   const { formatMessage } = useIntl();
   const [hexLayer, setHexLayer] = useState();
-  const lastMoveEndTs = useRef(0);
+  const isDraggingRef = useRef(false);
   // Pending requestAnimationFrame id - coalesces rapid .data() calls into one frame.
   const rafRef = useRef(null);
   // Skip colorRange + hoverHandler re-registration when the type hasn't changed.
@@ -120,13 +123,20 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     [hexLayer]
   );
 
-  useMapEvent('moveend', () => {
-    lastMoveEndTs.current = Date.now();
+  useMapEvent('dragstart', () => {
+    isDraggingRef.current = true;
+  });
+
+  useMapEvent('dragend', () => {
+    // Defer reset past the click event that may fire synchronously on the
+    // mouseup/touchend that ends the drag, preventing a spurious flyTo.
+    setTimeout(() => {
+      isDraggingRef.current = false;
+    }, 0);
   });
 
   const flyToHex = (_, hexPoints) => {
-    const timeSinceMapMoveMs = Date.now() - lastMoveEndTs.current;
-    if (timeSinceMapMoveMs < 20) return; // Prevent drag click
+    if (isDraggingRef.current) return;
 
     d3.selectAll('.hexbin-tooltip').attr('opacity', 0);
     const bounds = new L.LatLngBounds(
