@@ -51,6 +51,10 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
   const { formatMessage } = useIntl();
   const [hexLayer, setHexLayer] = useState();
   const lastMoveEndTs = useRef(0);
+  // Pending requestAnimationFrame id - coalesces rapid .data() calls into one frame.
+  const rafRef = useRef(null);
+  // Skip colorRange + hoverHandler re-registration when the type hasn't changed.
+  const lastTypeRef = useRef(null);
 
   // On zoom lvl, hex opacity and size can change
   const map = useMapEvent('zoomend', () => {
@@ -69,12 +73,21 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     }
   });
 
+  // Reset type cache when the hexLayer is (re)initialized.
+  useEffect(() => {
+    lastTypeRef.current = null;
+  }, [hexLayer]);
+
   const updateHeatData = useCallback(
     (newData, newType = type) => {
-      if (!isNil(hexLayer)) {
-        // Remove previous tooltip (avoid some bug)
-        d3.selectAll('.hexbin-tooltip').remove();
+      if (isNil(hexLayer)) return;
 
+      // Remove previous tooltip (avoid some bug)
+      d3.selectAll('.hexbin-tooltip').remove();
+
+      // colorRange and hoverHandler only need updating when the type switches.
+      // Skipping the D3 event re-registration on every pan saves work.
+      if (newType !== lastTypeRef.current) {
         hexLayer
           .colorRange(
             newType === heatmapTypes.NETWORKS
@@ -91,9 +104,17 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
                 })
               ]
             })
-          )
-          .data(newData);
+          );
+        lastTypeRef.current = newType;
       }
+
+      // Coalesce rapid calls into a single frame - cancels any pending RAF
+      // so only the latest data update is rendered, without blocking the current frame.
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        hexLayer.data(newData);
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [hexLayer]
@@ -121,6 +142,7 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     // Add hex layer to the map
     setHexLayer(L.hexbinLayer(HEX_LAYER_OPTIONS).addTo(map));
     return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
       // Remove tooltip
       d3.selectAll('.hexbin-tooltip').remove();
     };
