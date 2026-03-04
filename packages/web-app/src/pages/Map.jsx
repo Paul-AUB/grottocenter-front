@@ -96,8 +96,12 @@ const Map = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Capture the URL target present when the component first mounts.
+  // The initial position only needs to be set once; after that Leaflet owns its position.
+  const initialTargetRef = useRef(params.target);
+
   useEffect(() => {
-    const target = decodeMapTarget(params.target);
+    const target = decodeMapTarget(initialTargetRef.current);
     if (target) {
       dispatch(changeLocation({ lat: target.lat, lng: target.lng }));
       dispatch(changeZoom(target.zoom));
@@ -105,7 +109,7 @@ const Map = () => {
       dispatch(changeLocation(geoLocation));
       dispatch(changeZoom(defaultZoom));
     }
-  }, [dispatch, params.target, geoLocation]);
+  }, [dispatch, geoLocation]);
 
   useEffect(() => {
     const target = decodeMapTarget(params.target);
