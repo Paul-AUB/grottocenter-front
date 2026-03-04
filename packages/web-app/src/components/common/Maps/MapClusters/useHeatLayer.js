@@ -61,9 +61,10 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
 
   // On zoom lvl, hex opacity and size can change
   const map = useMapEvent('zoomend', () => {
-    // Always remove orphaned tooltips, the hex may disappear mid-hover
-    // leaving no mouseout to clean up the tooltip
-    d3.selectAll('.hexbin-tooltip').remove();
+    // Hide any visible tooltip - the hovered hex may disappear mid-zoom
+    // leaving no mouseout to clean it up. We hide rather than remove so the
+    // div stays alive in the hoverHandler's closure and can be reused on next hover.
+    d3.selectAll('.hexbin-tooltip').style('visibility', 'hidden');
 
     if (!isNil(hexLayer)) {
       if (map.getZoom() > HEX_DETAILS_ZOOM) {
@@ -85,12 +86,11 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     (newData, newType = type) => {
       if (isNil(hexLayer)) return;
 
-      // Remove previous tooltip (avoid some bug)
-      d3.selectAll('.hexbin-tooltip').remove();
-
       // colorRange and hoverHandler only need updating when the type switches.
       // Skipping the D3 event re-registration on every pan saves work.
       if (newType !== lastTypeRef.current) {
+        // Remove previous tooltip (avoid some bug)
+        d3.selectAll('.hexbin-tooltip').remove();
         hexLayer
           .colorRange(
             newType === heatmapTypes.NETWORKS
