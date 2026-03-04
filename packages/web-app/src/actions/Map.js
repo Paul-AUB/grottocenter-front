@@ -45,6 +45,25 @@ export const LOADINGS = {
 //
 // Benchmark (2025): ~130k entrances → ~2.6 MB uncompressed, ~700 KB gzipped.
 // One-time cost on page load vs. a bounded API call on every pan/zoom
+
+// Retries the fetch up to maxRetries times with exponential backoff (1 s, 2 s, 4 s…).
+// Rejects only after all attempts are exhausted.
+const fetchWithRetry = (url, maxRetries = 3) => {
+  const attempt = (retriesLeft, delay) =>
+    fetch(url)
+      .then(response => {
+        if (response.status >= 400) throw new Error(response.status);
+        return response.text();
+      })
+      .catch(error => {
+        if (retriesLeft === 0) throw error;
+        return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
+          attempt(retriesLeft - 1, delay * 2)
+        );
+      });
+  return attempt(maxRetries, 1000);
+};
+
 const MAX_BOUNDS = {
   sw_lat: -90,
   sw_lng: -180,
@@ -57,13 +76,7 @@ export const fetchAllNetworksCoordinates = () => dispatch => {
     type: FETCH_MAP_START_LOADING,
     key: LOADINGS.NETWORKS_COORDINATES
   });
-  return fetch(makeUrl(getMapCavesCoordinatesUrl, MAX_BOUNDS))
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
+  return fetchWithRetry(makeUrl(getMapCavesCoordinatesUrl, MAX_BOUNDS))
     .then(text => {
       dispatch({
         type: FETCH_MAP_NETWORKS_COORDINATES_SUCCESS,
@@ -130,13 +143,7 @@ export const fetchAllEntrancesCoordinates = () => dispatch => {
     type: FETCH_MAP_START_LOADING,
     key: LOADINGS.ENTRANCES_COORDINATES
   });
-  return fetch(makeUrl(getMapEntrancesCoordinatesUrl, MAX_BOUNDS))
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
+  return fetchWithRetry(makeUrl(getMapEntrancesCoordinatesUrl, MAX_BOUNDS))
     .then(text => {
       dispatch({
         type: FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
