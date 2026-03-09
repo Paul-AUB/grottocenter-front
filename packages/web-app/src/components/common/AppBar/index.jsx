@@ -45,7 +45,8 @@ const TitleWrapper = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
+  flex: 1;
 `;
 
 const LogoWrapper = styled('div')`
@@ -58,7 +59,7 @@ const LogoImage = styled('img')(
   padding-right: ${theme.spacing(2)};
   height: 30px;
   ${theme.breakpoints.down('sm')} {
-    height: 25px;
+    height: 28px;
   }
 `
 );
@@ -76,6 +77,12 @@ export const StyledLink = styled(Link)`
   text-decoration: inherit;
   cursor: pointer;
   display: flex;
+`;
+
+const ActionsWrapper = styled('div')`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing(1)};
 `;
 
 const AppBar = () => {
@@ -103,7 +110,7 @@ const AppBar = () => {
             edge="start"
             onClick={() => dispatch(toggleSideMenu())}
             size="large">
-            <MenuIcon />
+            <MenuIcon sx={{ fontSize: 32 }} />
           </IconButton>
           <TitleWrapper>
             <LogoWrapper>
@@ -125,14 +132,16 @@ const AppBar = () => {
               <LanguageSelector />
             </FadeWrapper>
           </Fade>
-          <NotificationMenu />
-          <UserMenu
-            authTokenExpirationDate={authTokenExpirationDate}
-            isAuth={permissions.isAuth}
-            onLoginClick={onLoginClick}
-            onLogoutClick={() => dispatch(postLogout())}
-            userNickname={authState?.authTokenDecoded?.nickname ?? null}
-          />
+          <ActionsWrapper>
+            <NotificationMenu />
+            <UserMenu
+              authTokenExpirationDate={authTokenExpirationDate}
+              isAuth={permissions.isAuth}
+              onLoginClick={onLoginClick}
+              onLogoutClick={() => dispatch(postLogout())}
+              userNickname={authState?.authTokenDecoded?.nickname ?? null}
+            />
+          </ActionsWrapper>
         </Toolbar>
       </StyledMuiAppBar>
       <Toolbar variant="dense" />

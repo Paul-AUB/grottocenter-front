@@ -10,6 +10,7 @@ import { pathOr } from 'ramda';
 
 import Translate from '../Translate';
 import { useUserProperties } from '../../../hooks';
+import UserAvatar from './UserAvatar';
 
 const UserMenu = ({
   authTokenExpirationDate,
@@ -64,7 +65,7 @@ const UserMenu = ({
         onClick={handleMenu}
         color="inherit"
         size="large">
-        <AccountCircle />
+        <UserAvatar username={userNickname} />
       </IconButton>
       <Menu
         id="menu-appbar"
