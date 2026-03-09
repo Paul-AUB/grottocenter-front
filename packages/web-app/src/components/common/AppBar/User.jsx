@@ -1,14 +1,28 @@
-import { Button, IconButton, Menu, MenuItem } from '@mui/material';
-import React from 'react';
+import {
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Box,
+  Typography,
+  Divider,
+  Alert,
+  ListItemIcon
+} from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 
 import Translate from '../Translate';
 import { useUserProperties } from '../../../hooks';
 import UserAvatar from './UserAvatar';
+
+// Constants
+const MENU_MIN_WIDTH = 250;
 
 const UserMenu = ({
   authTokenExpirationDate,
@@ -17,40 +31,43 @@ const UserMenu = ({
   onLoginClick,
   onLogoutClick
 }) => {
-  const { formatDate, formatMessage, formatTime } = useIntl();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const theme = useTheme();
-  const userId = pathOr(null, ['id'], useUserProperties());
+  const { formatMessage } = useIntl();
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
+  const userProperties = useUserProperties();
 
-  const handleMenu = event => {
+  const userId = pathOr(null, ['id'], userProperties);
+  const open = Boolean(anchorEl);
+
+  // Check if session has expired
+  const isSessionExpired = useMemo(
+    () => authTokenExpirationDate < Date.now(),
+    [authTokenExpirationDate]
+  );
+
+  const handleMenu = useCallback(event => {
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
   // Before using onLogoutClick(), we need to handle the menu closing
   // to detach the popover menu before the account icon/button changes.
-  const handleLogoutClick = () => {
+  const handleLogoutClick = useCallback(() => {
     handleClose();
     onLogoutClick();
-  };
+  }, [handleClose, onLogoutClick]);
 
-  // directs to the person page to see and modify the personnal data
-  const handleMyAccountClick = () => {
+  // Directs to the person page to see and modify the personal data
+  const handleMyAccountClick = useCallback(() => {
+    handleClose();
     navigate(`/ui/persons/${userId}`);
-  };
-
-  const isSessionExpired = authTokenExpirationDate < Date.now();
+  }, [handleClose, navigate, userId]);
 
   return !isAuth ? (
-    <Button
-      color="inherit"
-      onClick={onLoginClick}
-      variant="outlined">
+    <Button color="inherit" onClick={onLoginClick} variant="outlined">
       <Translate>Log in</Translate>
     </Button>
   ) : (
@@ -68,7 +85,7 @@ const UserMenu = ({
         id="menu-appbar"
         anchorEl={anchorEl}
         anchorOrigin={{
-          vertical: 'top',
+          vertical: 'bottom',
           horizontal: 'right'
         }}
         keepMounted
@@ -77,64 +94,63 @@ const UserMenu = ({
           horizontal: 'right'
         }}
         open={open}
-        onClose={handleClose}>
-        <MenuItem disabled>
-          {formatMessage(
-            {
-              id: 'Logged as {userNickname}',
-              defaultMessage: 'Logged as {userNickname}'
-            },
-            {
-              userNickname: (
-                <span key="nickname">
-                  &nbsp;
-                  <b>{userNickname}</b>
-                </span>
-              )
+        onClose={handleClose}
+        MenuListProps={{
+          sx: { py: 0 }
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              minWidth: MENU_MIN_WIDTH,
+              mt: 0.5
             }
-          )}
+          }
+        }}>
+        {/* Primary content: User info */}
+        <Box
+          sx={{
+            px: 2,
+            py: 2,
+            bgcolor: 'action.hover',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+          <Typography variant="body2" color="text.primary">
+            <Translate
+              id="Logged as {userNickname}"
+              values={{ userNickname: <strong>{userNickname}</strong> }}
+            />
+          </Typography>
+        </Box>
+
+        <Divider />
+
+        {/* Primary actions */}
+        <MenuItem onClick={handleMyAccountClick}>
+          <ListItemIcon>
+            <AccountCircleIcon />
+          </ListItemIcon>
+          <Translate>My Account</Translate>
         </MenuItem>
-        <MenuItem
-          divider
-          disabled
-          style={isSessionExpired ? { opacity: 1 } : {}}>
-          {isSessionExpired ? (
-            <span style={{ color: theme.palette.errorColor }}>
+
+        {/* Session expired warning */}
+        {isSessionExpired && (
+          <Box sx={{ px: 2, py: 1.5 }}>
+            <Alert severity="error">
               {formatMessage({
                 id: 'Your session has expired: please log in again.'
               })}
-            </span>
-          ) : (
-            <>
-              {formatMessage(
-                {
-                  id: 'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
-                  defaultMessage:
-                    'Expiration Date: {expirationDate} at {expirationHourAndMinutes}'
-                },
-                {
-                  expirationDate: (
-                    <span key="date">
-                      &nbsp;
-                      {formatDate(authTokenExpirationDate)}
-                      &nbsp;
-                    </span>
-                  ),
-                  expirationHourAndMinutes: (
-                    <span key="time">
-                      &nbsp;
-                      {formatTime(authTokenExpirationDate)}
-                    </span>
-                  )
-                }
-              )}
-            </>
-          )}
-        </MenuItem>
-        <MenuItem onClick={handleMyAccountClick}>
-          <Translate>My Account</Translate>
-        </MenuItem>
+            </Alert>
+          </Box>
+        )}
+
+        <Divider />
+
+        {/* Secondary actions */}
         <MenuItem onClick={handleLogoutClick}>
+          <ListItemIcon>
+            <LogoutIcon />
+          </ListItemIcon>
           <Translate>Log out</Translate>
         </MenuItem>
       </Menu>
