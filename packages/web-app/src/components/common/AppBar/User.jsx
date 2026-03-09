@@ -1,10 +1,8 @@
 import { Button, IconButton, Menu, MenuItem } from '@mui/material';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useTheme } from '@mui/material/styles';
-import { isMobileOnly } from 'react-device-detect';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 
@@ -52,9 +50,8 @@ const UserMenu = ({
     <Button
       color="inherit"
       onClick={onLoginClick}
-      startIcon={<AccountCircle />}
-      variant="text">
-      {!isMobileOnly && <Translate>Log in</Translate>}
+      variant="outlined">
+      <Translate>Log in</Translate>
     </Button>
   ) : (
     <>

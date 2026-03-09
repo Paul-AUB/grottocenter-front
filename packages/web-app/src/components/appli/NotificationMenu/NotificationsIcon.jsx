@@ -44,7 +44,7 @@ const NotificationsIcon = ({ onClick }) => {
         overlap="rectangular"
         color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
         badgeContent={getBadgeContent(nbNotifications, status)}>
-        <MuiNotificationsIcon sx={{ fontSize: 32 }} />
+        <MuiNotificationsIcon sx={{ fontSize: 28 }} />
       </Badge>
     </IconButton>
   );
