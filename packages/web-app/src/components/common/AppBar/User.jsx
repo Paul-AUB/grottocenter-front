@@ -98,7 +98,7 @@ const UserMenu = ({
         open={open}
         onClose={handleClose}
         slotProps={{
-          list: { sx: { py: 0 } },
+          list: { disablePadding: true },
           paper: {
             sx: {
               minWidth: MENU_MIN_WIDTH,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import {
   Box,
@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { usePermissions } from '../../../hooks';
@@ -24,14 +23,12 @@ import { countUnreadNotifications } from '../../../actions/Notifications/CountUn
 const NOTIFICATION_WIDTH = 320;
 const NUMBER_OF_NOTIFICATIONS = 10;
 
-const SeeAllMenuItem = styled(MenuItem)`
-  ${({ theme }) => `
-    color: ${theme.palette.primary.main};
-    font-weight: bold;
-    justify-content: center;
-    padding: ${theme.spacing(3)};
-  `}
-`;
+const SeeAllMenuItem = styled(MenuItem)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  fontWeight: 'bold',
+  justifyContent: 'center',
+  padding: theme.spacing(3)
+}));
 
 const createSkeletons = n =>
   [...Array(n)].map((e, i) => (
@@ -54,41 +51,61 @@ const NotificationMenu = () => {
     state => state.countUnreadNotifications
   );
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const handleCloseMenu = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleOnMenuClick = event => {
-    dispatch(fetchMenuNotifications({ size: NUMBER_OF_NOTIFICATIONS }));
-    dispatch(countUnreadNotifications());
-    setAnchorEl(event.currentTarget);
-  };
+  const handleOpen = useCallback(
+    event => {
+      dispatch(fetchMenuNotifications({ size: NUMBER_OF_NOTIFICATIONS }));
+      dispatch(countUnreadNotifications());
+      setAnchorEl(event.currentTarget);
+    },
+    [dispatch]
+  );
 
-  const handleOnNotificationClick = notification => {
-    if (!notification.dateReadAt) {
-      dispatch(readNotification(notification.id));
-    }
-    handleCloseMenu();
-  };
+  const handleNotificationClick = useCallback(
+    notification => {
+      if (!notification.dateReadAt) {
+        dispatch(readNotification(notification.id));
+      }
+      handleClose();
+    },
+    [dispatch, handleClose]
+  );
 
-  const handleOnSeeAllLinkClick = () => {
-    handleCloseMenu();
+  const handleSeeAllClick = useCallback(() => {
+    handleClose();
     navigate('/ui/notifications');
-  };
+  }, [handleClose, navigate]);
 
   if (!isAuth) return '';
   return (
     <>
-      <NotificationsIcon onClick={handleOnMenuClick} />
+      <NotificationsIcon onClick={handleOpen} />
       <Menu
         id="notifications-menu"
         anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
         keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-        MenuListProps={{
-          style: { padding: 0 }
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
+        open={open}
+        onClose={handleClose}
+        slotProps={{
+          list: {
+            disablePadding: true,
+            sx: { '& .MuiMenuItem-root': { mx: 0, borderRadius: 0 } }
+          },
+          paper: { sx: { mt: '4px' } }
         }}>
         {status === REDUCER_STATUS.LOADING &&
           !notifications &&
@@ -102,7 +119,7 @@ const NotificationMenu = () => {
               <div key={notification.id}>
                 <NotificationsMenuItem
                   notification={notification}
-                  onClick={handleOnNotificationClick}
+                  onClick={handleNotificationClick}
                   width={NOTIFICATION_WIDTH}
                 />
                 {idx !== notifications.length - 1 && <Divider />}
@@ -110,7 +127,7 @@ const NotificationMenu = () => {
             ))}
         {notifications && notifications.length === 0 && (
           <MenuItem disabled>
-            <Box flexDirection="row" display="flex">
+            <Box display="flex" flexDirection="row">
               <NotificationsOffIcon />
               <Typography>
                 {formatMessage({ id: 'You have no notifications.' })}
@@ -118,7 +135,7 @@ const NotificationMenu = () => {
             </Box>
           </MenuItem>
         )}
-        <SeeAllMenuItem onClick={handleOnSeeAllLinkClick}>
+        <SeeAllMenuItem onClick={handleSeeAllClick}>
           {formatMessage({ id: 'See all notifications' }).toUpperCase()}
         </SeeAllMenuItem>
       </Menu>
