@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -39,11 +39,7 @@ const UserMenu = ({
   const userId = pathOr(null, ['id'], userProperties);
   const open = Boolean(anchorEl);
 
-  // Check if session has expired
-  const isSessionExpired = useMemo(
-    () => authTokenExpirationDate < Date.now(),
-    [authTokenExpirationDate]
-  );
+  const isSessionExpired = authTokenExpirationDate < Date.now();
 
   const handleMenu = useCallback(event => {
     setAnchorEl(event.currentTarget);

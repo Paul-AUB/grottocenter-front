@@ -45,7 +45,6 @@ const Spacer = styled('div')({
 });
 
 const ToolsGroup = styled('div')(({ theme }) => ({
-  marginLeft: 'auto',
   height: 56,
   display: 'flex',
   gap: 12,

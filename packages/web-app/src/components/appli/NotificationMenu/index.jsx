@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import {
-  Badge,
   Box,
+  Chip,
   Divider,
   Menu,
   MenuItem,
@@ -120,15 +120,17 @@ const NotificationMenu = () => {
             {formatMessage({ id: 'Notifications' })}
           </Typography>
           {nbNotifications > 0 && (
-            <Badge
-              badgeContent={nbNotifications}
+            <Chip
+              label={nbNotifications}
               color="secondary"
-              overlap="rectangular"
+              size="small"
             />
           )}
         </Box>
 
-        <Divider />
+        {(status === REDUCER_STATUS.LOADING || notifications !== null) && (
+          <Divider />
+        )}
 
         {/* Notifications list */}
         {status === REDUCER_STATUS.LOADING &&
@@ -159,8 +161,7 @@ const NotificationMenu = () => {
               flexDirection: 'column',
               alignItems: 'center',
               gap: 1,
-              color: 'action.active',
-              width: NOTIFICATION_WIDTH
+              color: 'action.active'
             }}>
             <NotificationsOffIcon />
             <Typography variant="body2">
