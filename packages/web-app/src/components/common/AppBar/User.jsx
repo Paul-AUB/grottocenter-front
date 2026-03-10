@@ -31,7 +31,7 @@ const UserMenu = ({
   onLoginClick,
   onLogoutClick
 }) => {
-  const { formatMessage } = useIntl();
+  const { formatDate, formatMessage, formatTime } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const userProperties = useUserProperties();
@@ -62,6 +62,7 @@ const UserMenu = ({
 
   // Directs to the person page to see and modify the personal data
   const handleMyAccountClick = useCallback(() => {
+    if (!userId) return;
     handleClose();
     navigate(`/ui/persons/${userId}`);
   }, [handleClose, navigate, userId]);
@@ -75,7 +76,8 @@ const UserMenu = ({
       <IconButton
         aria-label={formatMessage({ id: 'account of current user' })}
         aria-controls="menu-appbar"
-        aria-haspopup="true"
+        aria-haspopup="menu"
+        aria-expanded={open}
         onClick={handleMenu}
         color="inherit"
         size="large">
@@ -95,31 +97,44 @@ const UserMenu = ({
         }}
         open={open}
         onClose={handleClose}
-        MenuListProps={{
-          sx: { py: 0 }
-        }}
         slotProps={{
+          list: { sx: { py: 0 } },
           paper: {
             sx: {
               minWidth: MENU_MIN_WIDTH,
-              mt: 0.5
+              maxWidth: '90vw',
+              mt: '4px'
             }
           }
         }}>
         {/* Primary content: User info */}
         <Box
+          role="region"
           sx={{
             px: 2,
             py: 2,
             bgcolor: 'action.hover',
             display: 'flex',
-            alignItems: 'center'
+            flexDirection: 'column'
           }}>
           <Typography variant="body2" color="text.primary">
             <Translate
               id="Logged as {userNickname}"
               values={{ userNickname: <strong>{userNickname}</strong> }}
             />
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {formatMessage(
+              {
+                id: 'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
+                defaultMessage:
+                  'Expiration Date: {expirationDate} at {expirationHourAndMinutes}'
+              },
+              {
+                expirationDate: formatDate(authTokenExpirationDate),
+                expirationHourAndMinutes: formatTime(authTokenExpirationDate)
+              }
+            )}
           </Typography>
         </Box>
 
@@ -135,7 +150,7 @@ const UserMenu = ({
 
         {/* Session expired warning */}
         {isSessionExpired && (
-          <Box sx={{ px: 2, py: 1.5 }}>
+          <Box sx={{ px: 2, py: '12px' }}>
             <Alert severity="error">
               {formatMessage({
                 id: 'Your session has expired: please log in again.'

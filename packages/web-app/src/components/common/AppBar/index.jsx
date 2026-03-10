@@ -81,8 +81,7 @@ export const StyledLink = styled(Link)`
 
 const ActionsGroup = styled('div')(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing(1.5),
+  gap: theme.spacing(1),
   marginLeft: theme.spacing(2),
   [theme.breakpoints.down('sm')]: {
     marginLeft: theme.spacing(1)
