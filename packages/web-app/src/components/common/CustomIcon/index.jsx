@@ -4,21 +4,27 @@ import { styled } from '@mui/material/styles';
 import {
   altitudeIcon,
   bibliographyIcon,
+  categoryIcon,
   caverIcon,
+  countryIcon,
   coordinatesIcon,
   depthIcon,
+  discoveryDateIcon,
+  divingCaveIcon,
   entranceIcon,
   entranceMarkerIcon,
   lengthIcon,
+  locationIcon,
   massifIcon,
   networkIcon,
   organizationIcon,
+  temperatureIcon,
   timeToGoIcon,
   undergroundTimeIcon
 } from '../../../assets/icons';
 
 const Icon = styled('span')`
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: ${({ size }) => size}px;
@@ -33,15 +39,21 @@ const Img = styled('img')`
 const iconSources = {
   altitude: altitudeIcon,
   bibliography: bibliographyIcon,
+  category: categoryIcon,
   caver: caverIcon,
+  country: countryIcon,
   coordinates: coordinatesIcon,
   depth: depthIcon,
+  discovery_date: discoveryDateIcon,
+  diving_cave: divingCaveIcon,
   entrance: entranceIcon,
   entrance_marker: entranceMarkerIcon,
   length: lengthIcon,
+  location: locationIcon,
   massif: massifIcon,
   network: networkIcon,
   organization: organizationIcon,
+  temperature: temperatureIcon,
   time_to_go: timeToGoIcon,
   underground_time: undergroundTimeIcon
 };
