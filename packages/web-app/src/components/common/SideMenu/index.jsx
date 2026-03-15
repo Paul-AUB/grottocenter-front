@@ -1,16 +1,28 @@
 import React, { useCallback } from 'react';
-import { Divider, Drawer, Typography } from '@mui/material';
+import {
+  Divider,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography
+} from '@mui/material';
+import { Launch, MenuBook } from '@mui/icons-material';
+import LanguageIcon from '@mui/icons-material/Translate';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MenuLinks from './MenuLinks';
-import Footer from './Footer';
+import Translate from '../Translate';
 import LanguageSelector from '../LanguageSelector';
 import { usePermissions } from '../../../hooks';
 import QuickSearch from '../../appli/QuickSearch';
 import { logoGC } from '../../../conf/config';
+import { userguideLinks } from '../../../conf/externalLinks';
 
 const Header = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -50,6 +62,11 @@ const SideMenu = ({ isOpen, toggle }) => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const handleClose = useCallback(() => dispatch(toggle()), [dispatch, toggle]);
+  const { locale } = useSelector(state => state.intl);
+  const userguideUrl =
+    userguideLinks[locale] !== undefined
+      ? userguideLinks[locale]
+      : userguideLinks['*'];
   return (
     <Drawer
       variant={isMobile ? 'temporary' : 'persistent'}
@@ -57,7 +74,7 @@ const SideMenu = ({ isOpen, toggle }) => {
       open={isOpen}
       onClose={handleClose}>
       <Header>
-        <HeaderLink to="">
+        <HeaderLink to="/" onClick={isMobile ? handleClose : undefined}>
           <LogoImage src={logoGC} alt="Grottocenter" />
           <Typography variant="h4" noWrap fontWeight="fontWeightBold">
             Grottocenter
@@ -69,8 +86,21 @@ const SideMenu = ({ isOpen, toggle }) => {
         <QuickSearch onClose={isMobile ? handleClose : undefined} />
         <Divider />
         <MenuLinks isAuth={permissions.isAuth} toggle={isMobile ? handleClose : undefined} />
-        <Footer />
-        <LanguageSelector />
+        <div style={{ marginTop: 'auto' }}>
+          <Divider />
+          <List>
+            <ListItemButton component="a" href={userguideUrl} target="_blank" rel="noreferrer">
+              <ListItemIcon><MenuBook color="primary" /></ListItemIcon>
+              <ListItemText primary={<Translate>User guide</Translate>} />
+              <Launch fontSize="small" color="action" />
+            </ListItemButton>
+          </List>
+          <Divider />
+          <ListItemButton disableRipple>
+            <ListItemIcon><LanguageIcon color="primary" /></ListItemIcon>
+            <LanguageSelector hideIcon />
+          </ListItemButton>
+        </div>
       </Content>
     </Drawer>
   );
