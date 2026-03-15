@@ -140,8 +140,9 @@ const SideMenu = ({ isOpen }) => {
             <Translate>Contribute</Translate>
           </ContributeButton>
           <Divider />
-          <List dense>
+          <List>
             <ListItemButton
+              sx={{ py: '5px' }}
               component="a"
               href={userguideUrl}
               target="_blank"
@@ -149,10 +150,10 @@ const SideMenu = ({ isOpen }) => {
               <ListItemIcon>
                 <MenuBook color="primary" sx={{ fontSize: 28 }} />
               </ListItemIcon>
-              <ListItemText primary={<Translate>User guide</Translate>} />
+              <ListItemText><Translate>User guide</Translate></ListItemText>
               <Launch fontSize="small" color="action" />
             </ListItemButton>
-            <ListItem>
+            <ListItem sx={{ py: '5px' }}>
               <ListItemIcon>
                 <LanguageIcon color="primary" sx={{ fontSize: 28 }} />
               </ListItemIcon>

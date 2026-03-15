@@ -106,15 +106,15 @@ const MenuLinks = ({ toggle }) => {
           onClick={toggle}
         />
         <LinkedItem
-          ItemIcon={() => <EntityIcon src={bibliographyIcon} alt="document" />}
-          label={formatMessage({ id: 'Documents' })}
-          href="/ui/documents"
-          onClick={toggle}
-        />
-        <LinkedItem
           ItemIcon={() => <EntityIcon src={massifIcon} alt="massif" />}
           label={formatMessage({ id: 'Massifs' })}
           href="/ui/massifs"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={bibliographyIcon} alt="document" />}
+          label={formatMessage({ id: 'Documents' })}
+          href="/ui/documents"
           onClick={toggle}
         />
         <LinkedItem
