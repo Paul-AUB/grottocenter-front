@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
-import { resetAdvancedSearchResults } from '../../../actions/Advancedsearch';
+import {
+  fetchAdvancedSearchResults,
+  resetAdvancedSearchResults
+} from '../../../actions/Advancedsearch';
+import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
 import SearchResults from './SearchResults';
 
 const EntitySearchPage = ({ title, entityType, children }) => {
@@ -11,7 +15,15 @@ const EntitySearchPage = ({ title, entityType, children }) => {
   const { formatMessage } = useIntl();
   useLayoutEffect(() => {
     dispatch(resetAdvancedSearchResults());
-  }, [dispatch]);
+    dispatch(
+      fetchAdvancedSearchResults({
+        entity: entityType,
+        query: '',
+        matchAllFields: true,
+        size: getStoredRowsPerPage()
+      })
+    );
+  }, [dispatch, entityType]);
 
   return (
     <FixedContent
