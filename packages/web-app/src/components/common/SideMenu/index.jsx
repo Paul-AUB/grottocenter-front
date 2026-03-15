@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { displayLoginDialog } from '../../../actions/Login';
+import { openSideMenu, closeSideMenu } from '../../../actions/SideMenu';
 import { usePermissions } from '../../../hooks';
 import MenuLinks from './MenuLinks';
 import Translate from '../Translate';
@@ -71,14 +72,12 @@ const ContributeButton = styled(Button)(({ theme }) => ({
   width: `calc(100% - ${theme.spacing(2)})`
 }));
 
-const SideMenu = ({ isOpen, toggle }) => {
+const SideMenu = ({ isOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuth } = usePermissions();
-  const handleClose = useCallback(() => dispatch(toggle()), [dispatch, toggle]);
-  const handleOpen = useCallback(() => {
-    if (!isOpen) dispatch(toggle());
-  }, [dispatch, toggle, isOpen]);
+  const handleClose = useCallback(() => dispatch(closeSideMenu()), [dispatch]);
+  const handleOpen = useCallback(() => dispatch(openSideMenu()), [dispatch]);
   const { locale } = useSelector(state => state.intl);
 
   const handleContributeClick = () => {
@@ -167,8 +166,7 @@ const SideMenu = ({ isOpen, toggle }) => {
 };
 
 SideMenu.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  toggle: PropTypes.func.isRequired
+  isOpen: PropTypes.bool.isRequired
 };
 
 export default SideMenu;
