@@ -58,6 +58,7 @@ const Content = styled('div')`
   flex-grow: 1;
   overflow-y: auto;
   padding: 0 8px 8px;
+  font-size: 0.95rem;
 `;
 
 const Footer = styled('div')`
@@ -117,24 +118,21 @@ const SideMenu = ({ isOpen, toggle }) => {
             <Translate>Contribute</Translate>
           </ContributeButton>
           <Divider />
-          <List>
+          <List dense>
             <ListItemButton
               component="a"
               href={userguideUrl}
               target="_blank"
               rel="noreferrer">
               <ListItemIcon>
-                <MenuBook color="primary" />
+                <MenuBook color="primary" sx={{ fontSize: 28 }} />
               </ListItemIcon>
               <ListItemText primary={<Translate>User guide</Translate>} />
               <Launch fontSize="small" color="action" />
             </ListItemButton>
-          </List>
-          <Divider />
-          <List>
             <ListItem>
               <ListItemIcon>
-                <LanguageIcon color="primary" />
+                <LanguageIcon color="primary" sx={{ fontSize: 28 }} />
               </ListItemIcon>
               <LanguageSelector hideIcon />
             </ListItem>

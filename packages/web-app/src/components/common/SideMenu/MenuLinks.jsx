@@ -34,7 +34,7 @@ const SectionHeader = styled(ListSubheader)(({ theme }) => ({
 }));
 
 const EntityIcon = ({ src, alt }) => (
-  <img src={src} alt={alt} style={{ height: 24, width: 24 }} />
+  <img src={src} alt={alt} style={{ height: 28, width: 28 }} />
 );
 
 EntityIcon.propTypes = {
@@ -69,6 +69,7 @@ const MenuLinks = ({ toggle }) => {
   return (
     <>
       <List
+        dense
         component="nav"
         aria-label={formatMessage({ id: 'main mailbox folders' })}
         subheader={
@@ -77,14 +78,21 @@ const MenuLinks = ({ toggle }) => {
           </SectionHeader>
         }>
         <LinkedItem
-          ItemIcon={() => <MapIcon color="primary" />}
+          ItemIcon={() => <MapIcon color="primary" sx={{ fontSize: 28 }} />}
           label={formatMessage({ id: 'Map' })}
           href="/ui/map"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <FlagRounded color="primary" sx={{ fontSize: 28 }} />}
+          label={formatMessage({ id: 'Countries' })}
+          href="/ui/countries"
           onClick={toggle}
         />
       </List>
       <Divider />
       <List
+        dense
         component="nav"
         sx={{ pb: 0 }}
         subheader={
@@ -122,12 +130,6 @@ const MenuLinks = ({ toggle }) => {
           ItemIcon={() => <EntityIcon src={caverIcon} alt="person" />}
           label={formatMessage({ id: 'Persons' })}
           href="/ui/persons"
-          onClick={toggle}
-        />
-        <LinkedItem
-          ItemIcon={() => <FlagRounded color="primary" />}
-          label={formatMessage({ id: 'Countries' })}
-          href="/ui/countries"
           onClick={toggle}
         />
       </List>
