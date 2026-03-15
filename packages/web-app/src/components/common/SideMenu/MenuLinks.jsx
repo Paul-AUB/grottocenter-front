@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
 import { FlagRounded } from '@mui/icons-material';
@@ -62,14 +61,6 @@ const MenuLinks = ({ isAuth, toggle }) => {
         href="/ui/entity/add"
         onClick={toggle}
       />
-      {isAuth && (
-        <LinkedItem
-          ItemIcon={() => <DashboardIcon color="primary" />}
-          label={formatMessage({ id: 'Dashboard' })}
-          href="/ui"
-          onClick={toggle}
-        />
-      )}
       <LinkedItem
         ItemIcon={() => <FlagRounded color="primary" />}
         label={formatMessage({ id: 'Countries' })}
