@@ -93,6 +93,7 @@ export const StyledLink = styled(Link)`
   text-decoration: inherit;
   cursor: pointer;
   display: flex;
+  align-items: center;
 `;
 
 const ActionsGroup = styled('div')(({ theme }) => ({
@@ -134,7 +135,7 @@ const AppBar = () => {
             </IconButton>
             {(!isSideMenuOpen || isMobileOnly) && (
               <Typography variant="h4">
-                <StyledLink to="">
+                <StyledLink to="/">
                   <LogoImage
                     id="grottocenter-logo"
                     src={logoGC}

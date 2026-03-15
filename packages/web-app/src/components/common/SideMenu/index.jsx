@@ -13,8 +13,7 @@ import { Launch, MenuBook } from '@mui/icons-material';
 import LanguageIcon from '@mui/icons-material/Translate';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MenuLinks from './MenuLinks';
@@ -57,6 +56,9 @@ const Content = styled('div')`
   padding: 0 8px 8px;
 `;
 
+const Footer = styled('div')`
+  margin-top: auto;
+`;
 
 const SideMenu = ({ isOpen, toggle }) => {
   const dispatch = useDispatch();
@@ -85,11 +87,17 @@ const SideMenu = ({ isOpen, toggle }) => {
         <QuickSearch onClose={isMobile ? handleClose : undefined} />
         <Divider />
         <MenuLinks toggle={isMobile ? handleClose : undefined} />
-        <div style={{ marginTop: 'auto' }}>
+        <Footer>
           <Divider />
           <List>
-            <ListItemButton component="a" href={userguideUrl} target="_blank" rel="noreferrer">
-              <ListItemIcon><MenuBook color="primary" /></ListItemIcon>
+            <ListItemButton
+              component="a"
+              href={userguideUrl}
+              target="_blank"
+              rel="noreferrer">
+              <ListItemIcon>
+                <MenuBook color="primary" />
+              </ListItemIcon>
               <ListItemText primary={<Translate>User guide</Translate>} />
               <Launch fontSize="small" color="action" />
             </ListItemButton>
@@ -97,11 +105,13 @@ const SideMenu = ({ isOpen, toggle }) => {
           <Divider />
           <List>
             <ListItem>
-              <ListItemIcon><LanguageIcon color="primary" /></ListItemIcon>
+              <ListItemIcon>
+                <LanguageIcon color="primary" />
+              </ListItemIcon>
               <LanguageSelector hideIcon />
             </ListItem>
           </List>
-        </div>
+        </Footer>
       </Content>
     </Drawer>
   );

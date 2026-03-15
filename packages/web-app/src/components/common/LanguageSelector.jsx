@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select, MenuItem, Input, CircularProgress } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Translate';
 import { styled } from '@mui/material/styles';
@@ -50,16 +51,21 @@ const LanguageSelector = ({ iconColor = 'inherit', hideIcon = false }) => {
 
   return (
     <Wrapper>
-      {!hideIcon && (isLoading ? (
-        <CircularProgress size={25} color="inherit" />
-      ) : (
-        <LanguageIcon color={iconColor} />
-      ))}
+      {!hideIcon && (
+        isLoading
+          ? <CircularProgress size={25} color="inherit" />
+          : <LanguageIcon color={iconColor} />
+      )}
       <StyledSelect value={locale} onChange={handleChange} input={<Input />}>
         {items}
       </StyledSelect>
     </Wrapper>
   );
+};
+
+LanguageSelector.propTypes = {
+  iconColor: PropTypes.string,
+  hideIcon: PropTypes.bool
 };
 
 export default LanguageSelector;
