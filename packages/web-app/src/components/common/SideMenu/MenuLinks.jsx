@@ -44,6 +44,7 @@ EntityIcon.propTypes = {
 
 export const LinkedItem = ({ href = '', ItemIcon, label, onClick }) => (
   <ListItemButton
+    sx={{ py: '5px' }}
     component={React.forwardRef((props, ref) => (
       <Link {...props} to={href} ref={ref} />
     ))}
@@ -69,7 +70,6 @@ const MenuLinks = ({ toggle }) => {
   return (
     <>
       <List
-        dense
         component="nav"
         aria-label={formatMessage({ id: 'main mailbox folders' })}
         subheader={
@@ -92,7 +92,6 @@ const MenuLinks = ({ toggle }) => {
       </List>
       <Divider />
       <List
-        dense
         component="nav"
         sx={{ pb: 0 }}
         subheader={

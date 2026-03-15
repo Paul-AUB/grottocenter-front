@@ -81,7 +81,7 @@ const SideMenu = ({ isOpen }) => {
   const { locale } = useSelector(state => state.intl);
 
   const handleContributeClick = () => {
-    handleClose();
+    if (isMobile) handleClose();
     if (isAuth) {
       navigate('/ui/entity/add');
     } else {
