@@ -3,7 +3,7 @@ import EntitySearchPage from '../components/appli/AdvancedSearch/EntitySearchPag
 import MassifsSearch from '../components/appli/AdvancedSearch/MassifsSearch';
 
 const MassifsSearchPage = () => (
-  <EntitySearchPage title="Massifs">
+  <EntitySearchPage title="Massifs" entityType="massifs">
     <MassifsSearch />
   </EntitySearchPage>
 );

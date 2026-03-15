@@ -3,7 +3,7 @@ import EntitySearchPage from '../components/appli/AdvancedSearch/EntitySearchPag
 import DocumentSearch from '../components/appli/AdvancedSearch/DocumentSearch';
 
 const DocumentsSearchPage = () => (
-  <EntitySearchPage title="Documents">
+  <EntitySearchPage title="Documents" entityType="documents">
     <DocumentSearch />
   </EntitySearchPage>
 );

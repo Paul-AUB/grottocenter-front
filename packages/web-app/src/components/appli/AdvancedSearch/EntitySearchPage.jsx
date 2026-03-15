@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -6,10 +6,10 @@ import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import { resetAdvancedSearchResults } from '../../../actions/Advancedsearch';
 import SearchResults from './SearchResults';
 
-const EntitySearchPage = ({ title, children }) => {
+const EntitySearchPage = ({ title, entityType, children }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  useEffect(() => {
+  useLayoutEffect(() => {
     dispatch(resetAdvancedSearchResults());
   }, [dispatch]);
 
@@ -20,7 +20,7 @@ const EntitySearchPage = ({ title, children }) => {
         <>
           {children}
           <br />
-          <SearchResults />
+          <SearchResults entityType={entityType} />
         </>
       }
     />
@@ -29,6 +29,7 @@ const EntitySearchPage = ({ title, children }) => {
 
 EntitySearchPage.propTypes = {
   title: PropTypes.string.isRequired,
+  entityType: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired
 };
 

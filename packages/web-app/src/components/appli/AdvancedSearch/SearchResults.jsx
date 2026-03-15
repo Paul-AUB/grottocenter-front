@@ -7,10 +7,12 @@ import {
 } from '../../../actions/Advancedsearch';
 import EntityTable from '../../common/EntityTable/EntityTable';
 
-const SearchResults = ({ onSelected, hideExport }) => {
+const SearchResults = ({ onSelected, hideExport, entityType }) => {
   const dispatch = useDispatch();
   const { isNewQuery, queryParams, isLoading, results, totalResults } =
     useSelector(state => state.advancedsearch);
+
+  if (entityType && queryParams?.entity !== entityType) return null;
 
   return (
     <EntityTable
@@ -49,7 +51,8 @@ const SearchResults = ({ onSelected, hideExport }) => {
 
 SearchResults.propTypes = {
   onSelected: PropTypes.func,
-  hideExport: PropTypes.bool
+  hideExport: PropTypes.bool,
+  entityType: PropTypes.string
 };
 
 export default SearchResults;

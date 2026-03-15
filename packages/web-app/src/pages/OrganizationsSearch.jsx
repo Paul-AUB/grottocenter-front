@@ -3,7 +3,7 @@ import EntitySearchPage from '../components/appli/AdvancedSearch/EntitySearchPag
 import OrganizationsSearch from '../components/appli/AdvancedSearch/OrganizationsSearch';
 
 const OrganizationsSearchPage = () => (
-  <EntitySearchPage title="Organizations">
+  <EntitySearchPage title="Organizations" entityType="organizations">
     <OrganizationsSearch />
   </EntitySearchPage>
 );
