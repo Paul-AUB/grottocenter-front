@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { useIntl } from 'react-intl';
 import Translate from './Translate';
 import InternationalizedLink from './InternationalizedLink';
 import { licenceLinks, licensesODBLink } from '../../conf/externalLinks';
@@ -10,7 +9,7 @@ const FooterBar = styled('div')(({ theme }) => ({
   color: theme.palette.fullBlack,
   backgroundColor: theme.palette.primary1Color,
   textAlign: 'center',
-  paddingTop: '15px'
+  padding: '15px 16px 8px'
 }));
 
 // .fixFooter {
@@ -24,11 +23,16 @@ const DisclamerText = styled('p')`
   font-size: 1.2rem;
   font-weight: 300;
   color: white;
-  display: inline-block;
+  margin: 0;
 `;
 
-const LicenceLink = styled('p')`
-  display: inline-block;
+const LicenceLine = styled('div')`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
 `;
 
 const LicenceImage = styled('img')`
@@ -37,27 +41,31 @@ const LicenceImage = styled('img')`
   display: inline-block;
 `;
 
-const FooterDisclamer = ({ className }) => {
-  const { formatMessage } = useIntl();
-  return (
-    <FooterBar className={className}>
+const FooterDisclamer = ({ className }) => (
+  <FooterBar className={className}>
+    <LicenceLine>
       <DisclamerText>
         <Translate>
-          Unless stated otherwise, all text and documents are available under
-          the terms
+          Unless stated otherwise, the CC-BY-SA license applies for documents
+          and texts subject to copyright.
         </Translate>
       </DisclamerText>
-      <LicenceLink>
-        <InternationalizedLink links={licenceLinks}>
-          <LicenceImage src="/images/CC-BY-SA.png" alt="CC-BY-SA licence" />
-        </InternationalizedLink>
-        <InternationalizedLink links={licensesODBLink}>
-          <LicenceImage src="/images/odbl.png" alt="ODBL license" title={formatMessage({ id: 'The ODBL license applies to all data that is not copyrighted.' })} />
-        </InternationalizedLink>
-      </LicenceLink>
-    </FooterBar>
-  );
-};
+      <InternationalizedLink links={licenceLinks}>
+        <LicenceImage src="/images/CC-BY-SA.png" alt="CC-BY-SA licence" />
+      </InternationalizedLink>
+    </LicenceLine>
+    <LicenceLine>
+      <DisclamerText>
+        <Translate>
+          The ODBL license applies to all data that is not copyrighted.
+        </Translate>
+      </DisclamerText>
+      <InternationalizedLink links={licensesODBLink}>
+        <LicenceImage src="/images/odbl.png" alt="ODBL license" />
+      </InternationalizedLink>
+    </LicenceLine>
+  </FooterBar>
+);
 
 FooterDisclamer.propTypes = {
   className: PropTypes.string
