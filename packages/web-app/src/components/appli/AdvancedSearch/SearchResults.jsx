@@ -19,25 +19,25 @@ const SearchResults = ({ onSelected, hideExport }) => {
       isNewQuery={isNewQuery}
       pageRows={results}
       nbTotalRows={totalResults}
-      onPageChange={(pageNum, pageSize) => {
-        if (!queryParams) {
-          console.error('onPageChange Missing query params');
-          return;
-        }
-        const newQueryParams = { ...queryParams };
-        newQueryParams.page = pageNum + 1;
-        newQueryParams.size = pageSize;
-        dispatch(fetchAdvancedSearchResults(newQueryParams, false));
-      }}
-      onSortChange={sort => {
-        if (!queryParams) {
-          console.error('onSortChange Missing query params');
-          return;
-        }
-        const newQueryParams = { ...queryParams };
-        newQueryParams.sort = sort;
-        dispatch(fetchAdvancedSearchResults(newQueryParams, false));
-      }}
+      onPageChange={
+        queryParams
+          ? (pageNum, pageSize) => {
+              const newQueryParams = { ...queryParams };
+              newQueryParams.page = pageNum + 1;
+              newQueryParams.size = pageSize;
+              dispatch(fetchAdvancedSearchResults(newQueryParams, false));
+            }
+          : null
+      }
+      onSortChange={
+        queryParams
+          ? sort => {
+              const newQueryParams = { ...queryParams };
+              newQueryParams.sort = sort;
+              dispatch(fetchAdvancedSearchResults(newQueryParams, false));
+            }
+          : null
+      }
       onCSVDownload={hideExport ? null : (columns, columnsName) => {
         downloadAdvancedSearchResults({ ...queryParams, columns, columnsName });
       }}

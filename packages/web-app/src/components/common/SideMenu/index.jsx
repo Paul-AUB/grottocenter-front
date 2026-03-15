@@ -104,7 +104,7 @@ const SideMenu = ({ isOpen }) => {
       // keepMounted prevents React from unmounting the drawer content when closed
       // (variant="temporary" unmounts by default). Without it, the first swipe
       // triggers a full React mount during the gesture, causing jank.
-      keepMounted={isMobile}
+      ModalProps={{ keepMounted: isMobile }}
       // Snappier than the default (0.52): drawer commits to open after 30% dragged.
       hysteresis={0.3}
       // More responsive than the default (450 px/s): a short fast fling is enough.
