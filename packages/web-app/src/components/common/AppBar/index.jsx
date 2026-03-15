@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   AppBar as MuiAppBar,
+  Box,
   Toolbar,
   IconButton,
   Typography,
@@ -64,6 +65,7 @@ const Spacer = styled('div')({
 const ToolsGroup = styled('div')(({ theme }) => ({
   height: 56,
   display: 'flex',
+  flexGrow: 1,
   gap: 12,
   alignItems: 'center',
   padding: theme.spacing(2),
@@ -146,11 +148,15 @@ const AppBar = () => {
               </Typography>
             )}
           </NavigationGroup>
-          <Spacer />
+          <Spacer sx={{ display: { xs: 'block', sm: 'none' } }} />
           <Fade in={!isSideMenuOpen}>
             <ToolsGroup>
-              <QuickSearch hasFixWidth={false} />
-              <LanguageSelector />
+              <Box sx={{ flexGrow: 1 }}>
+                <QuickSearch />
+              </Box>
+              <Box sx={{ flexShrink: 0 }}>
+                <LanguageSelector />
+              </Box>
             </ToolsGroup>
           </Fade>
           <ActionsGroup>
