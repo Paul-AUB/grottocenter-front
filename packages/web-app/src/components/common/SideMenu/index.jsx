@@ -127,8 +127,12 @@ const SideMenu = ({ isOpen }) => {
       </Header>
       <Content>
         <Divider />
-        <QuickSearch onClose={isMobile ? handleClose : undefined} />
-        <Divider />
+        {isMobile && (
+          <>
+            <QuickSearch onClose={handleClose} />
+            <Divider />
+          </>
+        )}
         <MenuLinks toggle={isMobile ? handleClose : undefined} />
         <Footer>
           <Divider />
@@ -150,15 +154,19 @@ const SideMenu = ({ isOpen }) => {
               <ListItemIcon>
                 <MenuBook color="primary" sx={{ fontSize: 28 }} />
               </ListItemIcon>
-              <ListItemText><Translate>User guide</Translate></ListItemText>
+              <ListItemText>
+                <Translate>User guide</Translate>
+              </ListItemText>
               <Launch fontSize="small" color="action" />
             </ListItemButton>
-            <ListItem sx={{ py: '5px' }}>
-              <ListItemIcon>
-                <LanguageIcon color="primary" sx={{ fontSize: 28 }} />
-              </ListItemIcon>
-              <LanguageSelector hideIcon />
-            </ListItem>
+            {isMobile && (
+              <ListItem sx={{ py: '5px' }}>
+                <ListItemIcon>
+                  <LanguageIcon color="primary" sx={{ fontSize: 28 }} />
+                </ListItemIcon>
+                <LanguageSelector hideIcon />
+              </ListItem>
+            )}
           </List>
         </Footer>
       </Content>

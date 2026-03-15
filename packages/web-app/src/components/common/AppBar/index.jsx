@@ -6,8 +6,7 @@ import {
   Box,
   Toolbar,
   IconButton,
-  Typography,
-  Fade
+  Typography
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
@@ -149,16 +148,14 @@ const AppBar = () => {
             )}
           </NavigationGroup>
           <Spacer sx={{ display: { xs: 'block', sm: 'none' } }} />
-          <Fade in={!isSideMenuOpen}>
-            <ToolsGroup>
-              <Box sx={{ flexGrow: 1 }}>
-                <QuickSearch />
-              </Box>
-              <Box sx={{ flexShrink: 0 }}>
-                <LanguageSelector />
-              </Box>
-            </ToolsGroup>
-          </Fade>
+          <ToolsGroup>
+            <Box sx={{ flexGrow: 1 }}>
+              <QuickSearch />
+            </Box>
+            <Box sx={{ flexShrink: 0 }}>
+              <LanguageSelector />
+            </Box>
+          </ToolsGroup>
           <ActionsGroup>
             <NotificationMenu />
             <UserMenu
