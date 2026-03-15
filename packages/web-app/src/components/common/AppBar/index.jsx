@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
+import { isMobileOnly } from 'react-device-detect';
 
 import {
   displayLoginDialog,
@@ -26,9 +27,25 @@ import QuickSearch from '../../appli/QuickSearch';
 
 import UserMenu from './User';
 
-const StyledMuiAppBar = styled(MuiAppBar)({
-  flexGrow: 1
-});
+const StyledMuiAppBar = styled(MuiAppBar, {
+  shouldForwardProp: prop => prop !== '$isSideMenuOpen'
+})(({ theme, $isSideMenuOpen }) => ({
+  flexGrow: 1,
+  ...(!isMobileOnly && {
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: $isSideMenuOpen
+        ? theme.transitions.easing.easeOut
+        : theme.transitions.easing.sharp,
+      duration: $isSideMenuOpen
+        ? theme.transitions.duration.enteringScreen
+        : theme.transitions.duration.leavingScreen
+    }),
+    ...($isSideMenuOpen && {
+      width: `calc(100% - ${theme.sideMenuWidth}px)`,
+      marginLeft: `${theme.sideMenuWidth}px`
+    })
+  })
+}));
 
 const NavigationGroup = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -104,27 +121,29 @@ const AppBar = () => {
 
   return (
     <>
-      <StyledMuiAppBar>
+      <StyledMuiAppBar $isSideMenuOpen={isSideMenuOpen}>
         <Toolbar variant="dense">
           <NavigationGroup>
             <IconButton
               color="inherit"
-              aria-label="open drawer"
+              aria-label="toggle drawer"
               edge="start"
               onClick={() => dispatch(toggleSideMenu())}
               size="large">
               <MenuIcon sx={{ fontSize: 32 }} />
             </IconButton>
-            <Typography variant="h4">
-              <StyledLink to="">
-                <LogoImage
-                  id="grottocenter-logo"
-                  src={logoGC}
-                  alt="Grottocenter"
-                />
-                <GrottoTxt>Grottocenter</GrottoTxt>
-              </StyledLink>
-            </Typography>
+            {(!isSideMenuOpen || isMobileOnly) && (
+              <Typography variant="h4">
+                <StyledLink to="">
+                  <LogoImage
+                    id="grottocenter-logo"
+                    src={logoGC}
+                    alt="Grottocenter"
+                  />
+                  <GrottoTxt>Grottocenter</GrottoTxt>
+                </StyledLink>
+              </Typography>
+            )}
           </NavigationGroup>
           <Spacer />
           <Fade in={!isSideMenuOpen}>
