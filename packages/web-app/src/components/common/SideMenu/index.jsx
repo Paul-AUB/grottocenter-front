@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import {
   Button,
   Divider,
-  Drawer,
+  SwipeableDrawer,
   List,
   ListItem,
   ListItemButton,
@@ -14,7 +14,7 @@ import { Launch, MenuBook } from '@mui/icons-material';
 import LanguageIcon from '@mui/icons-material/Translate';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import PropTypes from 'prop-types';
-import { isMobile } from 'react-device-detect';
+import { isMobile, isIOS } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
@@ -59,6 +59,7 @@ const Content = styled('div')`
   overflow-y: auto;
   padding: 0 8px 8px;
   font-size: 0.95rem;
+  touch-action: pan-y;
 `;
 
 const Footer = styled('div')`
@@ -75,6 +76,9 @@ const SideMenu = ({ isOpen, toggle }) => {
   const navigate = useNavigate();
   const { isAuth } = usePermissions();
   const handleClose = useCallback(() => dispatch(toggle()), [dispatch, toggle]);
+  const handleOpen = useCallback(() => {
+    if (!isOpen) dispatch(toggle());
+  }, [dispatch, toggle, isOpen]);
   const { locale } = useSelector(state => state.intl);
 
   const handleContributeClick = () => {
@@ -85,20 +89,39 @@ const SideMenu = ({ isOpen, toggle }) => {
       dispatch(displayLoginDialog());
     }
   };
+
   const userguideUrl =
     userguideLinks[locale] !== undefined
       ? userguideLinks[locale]
       : userguideLinks['*'];
+
   return (
-    <Drawer
+    <SwipeableDrawer
       variant={isMobile ? 'temporary' : 'persistent'}
       anchor="left"
       open={isOpen}
-      onClose={handleClose}>
+      onClose={handleClose}
+      onOpen={handleOpen}
+      // keepMounted prevents React from unmounting the drawer content when closed
+      // (variant="temporary" unmounts by default). Without it, the first swipe
+      // triggers a full React mount during the gesture, causing jank.
+      keepMounted={isMobile}
+      // Snappier than the default (0.52): drawer commits to open after 30% dragged.
+      hysteresis={0.3}
+      // More responsive than the default (450 px/s): a short fast fling is enough.
+      minFlingVelocity={300}
+      // Standard MUI iOS/Android pattern:
+      // - disableBackdropTransition: skip the backdrop fade on Android to save GPU.
+      // - disableDiscovery: disable the edge peek on iOS only, where it conflicts
+      //   with the native "swipe to go back" system gesture.
+      disableBackdropTransition={!isIOS}
+      disableDiscovery={isIOS}>
       <Header>
         <HeaderLink to="/" onClick={isMobile ? handleClose : undefined}>
           <LogoImage src={logoGC} alt="Grottocenter" />
-          <Typography variant="h4" noWrap fontWeight="fontWeightBold">
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 600, letterSpacing: '-2px' }}>
             Grottocenter
           </Typography>
         </HeaderLink>
@@ -139,7 +162,7 @@ const SideMenu = ({ isOpen, toggle }) => {
           </List>
         </Footer>
       </Content>
-    </Drawer>
+    </SwipeableDrawer>
   );
 };
 
