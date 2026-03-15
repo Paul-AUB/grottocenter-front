@@ -3,6 +3,7 @@ import {
   Divider,
   Drawer,
   List,
+  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
@@ -54,7 +55,7 @@ const Content = styled('div')`
   flex-direction: column;
   flex-grow: 1;
   overflow-y: auto;
-  padding: 8px;
+  padding: 0 8px 8px;
 `;
 
 
@@ -81,8 +82,8 @@ const SideMenu = ({ isOpen, toggle }) => {
           </Typography>
         </HeaderLink>
       </Header>
-      <Divider />
       <Content>
+        <Divider />
         <QuickSearch onClose={isMobile ? handleClose : undefined} />
         <Divider />
         <MenuLinks isAuth={permissions.isAuth} toggle={isMobile ? handleClose : undefined} />
@@ -96,10 +97,12 @@ const SideMenu = ({ isOpen, toggle }) => {
             </ListItemButton>
           </List>
           <Divider />
-          <ListItemButton disableRipple>
-            <ListItemIcon><LanguageIcon color="primary" /></ListItemIcon>
-            <LanguageSelector hideIcon />
-          </ListItemButton>
+          <List>
+            <ListItem>
+              <ListItemIcon><LanguageIcon color="primary" /></ListItemIcon>
+              <LanguageSelector hideIcon />
+            </ListItem>
+          </List>
         </div>
       </Content>
     </Drawer>
