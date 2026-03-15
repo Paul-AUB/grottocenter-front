@@ -8,10 +8,13 @@ import {
   ListItemText,
   ListSubheader
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import MapIcon from '@mui/icons-material/Map';
 import { FlagRounded } from '@mui/icons-material';
+import { displayLoginDialog } from '../../../actions/Login';
+import { usePermissions } from '../../../hooks';
 import {
   entranceIcon,
   bibliographyIcon,
@@ -55,6 +58,19 @@ LinkedItem.propTypes = {
 
 const MenuLinks = ({ toggle }) => {
   const { formatMessage } = useIntl();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuth } = usePermissions();
+
+  const handleContributeClick = () => {
+    if (toggle) toggle();
+    if (isAuth) {
+      navigate('/ui/entity/add');
+    } else {
+      dispatch(displayLoginDialog());
+    }
+  };
+
   return (
     <>
       <List
@@ -117,12 +133,14 @@ const MenuLinks = ({ toggle }) => {
         />
       </List>
       <List component="nav">
-        <LinkedItem
-          ItemIcon={() => <LibraryAddIcon color="primary" />}
-          label={formatMessage({ id: 'Contribute' })}
-          href="/ui/entity/add"
-          onClick={toggle}
-        />
+        <ListItemButton onClick={handleContributeClick}>
+          <ListItemIcon>
+            <LibraryAddIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText>
+            <Translate>Contribute</Translate>
+          </ListItemText>
+        </ListItemButton>
       </List>
     </>
   );
