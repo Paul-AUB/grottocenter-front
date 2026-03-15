@@ -37,7 +37,7 @@ LinkedItem.propTypes = {
   onClick: PropTypes.func
 };
 
-const MenuLinks = ({ isAuth, toggle }) => {
+const MenuLinks = ({ toggle }) => {
   const { formatMessage } = useIntl();
   return (
     <List
@@ -71,7 +71,6 @@ const MenuLinks = ({ isAuth, toggle }) => {
   );
 };
 MenuLinks.propTypes = {
-  isAuth: PropTypes.bool.isRequired,
   toggle: PropTypes.func
 };
 

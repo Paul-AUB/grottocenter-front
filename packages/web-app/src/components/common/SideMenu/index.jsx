@@ -20,7 +20,6 @@ import { styled } from '@mui/material/styles';
 import MenuLinks from './MenuLinks';
 import Translate from '../Translate';
 import LanguageSelector from '../LanguageSelector';
-import { usePermissions } from '../../../hooks';
 import QuickSearch from '../../appli/QuickSearch';
 import { logoGC } from '../../../conf/config';
 import { userguideLinks } from '../../../conf/externalLinks';
@@ -60,7 +59,6 @@ const Content = styled('div')`
 
 
 const SideMenu = ({ isOpen, toggle }) => {
-  const permissions = usePermissions();
   const dispatch = useDispatch();
   const handleClose = useCallback(() => dispatch(toggle()), [dispatch, toggle]);
   const { locale } = useSelector(state => state.intl);
@@ -86,7 +84,7 @@ const SideMenu = ({ isOpen, toggle }) => {
         <Divider />
         <QuickSearch onClose={isMobile ? handleClose : undefined} />
         <Divider />
-        <MenuLinks isAuth={permissions.isAuth} toggle={isMobile ? handleClose : undefined} />
+        <MenuLinks toggle={isMobile ? handleClose : undefined} />
         <div style={{ marginTop: 'auto' }}>
           <Divider />
           <List>
