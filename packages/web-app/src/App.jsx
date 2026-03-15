@@ -46,6 +46,11 @@ import NotificationsPage from './pages/Notifications';
 import SnapshotPage from './components/appli/Entry/Snapshots';
 import EntrancesListPage from './pages/EntrancesList';
 import CountryListPage from './pages/CountryList';
+import EntrancesSearchPage from './pages/EntrancesSearch';
+import DocumentsSearchPage from './pages/DocumentsSearch';
+import MassifsSearchPage from './pages/MassifsSearch';
+import OrganizationsSearchPage from './pages/OrganizationsSearch';
+import PersonsSearchPage from './pages/PersonsSearch';
 
 import './App.css';
 
@@ -56,6 +61,11 @@ const router = createBrowserRouter(
       <Route exact path="/ui" element={<Dashboard />} />
       <Route path="/ui/admin/users" element={<ManageUsers />} />
       <Route path="/ui/search/:tab?" element={<AdvancedSearch />} />
+      <Route path="/ui/entrances" element={<EntrancesSearchPage />} />
+      <Route path="/ui/documents" element={<DocumentsSearchPage />} />
+      <Route path="/ui/massifs" element={<MassifsSearchPage />} />
+      <Route path="/ui/organizations" element={<OrganizationsSearchPage />} />
+      <Route path="/ui/persons" element={<PersonsSearchPage />} />
       <Route path="/ui/api/:version" element={<ApiDoc />} />
       <Route path="/ui/api" element={<Api />} />
       <Route path="/ui/:type/:id/snapshots" element={<SnapshotPage />} />

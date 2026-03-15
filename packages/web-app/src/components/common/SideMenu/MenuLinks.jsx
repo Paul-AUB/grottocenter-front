@@ -5,15 +5,31 @@ import {
   List,
   ListItemButton,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  ListSubheader
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import MapIcon from '@mui/icons-material/Map';
-import SearchIcon from '@mui/icons-material/Search';
 import { FlagRounded } from '@mui/icons-material';
+import {
+  entranceIcon,
+  bibliographyIcon,
+  massifIcon,
+  organizationIcon,
+  caverIcon
+} from '../../../assets/icons';
 
 import Translate from '../Translate';
+
+const EntityIcon = ({ src, alt }) => (
+  <img src={src} alt={alt} style={{ height: 24, width: 24 }} />
+);
+
+EntityIcon.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired
+};
 
 export const LinkedItem = ({ href = '', ItemIcon, label, onClick }) => (
   <ListItemButton
@@ -40,36 +56,78 @@ LinkedItem.propTypes = {
 const MenuLinks = ({ toggle }) => {
   const { formatMessage } = useIntl();
   return (
-    <List
-      component="nav"
-      aria-label={formatMessage({ id: 'main mailbox folders' })}>
-      <LinkedItem
-        ItemIcon={() => <MapIcon color="primary" />}
-        label={formatMessage({ id: 'Map' })}
-        href="/ui/map"
-        onClick={toggle}
-      />
-      <LinkedItem
-        ItemIcon={() => <SearchIcon color="primary" />}
-        label={formatMessage({ id: 'Advanced search' })}
-        href="/ui/search"
-        onClick={toggle}
-      />
-      <LinkedItem
-        ItemIcon={() => <LibraryAddIcon color="primary" />}
-        label={formatMessage({ id: 'Contribute' })}
-        href="/ui/entity/add"
-        onClick={toggle}
-      />
-      <LinkedItem
-        ItemIcon={() => <FlagRounded color="primary" />}
-        label={formatMessage({ id: 'Countries' })}
-        href="/ui/countries"
-        onClick={toggle}
-      />
-    </List>
+    <>
+      <List
+        component="nav"
+        aria-label={formatMessage({ id: 'main mailbox folders' })}
+        subheader={
+          <ListSubheader disableSticky>
+            <Translate>Explore</Translate>
+          </ListSubheader>
+        }>
+        <LinkedItem
+          ItemIcon={() => <MapIcon color="primary" />}
+          label={formatMessage({ id: 'Map' })}
+          href="/ui/map"
+          onClick={toggle}
+        />
+      </List>
+      <List
+        component="nav"
+        subheader={
+          <ListSubheader disableSticky>
+            <Translate>Browse</Translate>
+          </ListSubheader>
+        }>
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={entranceIcon} alt="entrance" />}
+          label={formatMessage({ id: 'Entrances' })}
+          href="/ui/entrances"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={bibliographyIcon} alt="document" />}
+          label={formatMessage({ id: 'Documents' })}
+          href="/ui/documents"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={massifIcon} alt="massif" />}
+          label={formatMessage({ id: 'Massifs' })}
+          href="/ui/massifs"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={organizationIcon} alt="organization" />}
+          label={formatMessage({ id: 'Organizations' })}
+          href="/ui/organizations"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={caverIcon} alt="person" />}
+          label={formatMessage({ id: 'Persons' })}
+          href="/ui/persons"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <FlagRounded color="primary" />}
+          label={formatMessage({ id: 'Countries' })}
+          href="/ui/countries"
+          onClick={toggle}
+        />
+      </List>
+      <List component="nav">
+        <LinkedItem
+          ItemIcon={() => <LibraryAddIcon color="primary" />}
+          label={formatMessage({ id: 'Contribute' })}
+          href="/ui/entity/add"
+          onClick={toggle}
+        />
+      </List>
+    </>
   );
 };
+
 MenuLinks.propTypes = {
   toggle: PropTypes.func
 };
