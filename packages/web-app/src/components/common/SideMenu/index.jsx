@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import {
+  Button,
   Divider,
   Drawer,
   List,
@@ -11,11 +12,14 @@ import {
 } from '@mui/material';
 import { Launch, MenuBook } from '@mui/icons-material';
 import LanguageIcon from '@mui/icons-material/Translate';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
+import { displayLoginDialog } from '../../../actions/Login';
+import { usePermissions } from '../../../hooks';
 import MenuLinks from './MenuLinks';
 import Translate from '../Translate';
 import LanguageSelector from '../LanguageSelector';
@@ -60,10 +64,26 @@ const Footer = styled('div')`
   margin-top: auto;
 `;
 
+const ContributeButton = styled(Button)(({ theme }) => ({
+  margin: theme.spacing(2, 1),
+  width: `calc(100% - ${theme.spacing(2)})`
+}));
+
 const SideMenu = ({ isOpen, toggle }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuth } = usePermissions();
   const handleClose = useCallback(() => dispatch(toggle()), [dispatch, toggle]);
   const { locale } = useSelector(state => state.intl);
+
+  const handleContributeClick = () => {
+    handleClose();
+    if (isAuth) {
+      navigate('/ui/entity/add');
+    } else {
+      dispatch(displayLoginDialog());
+    }
+  };
   const userguideUrl =
     userguideLinks[locale] !== undefined
       ? userguideLinks[locale]
@@ -88,6 +108,14 @@ const SideMenu = ({ isOpen, toggle }) => {
         <Divider />
         <MenuLinks toggle={isMobile ? handleClose : undefined} />
         <Footer>
+          <Divider />
+          <ContributeButton
+            variant="outlined"
+            color="primary"
+            startIcon={<LibraryAddIcon />}
+            onClick={handleContributeClick}>
+            <Translate>Contribute</Translate>
+          </ContributeButton>
           <Divider />
           <List>
             <ListItemButton

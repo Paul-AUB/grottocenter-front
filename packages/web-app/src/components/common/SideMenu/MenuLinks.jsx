@@ -2,19 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
+  Divider,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   ListSubheader
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import { styled } from '@mui/material/styles';
+import { Link } from 'react-router-dom';
 import MapIcon from '@mui/icons-material/Map';
 import { FlagRounded } from '@mui/icons-material';
-import { displayLoginDialog } from '../../../actions/Login';
-import { usePermissions } from '../../../hooks';
 import {
   entranceIcon,
   bibliographyIcon,
@@ -24,6 +22,16 @@ import {
 } from '../../../assets/icons';
 
 import Translate from '../Translate';
+
+const SectionHeader = styled(ListSubheader)(({ theme }) => ({
+  fontSize: '1rem',
+  fontWeight: 600,
+  letterSpacing: '1px',
+  textTransform: 'uppercase',
+  color: theme.palette.text.secondary,
+  lineHeight: '2rem',
+  paddingTop: theme.spacing(1)
+}));
 
 const EntityIcon = ({ src, alt }) => (
   <img src={src} alt={alt} style={{ height: 24, width: 24 }} />
@@ -58,28 +66,15 @@ LinkedItem.propTypes = {
 
 const MenuLinks = ({ toggle }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { isAuth } = usePermissions();
-
-  const handleContributeClick = () => {
-    if (toggle) toggle();
-    if (isAuth) {
-      navigate('/ui/entity/add');
-    } else {
-      dispatch(displayLoginDialog());
-    }
-  };
-
   return (
     <>
       <List
         component="nav"
         aria-label={formatMessage({ id: 'main mailbox folders' })}
         subheader={
-          <ListSubheader disableSticky>
+          <SectionHeader disableSticky>
             <Translate>Explore</Translate>
-          </ListSubheader>
+          </SectionHeader>
         }>
         <LinkedItem
           ItemIcon={() => <MapIcon color="primary" />}
@@ -88,12 +83,14 @@ const MenuLinks = ({ toggle }) => {
           onClick={toggle}
         />
       </List>
+      <Divider />
       <List
         component="nav"
+        sx={{ pb: 0 }}
         subheader={
-          <ListSubheader disableSticky>
+          <SectionHeader disableSticky>
             <Translate>Browse</Translate>
-          </ListSubheader>
+          </SectionHeader>
         }>
         <LinkedItem
           ItemIcon={() => <EntityIcon src={entranceIcon} alt="entrance" />}
@@ -114,7 +111,9 @@ const MenuLinks = ({ toggle }) => {
           onClick={toggle}
         />
         <LinkedItem
-          ItemIcon={() => <EntityIcon src={organizationIcon} alt="organization" />}
+          ItemIcon={() => (
+            <EntityIcon src={organizationIcon} alt="organization" />
+          )}
           label={formatMessage({ id: 'Organizations' })}
           href="/ui/organizations"
           onClick={toggle}
@@ -131,16 +130,6 @@ const MenuLinks = ({ toggle }) => {
           href="/ui/countries"
           onClick={toggle}
         />
-      </List>
-      <List component="nav">
-        <ListItemButton onClick={handleContributeClick}>
-          <ListItemIcon>
-            <LibraryAddIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText>
-            <Translate>Contribute</Translate>
-          </ListItemText>
-        </ListItemButton>
       </List>
     </>
   );
