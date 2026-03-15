@@ -28,7 +28,7 @@ const CountryList = ({ countries = [] }) => {
         id: 'Countries : Sovereign countries and autonomous territories (ISO 3166-1)'
       })}
       content={
-        <TableContainer component={Paper} style={{ width: '500px' }}>
+        <TableContainer component={Paper} sx={{ maxWidth: 500 }}>
           <Table size="small">
             <TableHead>
               <TableRow>
