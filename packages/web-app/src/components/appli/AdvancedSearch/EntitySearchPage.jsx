@@ -36,7 +36,7 @@ const EntitySearchPage = ({ title, entityType, children }) => {
 
   return (
     <FixedContent
-      icon={<CustomIcon type={ENTITY_ICON_TYPE[entityType]} />}
+      icon={<CustomIcon type={ENTITY_ICON_TYPE[entityType] ?? 'entrance'} />}
       title={formatMessage({ id: title })}
       content={
         <>

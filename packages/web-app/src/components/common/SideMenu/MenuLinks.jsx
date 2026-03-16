@@ -45,6 +45,7 @@ EntityIcon.propTypes = {
 export const LinkedItem = ({ href = '', ItemIcon, label, onClick }) => (
   <ListItemButton
     sx={{ py: '5px' }}
+    aria-label={label}
     component={React.forwardRef((props, ref) => (
       <Link {...props} to={href} ref={ref} />
     ))}
