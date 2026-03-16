@@ -3,12 +3,21 @@ import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
+import CustomIcon from '../../common/CustomIcon';
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
 import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
 import SearchResults from './SearchResults';
+
+const ENTITY_ICON_TYPE = {
+  entrances: 'entrance',
+  documents: 'bibliography',
+  massifs: 'massif',
+  organizations: 'organization',
+  persons: 'caver'
+};
 
 const EntitySearchPage = ({ title, entityType, children }) => {
   const dispatch = useDispatch();
@@ -27,6 +36,7 @@ const EntitySearchPage = ({ title, entityType, children }) => {
 
   return (
     <FixedContent
+      icon={<CustomIcon type={ENTITY_ICON_TYPE[entityType]} />}
       title={formatMessage({ id: title })}
       content={
         <>
