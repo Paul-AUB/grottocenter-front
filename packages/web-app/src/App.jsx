@@ -57,7 +57,8 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<ApplicationShell />}>
       <Route exact path="/" element={<HomePage />} />
-      <Route exact path="/ui" element={<Dashboard />} />
+      <Route exact path="/ui" element={<Navigate to="/" replace />} />
+      <Route path="/ui/dashboard" element={<Dashboard />} />
       <Route path="/ui/admin/users" element={<ManageUsers />} />
       <Route path="/ui/entrances" element={<EntrancesSearchPage />} />
       <Route path="/ui/documents" element={<DocumentsSearchPage />} />
@@ -116,7 +117,7 @@ const router = createBrowserRouter(
       <Route path="/ui/documents/:documentId" element={<DocumentDetails />} />
       <Route path="/ui/import-csv" element={<ImportContainer />} />
       <Route path="/ui/duplicates" element={<DuplicateImportHandle />} />
-      <Route path="/ui/*" render={() => <Navigate to="/ui" replace />} />
+      <Route path="/ui/*" element={<Navigate to="/" replace />} />
     </Route>
   ),
   {

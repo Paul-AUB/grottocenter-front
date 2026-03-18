@@ -72,7 +72,6 @@ const MenuLinks = ({ toggle }) => {
     <>
       <List
         component="nav"
-        aria-label={formatMessage({ id: 'main mailbox folders' })}
         subheader={
           <SectionHeader disableSticky>
             <Translate>Explore</Translate>

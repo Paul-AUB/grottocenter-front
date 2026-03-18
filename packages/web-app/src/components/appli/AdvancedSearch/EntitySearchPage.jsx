@@ -36,7 +36,19 @@ const EntitySearchPage = ({ title, entityType, children }) => {
 
   return (
     <FixedContent
-      icon={<CustomIcon type={ENTITY_ICON_TYPE[entityType] ?? 'entrance'} />}
+      icon={
+        <CustomIcon
+          type={(() => {
+            const iconType = ENTITY_ICON_TYPE[entityType];
+            if (!iconType)
+              // eslint-disable-next-line no-console
+              console.warn(
+                `EntitySearchPage: unknown entityType "${entityType}"`
+              );
+            return iconType ?? 'entrance';
+          })()}
+        />
+      }
       title={formatMessage({ id: title })}
       content={
         <>

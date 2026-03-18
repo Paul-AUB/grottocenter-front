@@ -66,7 +66,7 @@ const UserMenu = ({
 
   const handleDashboardClick = useCallback(() => {
     handleClose();
-    navigate('/ui');
+    navigate('/ui/dashboard');
   }, [handleClose, navigate]);
 
   return !isAuth ? (
