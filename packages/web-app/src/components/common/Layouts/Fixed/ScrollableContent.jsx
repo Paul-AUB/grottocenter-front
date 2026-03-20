@@ -13,7 +13,7 @@ import { useAnchorScroll } from '../../../../hooks';
 
 const Card = styled(MuiCard)`
   overflow: inherit;
-  margin: ${({ theme }) => theme.spacing(2)};
+  margin: ${({ theme }) => theme.spacing(1)} ${({ theme }) => theme.spacing(2)};
   scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
 `;
 
@@ -26,6 +26,12 @@ const CardHeader = styled(MuiCardHeader, {
   shouldForwardProp: prop => prop[0] !== '$'
 })`
   ${({ $dense }) => $dense && `padding-bottom: 0px`}
+`;
+
+const StyledCardContent = styled(CardContent)`
+  &:last-child {
+    padding-bottom: ${({ theme }) => theme.spacing(2)};
+  }
 `;
 
 const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subTitle = false }) => {
@@ -53,7 +59,7 @@ const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subT
           </Title>
         }
       />
-      <CardContent>{content}</CardContent>
+      <StyledCardContent>{content}</StyledCardContent>
     </Card>
   );
 };

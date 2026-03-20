@@ -50,6 +50,7 @@ const CardActions = styled(MuiCardActions)`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding-left: 16px;
 `;
 
 const Title = styled('span')`
@@ -79,6 +80,7 @@ const FixedContent = ({
   onDelete,
   printRef,
   snapshot,
+  entranceSnapshot,
   onChangeSubscribe,
   isSubscribed,
   isSubscribeLoading,
@@ -202,6 +204,15 @@ const FixedContent = ({
                 </Button>
               </Tooltip>
             )}
+            {!!entranceSnapshot && (
+              <SnapshotButton
+                id={entranceSnapshot.id}
+                type={entranceSnapshot.type}
+                content={entranceSnapshot.content}
+                isNetwork={entranceSnapshot.isNetwork}
+                tooltipTitle={formatMessage({ id: 'Revision history of this entrance' })}
+              />
+            )}
             {!!snapshot && (
               <SnapshotButton
                 id={snapshot.id}
@@ -210,7 +221,7 @@ const FixedContent = ({
                 isNetwork={snapshot.isNetwork}
                 getAll={snapshot.getAll}
                 startIcon={<TimelineIcon />}
-                label={formatMessage({ id: 'All Revisions' })}
+                tooltipTitle={formatMessage({ id: 'All revisions (entrance + sections)' })}
               />
             )}
           </ButtonGroup>
@@ -258,6 +269,12 @@ FixedContent.propTypes = {
     content: PropTypes.shape({}),
     isNetwork: PropTypes.bool,
     getAll: PropTypes.bool
+  }),
+  entranceSnapshot: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    type: PropTypes.string,
+    content: PropTypes.shape({}),
+    isNetwork: PropTypes.bool
   }),
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,

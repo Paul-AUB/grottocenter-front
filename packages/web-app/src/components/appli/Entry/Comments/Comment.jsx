@@ -19,8 +19,11 @@ import Duration from '../../../common/Properties/Duration';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
-  flex-direction: column;
-  border-top: 1px solid ${props => props.theme.palette.divider};
+  flex-direction: row;
+  align-items: flex-start;
+  border-top: 1px solid ${({ theme }) => theme.palette.divider};
+  padding-top: ${({ theme }) => theme.spacing(1)};
+  padding-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledListItemText = styled(ListItemText)`
@@ -92,7 +95,73 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
 
   return (
     <ListItemStyled disableGutters alignItems="flex-start">
-      <Box style={{ alignSelf: 'flex-end' }}>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateCommentForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewComment={false}
+            onSubmit={onSubmitForm}
+            values={comment}
+          />
+        </Box>
+      ) : (
+        <Box style={{ flexGrow: 1 }}>
+          <StyledListItemText
+            style={{ margin: 0 }}
+            disableTypography
+            primary={
+              <SectionTitle
+                title={comment.title}
+                anchorId={`comment-${comment.id}`}
+                isDeleted={comment.isDeleted}
+              />
+            }
+            secondary={
+              <Contribution
+                author={comment.author}
+                body={comment.body}
+                dateInscription={comment.dateInscription}
+                reviewer={comment.reviewer}
+                dateReviewed={comment.dateReviewed}
+                isDeleted={comment.isDeleted}
+              />
+            }
+          />
+          {(comment.aestheticism || comment.caving || comment.approach ||
+            (comment.eTTrail && comment.eTTrail.length > 0) ||
+            (comment.eTUnderground && comment.eTUnderground.length > 0)) && (
+            <StyledListItemIcon>
+              {(comment.aestheticism || comment.caving || comment.approach) && (
+                <StyledRatings
+                  interest={comment.aestheticism}
+                  progression={comment.caving}
+                  access={comment.approach}
+                  size="small"
+                />
+              )}
+              {(comment.eTTrail?.length > 0 || comment.eTUnderground?.length > 0) && (
+                <DurationContainer>
+                  {!!comment.eTTrail && comment.eTTrail.length > 0 && (
+                    <Duration
+                      image={timeToGoIcon}
+                      durationStr={comment.eTTrail}
+                      title={formatMessage({ id: 'Time to go' })}
+                    />
+                  )}
+                  {!!comment.eTUnderground && comment.eTUnderground.length > 0 && (
+                    <Duration
+                      image={undergroundTimeIcon}
+                      durationStr={comment.eTUnderground}
+                      title={formatMessage({ id: 'Underground time' })}
+                    />
+                  )}
+                </DurationContainer>
+              )}
+            </StyledListItemIcon>
+          )}
+        </Box>
+      )}
+      <Box style={{ flexShrink: 0 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -116,64 +185,6 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             : {})}
         />
       </Box>
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <CreateCommentForm
-            closeForm={() => setIsUpdateFormVisible(false)}
-            isNewComment={false}
-            onSubmit={onSubmitForm}
-            values={comment}
-          />
-        </Box>
-      ) : (
-        <>
-          <StyledListItemText
-            style={{ margin: 0 }}
-            disableTypography
-            primary={
-              <SectionTitle
-                title={comment.title}
-                anchorId={`comment-${comment.id}`}
-                isDeleted={comment.isDeleted}
-              />
-            }
-            secondary={
-              <Contribution
-                author={comment.author}
-                body={comment.body}
-                dateInscription={comment.dateInscription}
-                reviewer={comment.reviewer}
-                dateReviewed={comment.dateReviewed}
-                isDeleted={comment.isDeleted}
-              />
-            }
-          />
-          <StyledListItemIcon>
-            <StyledRatings
-              interest={comment.aestheticism}
-              progression={comment.caving}
-              access={comment.approach}
-              size="small"
-            />
-            <DurationContainer>
-              {!!comment.eTTrail && comment.eTTrail.length > 0 && (
-                <Duration
-                  image={timeToGoIcon}
-                  durationStr={comment.eTTrail}
-                  title={formatMessage({ id: 'Time to go' })}
-                />
-              )}
-              {!!comment.eTUnderground && comment.eTUnderground.length > 0 && (
-                <Duration
-                  image={undergroundTimeIcon}
-                  durationStr={comment.eTUnderground}
-                  title={formatMessage({ id: 'Underground time' })}
-                />
-              )}
-            </DurationContainer>
-          </StyledListItemIcon>
-        </>
-      )}
     </ListItemStyled>
   );
 };

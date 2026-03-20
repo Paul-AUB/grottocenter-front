@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
-import { Card } from '@mui/material';
+import { Card, Typography } from '@mui/material';
 
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
@@ -30,7 +30,6 @@ import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 import Alert from '../../common/Alert';
 import Map from '../../common/Maps/MapMultipleMarkers';
 import { EntrancePropTypes } from '../../../types/entrance.type';
-import { SnapshotButton } from './Snapshots/UtilityFunction';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
@@ -38,18 +37,9 @@ import {
 } from '../../common/card/Deleted';
 import { fetchPerson } from '../../../actions/Person/GetPerson';
 
-const HalfSplitContainer = styled('div')(
-  ({ theme }) => `
+const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
-  ${theme.breakpoints.up('lg')} {
-    flex-direction: row;
-  }
-`
-);
-
-const SnapshotButtonStyled = styled(SnapshotButton)`
-  margin-left: auto;
 `;
 
 export const Entry = ({ isLoading, error, entrance }) => {
@@ -151,12 +141,45 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 : undefined
             }
             printRef={componentRef}
+            entranceSnapshot={{
+              id: entrance.id,
+              type: 'entrances',
+              isNetwork: entrance.cave?.entrances.length > 1,
+              content: {
+                ...entrance,
+                latitude: entrance?.latitude,
+                longitude: entrance?.longitude,
+                cave: entrance?.cave?.id,
+                caveName: entrance?.cave?.name
+              }
+            }}
             snapshot={{
               id: entrance.id,
               type: 'entrances',
               isNetwork: entrance.cave?.entrances.length > 1,
               getAll: true
             }}
+            footer={
+              (entrance.author || entrance.reviewer) && (
+                <Typography component="div" variant="caption">
+                  {entrance.author && (
+                    <AuthorAndDate
+                      author={entrance.author}
+                      verb="Created"
+                      date={entrance.dateInscription}
+                    />
+                  )}
+                  {entrance.author && entrance.reviewer && ' · '}
+                  {entrance.reviewer && (
+                    <AuthorAndDate
+                      author={entrance.reviewer}
+                      verb="Updated"
+                      date={entrance.dateReviewed}
+                    />
+                  )}
+                </Typography>
+              )
+            }
             content={
               <>
                 {entrance.isDeleted && (
@@ -194,40 +217,6 @@ export const Entry = ({ isLoading, error, entrance }) => {
 
                   <Properties entrance={entrance} />
                 </HalfSplitContainer>
-              </>
-            }
-            footer={
-              <>
-                {entrance.author && (
-                  <AuthorAndDate
-                    author={entrance.author}
-                    verb="Created"
-                    date={entrance.dateInscription}
-                  />
-                )}
-                {entrance.reviewer && (
-                  <AuthorAndDate
-                    author={entrance.reviewer}
-                    verb="Updated"
-                    date={entrance.dateReviewed}
-                  />
-                )}
-                <SnapshotButtonStyled
-                  size="small"
-                  variant="outlined"
-                  color="primary"
-                  id={entrance.id}
-                  type="entrances"
-                  isNetwork={entrance.cave?.entrances.length > 1}
-                  label={formatMessage({ id: 'Revisions' })}
-                  content={{
-                    ...entrance,
-                    latitude: entrance?.latitude,
-                    longitude: entrance?.longitude,
-                    cave: entrance?.cave?.id,
-                    caveName: entrance?.cave?.name
-                  }}
-                />
               </>
             }
           />

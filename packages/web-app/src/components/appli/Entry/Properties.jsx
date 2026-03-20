@@ -28,9 +28,6 @@ const GlobalWrapper = styled('div')`
   gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-const SmallRatingsWrapper = styled('div')`
-  transform: scale(0.85);
-`;
 
 const FlexContainer = styled('div')`
   display: flex;
@@ -92,13 +89,7 @@ const Properties = ({ isLoading = false, entrance }) => {
                 <Property
                   loading={isLoading}
                   label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-                  value={`${formatMessage({ id: 'Lat.' })} (N) / ${formatMessage(
-                    {
-                      id: 'Long.'
-                    }
-                  )} (E) = ${entrance.latitude.toFixed(
-                    4
-                  )}, ${entrance.longitude.toFixed(4)}`}
+                  value={`${entrance.latitude.toFixed(4)}° N, ${entrance.longitude.toFixed(4)}° E`}
                   icon={<CustomIcon type="coordinates" />}
                 />
               </FlexContainerGrow>
@@ -231,13 +222,12 @@ const Properties = ({ isLoading = false, entrance }) => {
         !!entrance.stats.approach &&
         !!entrance.stats.aestheticism &&
         !!entrance.stats.caving && (
-          <SmallRatingsWrapper>
             <StyledRatings
               access={entrance.stats.approach}
               interest={entrance.stats.aestheticism}
               progression={entrance.stats.caving}
+              size="small"
             />
-          </SmallRatingsWrapper>
         )}
     </GlobalWrapper>
   );

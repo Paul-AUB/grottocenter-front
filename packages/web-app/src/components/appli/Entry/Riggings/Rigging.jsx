@@ -45,42 +45,17 @@ const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
   const isActionLoading = wantedDeletedState !== rigging.isDeleted;
 
   return (
-    <Box key={rigging.id} position="relative" mt={2}>
-      <Box
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end'
-        }}>
-        <Box>
-          <ActionButtons
-            isLoading={isActionLoading}
-            isUpdating={isUpdateFormVisible}
-            setIsUpdating={setIsUpdateFormVisible}
-            isDeleted={rigging.isDeleted}
-            canEdit={isEditAllowed && permissions.isAuth}
-            canDelete={isEditAllowed && permissions.isModerator}
-            snapshotEl={
-              <SnapshotButton
-                id={rigging.id}
-                type="riggings"
-                content={rigging}
-              />
-            }
-            onDeletePress={onDeletePress}
-            onRestorePress={onRestorePress}
-            {...(isEditAllowed && permissions.isAuth && !rigging.isDeleted
-              ? {
-                  onMoveUp,
-                  onMoveDown,
-                  isFirst,
-                  isLast,
-                  isMoveLoading: isMoving
-                }
-              : {})}
-          />
-        </Box>
-      </Box>
+    <Box
+      key={rigging.id}
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        borderTop: '1px solid',
+        borderColor: 'divider',
+        pt: 1,
+        pb: 1
+      }}>
       {isUpdateFormVisible && permissions.isAuth ? (
         <Box width="100%">
           <CreateRiggingsForm
@@ -91,7 +66,7 @@ const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
           />
         </Box>
       ) : (
-        <Box>
+        <Box style={{ flexGrow: 1 }}>
           <RiggingTable {...rigging} />
           <Contribution
             author={rigging.author}
@@ -101,6 +76,34 @@ const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
           />
         </Box>
       )}
+      <Box style={{ flexShrink: 0 }}>
+        <ActionButtons
+          isLoading={isActionLoading}
+          isUpdating={isUpdateFormVisible}
+          setIsUpdating={setIsUpdateFormVisible}
+          isDeleted={rigging.isDeleted}
+          canEdit={isEditAllowed && permissions.isAuth}
+          canDelete={isEditAllowed && permissions.isModerator}
+          snapshotEl={
+            <SnapshotButton
+              id={rigging.id}
+              type="riggings"
+              content={rigging}
+            />
+          }
+          onDeletePress={onDeletePress}
+          onRestorePress={onRestorePress}
+          {...(isEditAllowed && permissions.isAuth && !rigging.isDeleted
+            ? {
+                onMoveUp,
+                onMoveDown,
+                isFirst,
+                isLast,
+                isMoveLoading: isMoving
+              }
+            : {})}
+        />
+      </Box>
     </Box>
   );
 };

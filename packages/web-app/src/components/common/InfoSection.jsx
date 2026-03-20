@@ -11,7 +11,6 @@ const SectionWrapper = styled(Box)`
 
 const SectionTitle = styled(Typography)`
   font-weight: 600;
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const InfoSection = ({ title, children }) => (

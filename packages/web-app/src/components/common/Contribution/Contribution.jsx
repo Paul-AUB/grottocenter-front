@@ -38,24 +38,25 @@ const Contribution = ({
           <Linkify>{body}</Linkify>
         </MultilinesTypography>
       )}
-      <br />
-      {author && (
-        <AuthorAndDate
-          author={author}
-          date={dateInscription}
-          withHours={withHours}
-        />
-      )}
-      {reviewer && (
-        <>
-          <br />
-          <AuthorAndDate
-            author={reviewer}
-            date={dateReviewed}
-            verb={author ? 'Updated' : ''}
-            withHours={withHours}
-          />
-        </>
+      {(author || reviewer) && (
+        <Typography component="div" variant="caption" sx={{ mt: 3 }}>
+          {author && (
+            <AuthorAndDate
+              author={author}
+              date={dateInscription}
+              withHours={withHours}
+            />
+          )}
+          {author && reviewer && ' · '}
+          {reviewer && (
+            <AuthorAndDate
+              author={reviewer}
+              date={dateReviewed}
+              verb={author ? 'Updated' : ''}
+              withHours={withHours}
+            />
+          )}
+        </Typography>
       )}
     </>
   );
