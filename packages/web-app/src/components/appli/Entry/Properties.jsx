@@ -29,14 +29,7 @@ const GlobalWrapper = styled('div')`
 `;
 
 
-const FlexContainer = styled('div')`
-  display: flex;
-  justify-content: start;
-  align-items: center;
-`;
-const FlexContainerGrow = styled('div')`
-  flex-grow: 1;
-`;
+
 const StyledRatings = styled(Ratings)`
   justify-content: space-evenly;
 `;
@@ -84,31 +77,24 @@ const Properties = ({ isLoading = false, entrance }) => {
       <InfoSection title={formatMessage({ id: 'Cave information' })}>
         <Box display="flex" flexDirection="column">
           {entrance.latitude && entrance.longitude && (
-            <FlexContainer>
-              <FlexContainerGrow>
-                <Property
-                  loading={isLoading}
-                  label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-                  value={`${entrance.latitude.toFixed(4)}° N, ${entrance.longitude.toFixed(4)}° E`}
-                  icon={<CustomIcon type="coordinates" />}
-                />
-              </FlexContainerGrow>
-              <div>
-                <ButtonGroup color="primary" variant="outlined" size="small">
-                  <Tooltip
-                    title={formatMessage({ id: 'Open on OpenStreetMap' })}>
-                    <Button onClick={openOSM} startIcon={<Map />}>
-                      OSM
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title={formatMessage({ id: 'Open on Google Maps' })}>
-                    <Button onClick={openGM} startIcon={<Place />}>
-                      GMaps
-                    </Button>
-                  </Tooltip>
-                </ButtonGroup>
-              </div>
-            </FlexContainer>
+            <Property
+              loading={isLoading}
+              label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
+              value={
+                <Box display="flex" alignItems="center" gap={1}>
+                  <span>{`${entrance.latitude.toFixed(4)}° N, ${entrance.longitude.toFixed(4)}° E`}</span>
+                  <ButtonGroup color="primary" variant="outlined" size="small">
+                    <Tooltip title={formatMessage({ id: 'Open on OpenStreetMap' })}>
+                      <Button onClick={openOSM} startIcon={<Map fontSize="small" />}>OSM</Button>
+                    </Tooltip>
+                    <Tooltip title={formatMessage({ id: 'Open on Google Maps' })}>
+                      <Button onClick={openGM} startIcon={<Place fontSize="small" />}>GMaps</Button>
+                    </Tooltip>
+                  </ButtonGroup>
+                </Box>
+              }
+              icon={<CustomIcon type="coordinates" />}
+            />
           )}
           {precisionText && (
             <Alert
