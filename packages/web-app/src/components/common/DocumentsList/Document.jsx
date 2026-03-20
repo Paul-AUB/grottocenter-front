@@ -1,13 +1,15 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
+  Box,
   Chip,
   ListItem,
-  ListItemIcon,
   Typography,
   ButtonGroup,
   Tooltip,
-  Button
+  Button,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import React, { useState } from 'react';
@@ -47,6 +49,8 @@ const Document = ({
   imageIndexOffset = 0
 }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const [isUnlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
 
   return (
@@ -83,10 +87,10 @@ const Document = ({
         )}
       </StyledListItemContainer>
 
-      {hasSnapshotButton || onUnlink ? (
-        <ListItemIcon style={{ alignSelf: 'start' }}>
-          <ButtonGroup color="primary">
-            {hasSnapshotButton ? (
+      {(hasSnapshotButton || onUnlink) && (
+        <Box style={{ flexShrink: 0, alignSelf: 'flex-start' }}>
+          <ButtonGroup color="primary" size="small" orientation={isSmall ? 'vertical' : 'horizontal'}>
+            {hasSnapshotButton && (
               <SnapshotButton
                 color="primary"
                 variant="outlined"
@@ -94,15 +98,9 @@ const Document = ({
                 type="documents"
                 content={document}
               />
-            ) : (
-              false
             )}
-            {onUnlink ? (
-              <Tooltip
-                title={formatMessage({
-                  id: 'Unlink this document'
-                })}
-              >
+            {onUnlink && (
+              <Tooltip title={formatMessage({ id: 'Unlink this document' })}>
                 <Button
                   onClick={() => setUnlinkDialogOpen(true)}
                   color="primary"
@@ -111,13 +109,9 @@ const Document = ({
                   <LinkOffIcon />
                 </Button>
               </Tooltip>
-            ) : (
-              false
             )}
           </ButtonGroup>
-        </ListItemIcon>
-      ) : (
-        false
+        </Box>
       )}
       {onUnlink ? (
         <StandardDialog
