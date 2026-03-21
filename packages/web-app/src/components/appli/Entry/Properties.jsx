@@ -74,7 +74,7 @@ const Properties = ({ isLoading = false, entrance }) => {
 
   return (
     <GlobalWrapper>
-      <InfoSection title={formatMessage({ id: 'Cave information' })}>
+      <InfoSection title="Location">
         <Box display="flex" flexDirection="column">
           {entrance.latitude && entrance.longitude && (
             <Property
@@ -102,11 +102,7 @@ const Properties = ({ isLoading = false, entrance }) => {
               content={precisionText}
             />
           )}
-          <Box
-            display="flex"
-            flexDirection="row"
-            flexWrap="wrap"
-            justifyContent="flex-start">
+          <Box display="flex" flexDirection="row" flexWrap="wrap" justifyContent="flex-start">
             <Property
               loading={isLoading}
               label={formatMessage({ id: 'Country' })}
@@ -119,18 +115,10 @@ const Properties = ({ isLoading = false, entrance }) => {
               flexBasis="fill"
               loading={isLoading}
               label={formatMessage({ id: 'Location' })}
-              value={[entrance.city, entrance.region]
-                .flatMap(f => (f ? [f] : []))
-                .join(', ')}
+              value={[entrance.city, entrance.region].flatMap(f => (f ? [f] : [])).join(', ')}
               icon={<CustomIcon type="location" />}
               secondary
             />
-          </Box>
-          <Box
-            display="flex"
-            flexDirection="row"
-            flexWrap="wrap"
-            justifyContent="flex-start">
             {entrance.massif && (
               <Property
                 label={formatMessage({ id: 'Massif' })}
@@ -150,16 +138,12 @@ const Properties = ({ isLoading = false, entrance }) => {
             )}
           </Box>
         </Box>
-        <Box
-          display="flex"
-          flexDirection="row"
-          flexWrap="wrap"
-          justifyContent="flex-start">
+      </InfoSection>
+
+      <InfoSection title="Characteristics">
+        <Box display="flex" flexDirection="row" flexWrap="wrap" justifyContent="flex-start">
           <DepthProperty depth={entrance.cave?.depth} isLoading={isLoading} />
-          <LengthProperty
-            length={entrance.cave?.length}
-            isLoading={isLoading}
-          />
+          <LengthProperty length={entrance.cave?.length} isLoading={isLoading} />
           {!!entrance.altitude && (
             <Property
               label={formatMessage({ id: 'Altitude' })}
@@ -167,10 +151,7 @@ const Properties = ({ isLoading = false, entrance }) => {
               icon={<CustomIcon type="altitude" />}
             />
           )}
-          <TemperatureProperty
-            temperature={entrance.cave?.temperature}
-            isLoading={isLoading}
-          />
+          <TemperatureProperty temperature={entrance.cave?.temperature} isLoading={isLoading} />
           {!!entrance.discoveryYear && (
             <Property
               label={formatMessage({ id: 'Year of discovery' })}
@@ -178,19 +159,23 @@ const Properties = ({ isLoading = false, entrance }) => {
               icon={<CustomIcon type="discovery_date" />}
             />
           )}
-          {!!entrance.massif?.undergroundType && (
-            <Property
-              label={formatMessage({ id: 'Underground type' })}
-              value={entrance.undergroundType}
-              icon={<CustomIcon type="category" />}
-            />
-          )}
-          <DivingProperty
-            isDiving={entrance.cave?.isDiving}
-            isLoading={isLoading}
-          />
         </Box>
       </InfoSection>
+
+      {(!!entrance.massif?.undergroundType || entrance.cave?.isDiving) && (
+        <InfoSection title="Features">
+          <Box display="flex" flexDirection="row" flexWrap="wrap" justifyContent="flex-start">
+            {!!entrance.massif?.undergroundType && (
+              <Property
+                label={formatMessage({ id: 'Underground type' })}
+                value={entrance.undergroundType}
+                icon={<CustomIcon type="category" />}
+              />
+            )}
+            <DivingProperty isDiving={entrance.cave?.isDiving} isLoading={isLoading} />
+          </Box>
+        </InfoSection>
+      )}
       {entrance.cave?.exploringOrganizations?.length > 0 && (
         <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
           <Box

@@ -59,7 +59,7 @@ const Property = ({
   icon,
   secondary = false,
   url,
-  flexBasis = '33%'
+  flexBasis = '25%'
 }) => (
   <PropertyWrapper $flexBasis={flexBasis}>
     {!isNil(icon) && <IconWrapper display="flex">{icon}</IconWrapper>}
