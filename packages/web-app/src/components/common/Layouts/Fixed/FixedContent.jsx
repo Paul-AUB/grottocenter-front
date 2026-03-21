@@ -44,6 +44,7 @@ const CardContent = styled(MuiCardContent)`
   flex-grow: 1;
   overflow-y: auto;
   scroll-behavior: smooth;
+  padding-top: 0;
 `;
 
 const CardActions = styled(MuiCardActions)`
