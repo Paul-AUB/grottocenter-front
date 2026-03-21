@@ -2,12 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { Box, Button, ButtonGroup, Tooltip } from '@mui/material';
-import {
-  Place,
-  Map
-} from '@mui/icons-material';
-import Alert from '../../common/Alert';
+import { Box, Button, ButtonGroup, Chip, Tooltip } from '@mui/material';
+import { Place, Map } from '@mui/icons-material';
+
 import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
 import InfoSection from '../../common/InfoSection';
@@ -28,8 +25,6 @@ const GlobalWrapper = styled('div')`
   gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-
-
 const StyledRatings = styled(Ratings)`
   justify-content: space-evenly;
 `;
@@ -45,13 +40,13 @@ const Properties = ({ isLoading = false, entrance }) => {
   let precisionText = '';
   if (entrance.precision === 0) {
     precisionText = formatMessage({
-      id: 'Coordinates precision unavailable for restricted access entrance.'
+      id: 'Precision unavailable for restricted access entrance.'
     });
   } else if (entrance.precision !== undefined && entrance.precision !== null) {
     precisionText = formatMessage(
       {
-        id: 'Coordinates precision: ±{precision}m',
-        defaultMessage: 'Coordinates precision: ±{precision}m'
+        id: 'Precision: ±{precision}m',
+        defaultMessage: 'Precision: ±{precision}m'
       },
       { precision: entrance.precision }
     );
@@ -81,14 +76,31 @@ const Properties = ({ isLoading = false, entrance }) => {
               loading={isLoading}
               label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
               value={
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
                   <span>{`${entrance.latitude.toFixed(4)}° N, ${entrance.longitude.toFixed(4)}° E`}</span>
+                  {precisionText && (
+                    <Chip
+                      label={precisionText}
+                      size="small"
+                      color={computePrecisionSeverity(entrance.precision)}
+                    />
+                  )}
                   <ButtonGroup color="primary" variant="outlined" size="small">
-                    <Tooltip title={formatMessage({ id: 'Open on OpenStreetMap' })}>
-                      <Button onClick={openOSM} startIcon={<Map fontSize="small" />}>OSM</Button>
+                    <Tooltip
+                      title={formatMessage({ id: 'Open on OpenStreetMap' })}>
+                      <Button
+                        onClick={openOSM}
+                        startIcon={<Map fontSize="small" />}>
+                        OSM
+                      </Button>
                     </Tooltip>
-                    <Tooltip title={formatMessage({ id: 'Open on Google Maps' })}>
-                      <Button onClick={openGM} startIcon={<Place fontSize="small" />}>GMaps</Button>
+                    <Tooltip
+                      title={formatMessage({ id: 'Open on Google Maps' })}>
+                      <Button
+                        onClick={openGM}
+                        startIcon={<Place fontSize="small" />}>
+                        GMaps
+                      </Button>
                     </Tooltip>
                   </ButtonGroup>
                 </Box>
@@ -96,13 +108,12 @@ const Properties = ({ isLoading = false, entrance }) => {
               icon={<CustomIcon type="coordinates" />}
             />
           )}
-          {precisionText && (
-            <Alert
-              severity={computePrecisionSeverity(entrance.precision)}
-              content={precisionText}
-            />
-          )}
-          <Box display="flex" flexDirection="row" flexWrap="wrap" justifyContent="flex-start">
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns:
+                'repeat(auto-fill, minmax(max(24%, 130px), 1fr))'
+            }}>
             <Property
               loading={isLoading}
               label={formatMessage({ id: 'Country' })}
@@ -112,10 +123,11 @@ const Properties = ({ isLoading = false, entrance }) => {
               secondary
             />
             <Property
-              flexBasis="fill"
               loading={isLoading}
               label={formatMessage({ id: 'Location' })}
-              value={[entrance.city, entrance.region].flatMap(f => (f ? [f] : [])).join(', ')}
+              value={[entrance.city, entrance.region]
+                .flatMap(f => (f ? [f] : []))
+                .join(', ')}
               icon={<CustomIcon type="location" />}
               secondary
             />
@@ -129,7 +141,6 @@ const Properties = ({ isLoading = false, entrance }) => {
             )}
             {entrance.cave && entrance.cave.entrances.length > 1 && (
               <Property
-                flexBasis="fit-content"
                 label={formatMessage({ id: 'Network' })}
                 value={`${entrance.cave.name}`}
                 icon={<CustomIcon type="network" />}
@@ -141,9 +152,17 @@ const Properties = ({ isLoading = false, entrance }) => {
       </InfoSection>
 
       <InfoSection title="Characteristics">
-        <Box display="flex" flexDirection="row" flexWrap="wrap" justifyContent="flex-start">
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns:
+              'repeat(auto-fill, minmax(max(24%, 120px), 1fr))'
+          }}>
           <DepthProperty depth={entrance.cave?.depth} isLoading={isLoading} />
-          <LengthProperty length={entrance.cave?.length} isLoading={isLoading} />
+          <LengthProperty
+            length={entrance.cave?.length}
+            isLoading={isLoading}
+          />
           {!!entrance.altitude && (
             <Property
               label={formatMessage({ id: 'Altitude' })}
@@ -151,7 +170,10 @@ const Properties = ({ isLoading = false, entrance }) => {
               icon={<CustomIcon type="altitude" />}
             />
           )}
-          <TemperatureProperty temperature={entrance.cave?.temperature} isLoading={isLoading} />
+          <TemperatureProperty
+            temperature={entrance.cave?.temperature}
+            isLoading={isLoading}
+          />
           {!!entrance.discoveryYear && (
             <Property
               label={formatMessage({ id: 'Year of discovery' })}
@@ -159,30 +181,43 @@ const Properties = ({ isLoading = false, entrance }) => {
               icon={<CustomIcon type="discovery_date" />}
             />
           )}
+          {!!entrance.massif?.undergroundType && (
+            <Property
+              label={formatMessage({ id: 'Underground type' })}
+              value={entrance.undergroundType}
+              icon={<CustomIcon type="category" />}
+            />
+          )}
         </Box>
       </InfoSection>
 
-      {(!!entrance.massif?.undergroundType || entrance.cave?.isDiving) && (
+      {entrance.cave?.isDiving && (
         <InfoSection title="Features">
-          <Box display="flex" flexDirection="row" flexWrap="wrap" justifyContent="flex-start">
-            {!!entrance.massif?.undergroundType && (
-              <Property
-                label={formatMessage({ id: 'Underground type' })}
-                value={entrance.undergroundType}
-                icon={<CustomIcon type="category" />}
-              />
-            )}
-            <DivingProperty isDiving={entrance.cave?.isDiving} isLoading={isLoading} />
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns:
+                'repeat(auto-fill, minmax(max(24%, 130px), 1fr))'
+            }}>
+            <DivingProperty
+              isDiving={entrance.cave?.isDiving}
+              isLoading={isLoading}
+            />
           </Box>
         </InfoSection>
       )}
       {entrance.cave?.exploringOrganizations?.length > 0 && (
         <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
           <Box
-            display="flex"
-            flexDirection="row"
-            flexWrap="wrap"
-            justifyContent="flex-start">
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)',
+                lg: 'repeat(4, 1fr)'
+              }
+            }}>
             {entrance.cave.exploringOrganizations.map(org => (
               <OrganizationProperty key={org.id} organization={org} />
             ))}
@@ -193,12 +228,12 @@ const Properties = ({ isLoading = false, entrance }) => {
         !!entrance.stats.approach &&
         !!entrance.stats.aestheticism &&
         !!entrance.stats.caving && (
-            <StyledRatings
-              access={entrance.stats.approach}
-              interest={entrance.stats.aestheticism}
-              progression={entrance.stats.caving}
-              size="small"
-            />
+          <StyledRatings
+            access={entrance.stats.approach}
+            interest={entrance.stats.aestheticism}
+            progression={entrance.stats.caving}
+            size="small"
+          />
         )}
     </GlobalWrapper>
   );
