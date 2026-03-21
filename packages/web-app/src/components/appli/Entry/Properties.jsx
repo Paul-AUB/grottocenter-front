@@ -131,12 +131,12 @@ const Properties = ({ isLoading = false, entrance }) => {
               icon={<CustomIcon type="location" />}
               secondary
             />
-            {entrance.massif && (
+            {entrance.massifs?.length > 0 && (
               <Property
                 label={formatMessage({ id: 'Massif' })}
-                value={entrance.massif.name}
+                value={entrance.massifs[0].name}
                 icon={<CustomIcon type="massif" />}
-                url={`/ui/massifs/${entrance.massif.id}`}
+                url={`/ui/massifs/${entrance.massifs[0].id}`}
               />
             )}
             {entrance.cave && entrance.cave.entrances.length > 1 && (
@@ -151,45 +151,52 @@ const Properties = ({ isLoading = false, entrance }) => {
         </Box>
       </InfoSection>
 
-      <InfoSection title="Characteristics">
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fill, minmax(max(24%, 120px), 1fr))'
-          }}>
-          <DepthProperty depth={entrance.cave?.depth} isLoading={isLoading} />
-          <LengthProperty
-            length={entrance.cave?.length}
-            isLoading={isLoading}
-          />
-          {!!entrance.altitude && (
-            <Property
-              label={formatMessage({ id: 'Altitude' })}
-              value={`${entrance.altitude} m`}
-              icon={<CustomIcon type="altitude" />}
+      {(entrance.cave?.depth ||
+        entrance.cave?.length ||
+        entrance.altitude ||
+        entrance.cave?.temperature ||
+        entrance.discoveryYear ||
+        entrance.undergroundType) && (
+        <InfoSection title="Characteristics">
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns:
+                'repeat(auto-fill, minmax(max(24%, 120px), 1fr))'
+            }}>
+            <DepthProperty depth={entrance.cave?.depth} isLoading={isLoading} />
+            <LengthProperty
+              length={entrance.cave?.length}
+              isLoading={isLoading}
             />
-          )}
-          <TemperatureProperty
-            temperature={entrance.cave?.temperature}
-            isLoading={isLoading}
-          />
-          {!!entrance.discoveryYear && (
-            <Property
-              label={formatMessage({ id: 'Year of discovery' })}
-              value={entrance.discoveryYear}
-              icon={<CustomIcon type="discovery_date" />}
+            {!!entrance.altitude && (
+              <Property
+                label={formatMessage({ id: 'Altitude' })}
+                value={`${entrance.altitude} m`}
+                icon={<CustomIcon type="altitude" />}
+              />
+            )}
+            <TemperatureProperty
+              temperature={entrance.cave?.temperature}
+              isLoading={isLoading}
             />
-          )}
-          {!!entrance.massif?.undergroundType && (
-            <Property
-              label={formatMessage({ id: 'Underground type' })}
-              value={entrance.undergroundType}
-              icon={<CustomIcon type="category" />}
-            />
-          )}
-        </Box>
-      </InfoSection>
+            {!!entrance.discoveryYear && (
+              <Property
+                label={formatMessage({ id: 'Year of discovery' })}
+                value={entrance.discoveryYear}
+                icon={<CustomIcon type="discovery_date" />}
+              />
+            )}
+            {!!entrance.undergroundType && (
+              <Property
+                label={formatMessage({ id: 'Underground type' })}
+                value={entrance.undergroundType}
+                icon={<CustomIcon type="category" />}
+              />
+            )}
+          </Box>
+        </InfoSection>
+      )}
 
       {entrance.cave?.isDiving && (
         <InfoSection title="Features">

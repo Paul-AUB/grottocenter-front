@@ -5,7 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
-import { Card, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { Link as RouterLink } from 'react-router-dom';
 
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
@@ -127,6 +129,47 @@ export const Entry = ({ isLoading, error, entrance }) => {
         {entrance && (
           <FixedContent
             displayShare
+            subheader={
+              <Box>
+                <Breadcrumbs
+                  separator={<NavigateNextIcon fontSize="small" />}
+                  sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
+                  {entrance.country && (
+                    <Link
+                      component={RouterLink}
+                      to={`/ui/countries/${entrance.country}`}
+                      underline="hover"
+                      color="inherit"
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <CustomIcon type="country" size={16} />
+                      {entrance.country}
+                    </Link>
+                  )}
+                  {entrance.massifs?.[0] && (
+                    <Link
+                      component={RouterLink}
+                      to={`/ui/massifs/${entrance.massifs[0].id}`}
+                      underline="hover"
+                      color="inherit"
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <CustomIcon type="massif" size={16} />
+                      {entrance.massifs[0].name}
+                    </Link>
+                  )}
+                  {entrance.cave?.entrances?.length > 1 && (
+                    <Link
+                      component={RouterLink}
+                      to={`/ui/caves/${entrance.cave.id}`}
+                      underline="hover"
+                      color="inherit"
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <CustomIcon type="network" size={16} />
+                      {entrance.cave.name}
+                    </Link>
+                  )}
+                </Breadcrumbs>
+              </Box>
+            }
             title={entrance.name ?? ''}
             icon={<CustomIcon type="entrance" />}
             onEdit={
@@ -160,7 +203,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
               getAll: true
             }}
             footer={
-              (entrance.author || entrance.reviewer) && (
+              (entrance.author || entrance.reviewer || entrance.language) && (
                 <Typography component="div" variant="caption">
                   {entrance.author && (
                     <AuthorAndDate
@@ -177,6 +220,11 @@ export const Entry = ({ isLoading, error, entrance }) => {
                       date={entrance.dateReviewed}
                     />
                   )}
+                  {entrance.language &&
+                    (entrance.author || entrance.reviewer) &&
+                    ' · '}
+                  {entrance.language &&
+                    `${formatMessage({ id: 'Language' })} : ${entrance.language.toUpperCase()}`}
                 </Typography>
               )
             }

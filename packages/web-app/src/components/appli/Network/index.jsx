@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Card } from '@mui/material';
+import { Card, Typography } from '@mui/material';
 
 import { usePermissions, useUserProperties } from '../../../hooks';
 import { linkCave } from '../../../actions/Cave/LinkCave';
@@ -178,22 +178,28 @@ export const Network = ({ isLoading, error, cave }) => {
                 </>
               }
               footer={
-                <>
-                  {cave.author && (
-                    <AuthorAndDate
-                      author={cave.author}
-                      verb="Created"
-                      date={cave.dateInscription}
-                    />
-                  )}
-                  {cave.reviewer && (
-                    <AuthorAndDate
-                      author={cave.reviewer}
-                      verb="Updated"
-                      date={cave.dateReviewed}
-                    />
-                  )}
-                </>
+                (cave.author || cave.reviewer || cave.language) && (
+                  <Typography component="div" variant="caption">
+                    {cave.author && (
+                      <AuthorAndDate
+                        author={cave.author}
+                        verb="Created"
+                        date={cave.dateInscription}
+                      />
+                    )}
+                    {cave.author && cave.reviewer && ' · '}
+                    {cave.reviewer && (
+                      <AuthorAndDate
+                        author={cave.reviewer}
+                        verb="Updated"
+                        date={cave.dateReviewed}
+                      />
+                    )}
+                    {(cave.author || cave.reviewer) && cave.language && ' · '}
+                    {cave.language &&
+                      `${formatMessage({ id: 'Language' })} : ${cave.language.toUpperCase()}`}
+                  </Typography>
+                )
               }
             />
           )
