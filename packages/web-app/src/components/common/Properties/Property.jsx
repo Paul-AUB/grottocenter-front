@@ -18,7 +18,7 @@ export const PropertyWrapper = styled('div')`
   display: flex;
   flex-basis: ${({ $flexBasis }) => $flexBasis};
   flex-shrink: 0;
-  padding: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(0)};
   & > svg {
     margin-right: ${({ theme }) => theme.spacing(1)};
   }
