@@ -118,16 +118,16 @@ const Country = ({
       )}
       {country && (
         <>
-          <ScrollableContent
-            anchorId="regions"
-            title={formatMessage({ id: 'Regions' })}
-            content={<RegionsList countryId={country.id} />}
-          />
           <StatisticsDataDashboard
             countryId={country.id}
             description={formatMessage({
               id: 'Discover the numbers about this country and its massifs and caves.'
             })}
+          />
+          <ScrollableContent
+            anchorId="regions"
+            title={formatMessage({ id: 'Regions' })}
+            content={<RegionsList countryId={country.id} />}
           />
         </>
       )}
