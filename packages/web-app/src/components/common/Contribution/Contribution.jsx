@@ -6,6 +6,7 @@ import Linkify from 'linkify-react';
 import MultilinesTypography from '../MultilinesTypography';
 import AuthorAndDate from './AuthorAndDate';
 import authorType from '../../../types/author.type';
+import linkifyOptions from '../../../helpers/linkifyOptions';
 
 const Contribution = ({
   author,
@@ -35,7 +36,7 @@ const Contribution = ({
       )}
       {body && (
         <MultilinesTypography variant="body1" component="span" sx={bodyStyle}>
-          <Linkify>{body}</Linkify>
+          <Linkify options={linkifyOptions}>{body}</Linkify>
         </MultilinesTypography>
       )}
       {(author || reviewer) && (

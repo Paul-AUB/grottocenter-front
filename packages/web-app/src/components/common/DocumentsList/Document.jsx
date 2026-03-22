@@ -20,6 +20,7 @@ import Files from './Files';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
+import linkifyOptions from '../../../helpers/linkifyOptions';
 
 const StyledListItemContainer = styled('div')`
   width: 100%;
@@ -70,7 +71,7 @@ const Document = ({
         />
         {document.description ? (
           <DocumentDescription>
-            <Linkify> {document.description}</Linkify>
+            <Linkify options={linkifyOptions}> {document.description}</Linkify>
           </DocumentDescription>
         ) : (
           false
@@ -89,7 +90,10 @@ const Document = ({
 
       {(hasSnapshotButton || onUnlink) && (
         <Box style={{ flexShrink: 0, alignSelf: 'flex-start' }}>
-          <ButtonGroup color="primary" size="small" orientation={isSmall ? 'vertical' : 'horizontal'}>
+          <ButtonGroup
+            color="primary"
+            size="small"
+            orientation={isSmall ? 'vertical' : 'horizontal'}>
             {hasSnapshotButton && (
               <SnapshotButton
                 color="primary"
@@ -104,8 +108,7 @@ const Document = ({
                 <Button
                   onClick={() => setUnlinkDialogOpen(true)}
                   color="primary"
-                  aria-label={formatMessage({ id: 'unlink' })}
-                >
+                  aria-label={formatMessage({ id: 'unlink' })}>
                   <LinkOffIcon />
                 </Button>
               </Tooltip>
@@ -122,8 +125,7 @@ const Document = ({
             <Button
               key="no"
               onClick={() => setUnlinkDialogOpen(false)}
-              disableElevation
-            >
+              disableElevation>
               <Translate>No</Translate>
             </Button>,
             <Button
@@ -134,12 +136,10 @@ const Document = ({
                 onUnlink(document);
               }}
               color="primary"
-              autoFocus
-            >
+              autoFocus>
               <Translate>Yes</Translate>
             </Button>
-          ]}
-        >
+          ]}>
           <Translate>
             Are you sure you want to unlink this document of this entity?
           </Translate>

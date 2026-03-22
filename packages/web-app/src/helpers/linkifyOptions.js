@@ -1,0 +1,12 @@
+const linkifyOptions = {
+  format: (value, type) => {
+    if (type !== 'url') return value;
+    try {
+      return decodeURIComponent(value);
+    } catch {
+      return value;
+    }
+  }
+};
+
+export default linkifyOptions;
