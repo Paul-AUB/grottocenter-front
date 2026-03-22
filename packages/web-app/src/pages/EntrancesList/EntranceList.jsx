@@ -10,10 +10,11 @@ import Alert from '../../components/common/Alert';
 import DataQualityHelpButton from '../../components/common/DataQualityBadge/DataQualityHelpButton';
 
 const StyledList = styled(List)({
-  display: 'flex',
-  flexWrap: 'wrap',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(min(350px, 100%), 1fr))',
   width: '100%',
-  justifyContent: 'space-between'
+  gap: '10px',
+  padding: 0
 });
 
 const getFormatDate = (date, formatMessage, locale) => {
@@ -61,7 +62,7 @@ const EntrancesList = props => {
           </Typography>
           <DataQualityHelpButton />
         </Box>
-        <Box style={{ marginRight: '40px' }}>
+        <Box>
           {dateOfUpdate && (
             <>
               <Typography variant="body2">

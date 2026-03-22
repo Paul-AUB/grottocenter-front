@@ -6,9 +6,6 @@ import { styled } from '@mui/material/styles';
 import DataQualityBadge from '../../components/common/DataQualityBadge';
 
 const StyledListItem = styled(ListItem)`
-  flex-basis: 25%;
-  min-width: 350px;
-  margin: 5px;
   gap: 12px;
 `;
 
