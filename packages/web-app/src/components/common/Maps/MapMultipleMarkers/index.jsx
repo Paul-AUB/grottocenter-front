@@ -11,18 +11,13 @@ export const filterValidPositions = positions =>
     e => typeof e.latitude === 'number' && typeof e.longitude === 'number'
   );
 
-const MultipleMarkers = ({ positions }) => {
+const MultipleMarkers = ({ validPositions }) => {
   const map = useMap();
   const updateEntranceMarkers = useMarkers({
     icon: EntranceMarker,
     tooltipContent: entrance => entrance.name,
     shouldFitMapBound: true
   });
-
-  const validPositions = useMemo(
-    () => filterValidPositions(positions),
-    [positions]
-  );
 
   useEffect(() => {
     if (validPositions.length === 0) return;
@@ -44,25 +39,27 @@ const MultipleMarkers = ({ positions }) => {
   return null;
 };
 
+MultipleMarkers.propTypes = {
+  validPositions: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+};
+
 const MapMultipleMarkers = ({ style, zoom, positions }) => {
-  const validPositions = filterValidPositions(positions);
+  const validPositions = useMemo(() => filterValidPositions(positions), [positions]);
   if (validPositions.length === 0) return null;
-  
+
   return (
     <CustomMapContainer
       wholePage={false}
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
-      viewport={null}
       scrollWheelZoom={false}
       style={style}
       zoom={zoom || 14}>
-      <MultipleMarkers positions={positions} zoom={zoom || 14} />
+      <MultipleMarkers validPositions={validPositions} />
     </CustomMapContainer>
   );
 };
 
-// eslint-disable-next-line no-multi-assign
-MapMultipleMarkers.propTypes = MultipleMarkers.propTypes = {
+MapMultipleMarkers.propTypes = {
   positions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   style: PropTypes.shape({}),
   zoom: PropTypes.number
