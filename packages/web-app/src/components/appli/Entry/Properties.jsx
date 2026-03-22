@@ -148,13 +148,19 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                 url={`/ui/caves/${entrance.cave.id}`}
               />
             )}
+            {!!entrance.altitude && (
+              <Property
+                label={formatMessage({ id: 'Altitude' })}
+                value={`${entrance.altitude} m`}
+                icon={<CustomIcon type="altitude" />}
+              />
+            )}
           </Box>
         </Box>
       </InfoSection>
 
       {(entrance.cave?.depth ||
         entrance.cave?.length ||
-        entrance.altitude ||
         entrance.cave?.temperature ||
         entrance.discoveryYear ||
         entrance.undergroundType) && (
@@ -170,13 +176,6 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
               length={entrance.cave?.length}
               isLoading={isLoading}
             />
-            {!!entrance.altitude && (
-              <Property
-                label={formatMessage({ id: 'Altitude' })}
-                value={`${entrance.altitude} m`}
-                icon={<CustomIcon type="altitude" />}
-              />
-            )}
             <TemperatureProperty
               temperature={entrance.cave?.temperature}
               isLoading={isLoading}
