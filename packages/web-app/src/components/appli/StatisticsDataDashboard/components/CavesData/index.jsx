@@ -24,21 +24,21 @@ const CavesData = ({
           <InlineData
             icon={<CustomIcon type="massif" size={40} />}
             numberData={nbMassifs}
-            text={formatMessage({ id: 'massif(s)' })}
+            text={formatMessage({ id: nbMassifs === 1 ? 'massif' : 'massifs' })}
           />
         )}
         {nbCaves !== undefined && nbCaves !== null && (
           <InlineData
             icon={<CustomIcon type="entrance" size={40} />}
             numberData={nbCaves}
-            text={formatMessage({ id: 'cave(s) (1 or multiple entrances)' })}
+            text={formatMessage({ id: nbCaves === 1 ? 'cave (1 or multiple entrances)' : 'cave(s) (1 or multiple entrances)' })}
           />
         )}
         {nbDivingCaves !== undefined && nbDivingCaves !== null && (
           <InlineData
             icon={<CustomIcon type="diving_cave" size={40} />}
             numberData={nbDivingCaves}
-            text={formatMessage({ id: 'cave(s) are diveable' })}
+            text={formatMessage({ id: nbDivingCaves === 1 ? 'cave is diveable' : 'caves are diveable' })}
           />
         )}
         {nbNetworks !== undefined && nbNetworks !== null && (
@@ -46,7 +46,7 @@ const CavesData = ({
             icon={<CustomIcon type="network" size={40} />}
             numberData={nbNetworks}
             text={formatMessage({
-              id: 'network(s) (cave of more than 1 entrance)'
+              id: nbNetworks === 1 ? 'network (cave of more than 1 entrance)' : 'networks (cave of more than 1 entrance)'
             })}
           />
         )}
