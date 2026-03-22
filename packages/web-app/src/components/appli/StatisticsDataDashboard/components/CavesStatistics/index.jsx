@@ -1,19 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Badge, Box, Tooltip } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import InfoBlock from './InfoBlock';
 
 import InfoSection from '../../../../common/InfoSection';
 import { depthIcon, lengthIcon } from '../../../../../assets/icons';
-
-const StyledBadge = styled(Badge)`
-  right: 3;
-  top: 4;
-  padding: 0px 4px;
-  font-size: 10px;
-`;
 
 const StyledBox = styled(Box)`
   display: flex;
@@ -64,16 +57,11 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
           <InfoBlock
             icon={
               <Tooltip title={tooltipText}>
-                <StyledBadge
-                  badgeContent={totalLength.nb_data}
-                  color="secondary"
-                  max={999}>
-                  <img
-                    style={styledImg}
-                    src={lengthIcon}
-                    alt={formatMessage({ id: 'Length icon' })}
-                  />
-                </StyledBadge>
+                <img
+                  style={styledImg}
+                  src={lengthIcon}
+                  alt={formatMessage({ id: 'Length icon' })}
+                />
               </Tooltip>
             }
             numberData={totalLength.value}

@@ -8,8 +8,7 @@ import InfoSection from '../../../../common/InfoSection';
 
 const StyledBox = styled(Box)`
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: ${({ theme }) => theme.spacing(2)};
 `;
 

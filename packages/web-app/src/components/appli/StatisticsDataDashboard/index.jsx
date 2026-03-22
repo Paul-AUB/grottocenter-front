@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
@@ -85,40 +85,50 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId, description })
             {isLoading && <Skeleton height={200} width="100%" />}
           {hasData && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <CavesData
-                title={
-                  entityType === 'country'
-                    ? formatMessage({ id: 'Massifs, networks and caves' })
-                    : formatMessage({ id: 'Networks and caves' })
-                }
-                nbMassifs={data.nb_massifs}
-                nbCaves={data.nb_caves}
-                nbDivingCaves={data.diving_caves}
-                nbNetworks={data.nb_networks}
-                url={(() => {
-                  if (entityType === 'country')
-                    return `/ui/countries/${countryId}/entrances`;
-                  if (entityType === 'region')
-                    return `/ui/countries/${countryId}/regions/${regionId}/entrances`;
-                  return `/ui/massifs/${massifId}/entrances`;
-                })()}
-              />
-              <CavesStatistics
-                avgDepth={data.avg.avg_depth}
-                avgLength={data.avg.avg_length}
-                totalLength={data.total_length}
-              />
-              <SpecificsCaves
-                maxDepthCave={data.cave_with_max_depth}
-                maxLengthCave={data.cave_with_max_length}
-                parentEntity={(() => {
-                  if (entityType === 'country')
-                    return formatMessage({ id: 'country' });
-                  if (entityType === 'region')
-                    return formatMessage({ id: 'region' });
-                  return formatMessage({ id: 'massif' });
-                })()}
-              />
+              {/* KPI banner: 3 key metrics full width */}
+              <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+                <CavesStatistics
+                  avgDepth={data.avg.avg_depth}
+                  avgLength={data.avg.avg_length}
+                  totalLength={data.total_length}
+                />
+              </Paper>
+              {/* 2 columns: counts (left) + specific caves stacked (right) */}
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+                  <CavesData
+                    title={
+                      entityType === 'country'
+                        ? formatMessage({ id: 'Massifs, networks and caves' })
+                        : formatMessage({ id: 'Networks and caves' })
+                    }
+                    nbMassifs={data.nb_massifs}
+                    nbCaves={data.nb_caves}
+                    nbDivingCaves={data.diving_caves}
+                    nbNetworks={data.nb_networks}
+                    url={(() => {
+                      if (entityType === 'country')
+                        return `/ui/countries/${countryId}/entrances`;
+                      if (entityType === 'region')
+                        return `/ui/countries/${countryId}/regions/${regionId}/entrances`;
+                      return `/ui/massifs/${massifId}/entrances`;
+                    })()}
+                  />
+                </Paper>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+                  <SpecificsCaves
+                    maxDepthCave={data.cave_with_max_depth}
+                    maxLengthCave={data.cave_with_max_length}
+                    parentEntity={(() => {
+                      if (entityType === 'country')
+                        return formatMessage({ id: 'country' });
+                      if (entityType === 'region')
+                        return formatMessage({ id: 'region' });
+                      return formatMessage({ id: 'massif' });
+                    })()}
+                  />
+                </Paper>
+              </Box>
             </Box>
           )}
           {(hasError || isEmpty) && (

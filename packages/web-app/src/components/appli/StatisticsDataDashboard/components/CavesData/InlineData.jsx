@@ -7,14 +7,12 @@ import { styled } from '@mui/material/styles';
 const StyledIcon = styled(Box)`
   width: 25px;
   height: 25px;
+  flex-shrink: 0;
 `;
 
 const StyledLine = styled(Box)`
   display: flex;
-`;
-
-const StyledText = styled(Typography)`
-  padding-left: 8px;
+  align-items: center;
 `;
 
 const InlineData = ({ icon, numberData, text }) => {
@@ -23,9 +21,15 @@ const InlineData = ({ icon, numberData, text }) => {
   return (
     <StyledLine>
       <StyledIcon>{icon}</StyledIcon>
-      <StyledText>
-        {numberData.toLocaleString(locale)} {text}
-      </StyledText>
+      <Typography sx={{ pl: 1 }}>
+        <Typography
+          component="span"
+          fontWeight={600}
+          color="secondary">
+          {numberData.toLocaleString(locale)}
+        </Typography>
+        {' '}{text}
+      </Typography>
     </StyledLine>
   );
 };
