@@ -15,8 +15,7 @@ import Contribution from '../../../common/Contribution/Contribution';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
-  flex-direction: row;
-  align-items: flex-start;
+  display: flow-root;
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
   padding-top: ${({ theme }) => theme.spacing(1)};
   padding-bottom: ${({ theme }) => theme.spacing(1)};
@@ -64,40 +63,8 @@ const Location = ({
   const isActionLoading = wantedDeletedState !== location.isDeleted;
 
   return (
-    <ListItemStyled disableGutters alignItems="flex-start">
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <CreateLocationForm
-            closeForm={() => setIsUpdateFormVisible(false)}
-            isNewLocation={false}
-            onSubmit={onSubmitForm}
-            values={location}
-          />
-        </Box>
-      ) : (
-        <ListItemText
-          style={{ margin: 0, flexGrow: 1 }}
-          disableTypography
-          primary={
-            <SectionTitle
-              title={location.title}
-              anchorId={`location-${location.id}`}
-              isDeleted={location.isDeleted}
-            />
-          }
-          secondary={
-            <Contribution
-              author={location.author}
-              reviewer={location.reviewer}
-              body={location.body}
-              dateInscription={location.dateInscription}
-              dateReviewed={location.dateReviewed}
-              isDeleted={location.isDeleted}
-            />
-          }
-        />
-      )}
-      <Box style={{ flexShrink: 0 }}>
+    <ListItemStyled disableGutters>
+      <Box sx={{ float: 'right', ml: 1 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -125,6 +92,38 @@ const Location = ({
             : {})}
         />
       </Box>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateLocationForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewLocation={false}
+            onSubmit={onSubmitForm}
+            values={location}
+          />
+        </Box>
+      ) : (
+        <ListItemText
+          style={{ margin: 0 }}
+          disableTypography
+          primary={
+            <SectionTitle
+              title={location.title}
+              anchorId={`location-${location.id}`}
+              isDeleted={location.isDeleted}
+            />
+          }
+          secondary={
+            <Contribution
+              author={location.author}
+              reviewer={location.reviewer}
+              body={location.body}
+              dateInscription={location.dateInscription}
+              dateReviewed={location.dateReviewed}
+              isDeleted={location.isDeleted}
+            />
+          }
+        />
+      )}
     </ListItemStyled>
   );
 };

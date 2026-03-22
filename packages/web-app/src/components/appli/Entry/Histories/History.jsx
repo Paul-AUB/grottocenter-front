@@ -14,8 +14,7 @@ import Contribution from '../../../common/Contribution/Contribution';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
-  flex-direction: row;
-  align-items: flex-start;
+  display: flow-root;
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
   padding-top: ${({ theme }) => theme.spacing(1)};
   padding-bottom: ${({ theme }) => theme.spacing(1)};
@@ -54,33 +53,8 @@ const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
   const isActionLoading = wantedDeletedState !== history.isDeleted;
 
   return (
-    <ListItemStyled disableGutters alignItems="flex-start">
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <CreateHistoryForm
-            closeForm={() => setIsUpdateFormVisible(false)}
-            isNewHistory={false}
-            onSubmit={onSubmitForm}
-            values={history}
-          />
-        </Box>
-      ) : (
-        <ListItemText
-          style={{ margin: 0, flexGrow: 1 }}
-          disableTypography
-          secondary={
-            <Contribution
-              body={history.body}
-              author={history.author}
-              reviewer={history.reviewer}
-              dateInscription={history.dateInscription}
-              dateReviewed={history.dateReviewed}
-              isDeletedWithHeader={history.isDeleted}
-            />
-          }
-        />
-      )}
-      <Box style={{ flexShrink: 0 }}>
+    <ListItemStyled disableGutters>
+      <Box sx={{ float: 'right', ml: 1 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -108,6 +82,31 @@ const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             : {})}
         />
       </Box>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateHistoryForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewHistory={false}
+            onSubmit={onSubmitForm}
+            values={history}
+          />
+        </Box>
+      ) : (
+        <ListItemText
+          style={{ margin: 0 }}
+          disableTypography
+          secondary={
+            <Contribution
+              body={history.body}
+              author={history.author}
+              reviewer={history.reviewer}
+              dateInscription={history.dateInscription}
+              dateReviewed={history.dateReviewed}
+              isDeletedWithHeader={history.isDeleted}
+            />
+          }
+        />
+      )}
     </ListItemStyled>
   );
 };

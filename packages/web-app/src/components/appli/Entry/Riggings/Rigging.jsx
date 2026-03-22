@@ -48,35 +48,13 @@ const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
     <Box
       key={rigging.id}
       sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
+        display: 'flow-root',
         borderTop: '1px solid',
         borderColor: 'divider',
         pt: 1,
         pb: 1
       }}>
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <CreateRiggingsForm
-            closeForm={() => setIsUpdateFormVisible(false)}
-            isNew={false}
-            onSubmit={onSubmitUpdateForm}
-            values={rigging}
-          />
-        </Box>
-      ) : (
-        <Box style={{ flexGrow: 1 }}>
-          <RiggingTable {...rigging} />
-          <Contribution
-            author={rigging.author}
-            dateInscription={rigging.dateInscription}
-            reviewer={rigging.reviewer}
-            dateReviewed={rigging.dateReviewed}
-          />
-        </Box>
-      )}
-      <Box style={{ flexShrink: 0 }}>
+      <Box sx={{ float: 'right', ml: 1 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -104,6 +82,26 @@ const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             : {})}
         />
       </Box>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateRiggingsForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNew={false}
+            onSubmit={onSubmitUpdateForm}
+            values={rigging}
+          />
+        </Box>
+      ) : (
+        <Box>
+          <RiggingTable {...rigging} />
+          <Contribution
+            author={rigging.author}
+            dateInscription={rigging.dateInscription}
+            reviewer={rigging.reviewer}
+            dateReviewed={rigging.dateReviewed}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

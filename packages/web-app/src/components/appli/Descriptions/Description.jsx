@@ -15,8 +15,7 @@ import { usePermissions } from '../../../hooks';
 import Contribution from '../../common/Contribution/Contribution';
 
 const ListItemStyled = styled(ListItem)`
-  flex-direction: row;
-  align-items: flex-start;
+  display: flow-root;
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
   padding-top: ${({ theme }) => theme.spacing(1)};
   padding-bottom: ${({ theme }) => theme.spacing(1)};
@@ -64,40 +63,8 @@ const Description = ({
   const isActionLoading = wantedDeletedState !== description.isDeleted;
 
   return (
-    <ListItemStyled disableGutters alignItems="flex-start">
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <CreateDescriptionForm
-            closeForm={() => setIsUpdateFormVisible(false)}
-            isNewDescription={false}
-            onSubmit={onSubmitForm}
-            values={description}
-          />
-        </Box>
-      ) : (
-        <ListItemText
-          style={{ margin: 0, flexGrow: 1 }}
-          disableTypography
-          primary={
-            <SectionTitle
-              title={description.title}
-              anchorId={`description-${description.id}`}
-              isDeleted={description.isDeleted}
-            />
-          }
-          secondary={
-            <Contribution
-              body={description.body}
-              author={description.author}
-              reviewer={description.reviewer}
-              dateInscription={description.dateInscription}
-              dateReviewed={description.dateReviewed}
-              isDeleted={description.isDeleted}
-            />
-          }
-        />
-      )}
-      <Box style={{ flexShrink: 0 }}>
+    <ListItemStyled disableGutters>
+      <Box sx={{ float: 'right', ml: 1 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -125,6 +92,38 @@ const Description = ({
             : {})}
         />
       </Box>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateDescriptionForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewDescription={false}
+            onSubmit={onSubmitForm}
+            values={description}
+          />
+        </Box>
+      ) : (
+        <ListItemText
+          style={{ margin: 0 }}
+          disableTypography
+          primary={
+            <SectionTitle
+              title={description.title}
+              anchorId={`description-${description.id}`}
+              isDeleted={description.isDeleted}
+            />
+          }
+          secondary={
+            <Contribution
+              body={description.body}
+              author={description.author}
+              reviewer={description.reviewer}
+              dateInscription={description.dateInscription}
+              dateReviewed={description.dateReviewed}
+              isDeleted={description.isDeleted}
+            />
+          }
+        />
+      )}
     </ListItemStyled>
   );
 };

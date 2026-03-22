@@ -19,8 +19,7 @@ import Duration from '../../../common/Properties/Duration';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
-  flex-direction: row;
-  align-items: flex-start;
+  display: flow-root;
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
   padding-top: ${({ theme }) => theme.spacing(1)};
   padding-bottom: ${({ theme }) => theme.spacing(1)};
@@ -28,7 +27,6 @@ const ListItemStyled = styled(ListItem)`
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
-  padding-right: ${({ theme }) => theme.spacing(2)};
 `;
 
 const StyledListItemIcon = styled(ListItemIcon)`
@@ -94,7 +92,31 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
     permissions.isModerator;
 
   return (
-    <ListItemStyled disableGutters alignItems="flex-start">
+    <ListItemStyled disableGutters>
+      <Box sx={{ float: 'right', ml: 1 }}>
+        <ActionButtons
+          isLoading={isActionLoading}
+          isUpdating={isUpdateFormVisible}
+          setIsUpdating={setIsUpdateFormVisible}
+          isDeleted={comment.isDeleted}
+          canEdit={isEditAllowed && permissions.isAuth && canEdit}
+          canDelete={isEditAllowed && permissions.isModerator}
+          snapshotEl={
+            <SnapshotButton id={comment.id} type="comments" content={comment} />
+          }
+          onDeletePress={onDeletePress}
+          onRestorePress={onRestorePress}
+          {...(isEditAllowed && permissions.isAuth && !comment.isDeleted
+            ? {
+                onMoveUp,
+                onMoveDown,
+                isFirst,
+                isLast,
+                isMoveLoading: isMoving
+              }
+            : {})}
+        />
+      </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
         <Box width="100%">
           <CreateCommentForm
@@ -105,7 +127,7 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
           />
         </Box>
       ) : (
-        <Box style={{ flexGrow: 1 }}>
+        <Box>
           <StyledListItemText
             style={{ margin: 0 }}
             disableTypography
@@ -161,30 +183,6 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
           )}
         </Box>
       )}
-      <Box style={{ flexShrink: 0 }}>
-        <ActionButtons
-          isLoading={isActionLoading}
-          isUpdating={isUpdateFormVisible}
-          setIsUpdating={setIsUpdateFormVisible}
-          isDeleted={comment.isDeleted}
-          canEdit={isEditAllowed && permissions.isAuth && canEdit}
-          canDelete={isEditAllowed && permissions.isModerator}
-          snapshotEl={
-            <SnapshotButton id={comment.id} type="comments" content={comment} />
-          }
-          onDeletePress={onDeletePress}
-          onRestorePress={onRestorePress}
-          {...(isEditAllowed && permissions.isAuth && !comment.isDeleted
-            ? {
-                onMoveUp,
-                onMoveDown,
-                isFirst,
-                isLast,
-                isMoveLoading: isMoving
-              }
-            : {})}
-        />
-      </Box>
     </ListItemStyled>
   );
 };
