@@ -27,6 +27,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import ShareIcon from '@mui/icons-material/Share';
 
+import { isMobileOnly } from 'react-device-detect';
 import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
 import { useNotification } from '../../../../hooks';
 import copyToClipboard from '../../../../helpers/clipboard';
@@ -103,12 +104,14 @@ const FixedContent = ({
       } catch (err) {
         if (err.name !== 'AbortError') {
           await copyToClipboard(url);
-          onSuccess(formatMessage({ id: 'Link copied!' }));
+          // no toast: system clipboard notification handles feedback on mobile
         }
       }
     } else {
       await copyToClipboard(url);
-      onSuccess(formatMessage({ id: 'Link copied!' }));
+      if (!isMobileOnly) {
+        onSuccess(formatMessage({ id: 'Link copied!' }));
+      }
     }
   };
 
