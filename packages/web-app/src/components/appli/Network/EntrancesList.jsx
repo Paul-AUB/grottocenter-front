@@ -38,8 +38,6 @@ const EntrancesList = ({
   inline = false
 }) => {
   const { formatMessage } = useIntl();
-  const isFiltering = selectedEntrancesId.length > 0;
-
   const listContent = (
     <List
       dense
@@ -53,8 +51,9 @@ const EntrancesList = ({
         entrances
           .sort((e1, e2) => e1.name.localeCompare(e2.name))
           .map(entrance => {
+            const isSelected = selectedEntrancesId.includes(entrance.id);
             const isVisible =
-              !isFiltering || selectedEntrancesId.includes(entrance.id);
+              selectedEntrancesId.length === 0 || isSelected;
             return (
               <ListItem
                 key={entrance.id}
@@ -62,11 +61,9 @@ const EntrancesList = ({
                 secondaryAction={
                   onToggleSelection && (
                     <Tooltip
+                      placement="left"
                       title={formatMessage({
-                        id:
-                          isFiltering && !isVisible
-                            ? 'Show on map'
-                            : 'Hide from map'
+                        id: isSelected ? 'Hide from map' : 'Show on map'
                       })}>
                       <IconButton
                         edge="end"
