@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Divider, Tooltip } from '@mui/material';
+import { Box, Divider, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import InfoBlock from './InfoBlock';
 
-import InfoSection from '../../../../common/InfoSection';
 import { depthIcon, lengthIcon } from '../../../../../assets/icons';
 
 const StyledBox = styled(Box)(({ theme }) => ({
@@ -29,7 +28,10 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
   } ${formatMessage({ id: 'caves' })}`;
 
   return (
-    <InfoSection title={formatMessage({ id: 'Caves statistics' })}>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h4" textAlign="center" pb={2}>
+        {formatMessage({ id: 'Caves statistics' })}
+      </Typography>
       <StyledBox>
         {avgDepth && (
           <InfoBlock
@@ -59,7 +61,7 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
           />
         )}
       </StyledBox>
-    </InfoSection>
+    </Box>
   );
 };
 

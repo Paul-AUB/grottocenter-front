@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useTheme, styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import CaveCard from './CaveCard';
-import InfoSection from '../../../../common/InfoSection';
 
 const StyledBox = styled(Box)`
   display: flex;
@@ -17,7 +16,10 @@ const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
   const theme = useTheme();
 
   return (
-    <InfoSection title={formatMessage({ id: 'Specifics caves' })}>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h4" textAlign="center" pb={2}>
+        {formatMessage({ id: 'Specifics caves' })}
+      </Typography>
       <StyledBox>
         {maxDepthCave && (
           <CaveCard
@@ -42,7 +44,7 @@ const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
           />
         )}
       </StyledBox>
-    </InfoSection>
+    </Box>
   );
 };
 
