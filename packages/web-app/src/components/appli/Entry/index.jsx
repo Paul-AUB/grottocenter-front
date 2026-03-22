@@ -44,6 +44,13 @@ import { fetchPerson } from '../../../actions/Person/GetPerson';
 const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    flex-direction: row;
+    align-items: stretch;
+    gap: ${({ theme }) => theme.spacing(3)};
+  }
 `;
 
 export const Entry = ({ isLoading, error, entrance }) => {
@@ -142,7 +149,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
                       to={`/ui/countries/${entrance.country}`}
                       underline="hover"
                       color="inherit"
-                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <CustomIcon type="country" size={16} />
                       {entrance.country}
                     </Link>
@@ -153,7 +160,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
                       to={`/ui/massifs/${entrance.massifs[0].id}`}
                       underline="hover"
                       color="inherit"
-                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <CustomIcon type="massif" size={16} />
                       {entrance.massifs[0].name}
                     </Link>
@@ -164,7 +171,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
                       to={`/ui/caves/${entrance.cave.id}`}
                       underline="hover"
                       color="inherit"
-                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <CustomIcon type="network" size={16} />
                       {entrance.cave.name}
                     </Link>
@@ -262,10 +269,13 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 {entrance.isSensitive && <SensitiveCaveWarning />}
                 <HalfSplitContainer>
                   {(!entrance.isSensitive || isAdmin) && (
-                    <Map positions={mapPositions} loading={isLoading} />
+                    <Box sx={{ flex: 1, minHeight: 200 }}>
+                      <Map positions={mapPositions} loading={isLoading} />
+                    </Box>
                   )}
-
-                  <Properties entrance={entrance} dataQuality={entrance.dataQuality} />
+                  <Box sx={{ flex: 1, overflow: 'auto' }}>
+                    <Properties entrance={entrance} dataQuality={entrance.dataQuality} />
+                  </Box>
                 </HalfSplitContainer>
               </>
             }

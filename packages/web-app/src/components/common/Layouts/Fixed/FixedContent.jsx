@@ -20,6 +20,7 @@ import { useReactToPrint } from 'react-to-print';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TimelineIcon from '@mui/icons-material/Timeline';
+import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -211,7 +212,9 @@ const FixedContent = ({
                 type={entranceSnapshot.type}
                 content={entranceSnapshot.content}
                 isNetwork={entranceSnapshot.isNetwork}
-                tooltipTitle={formatMessage({ id: 'Revision history of this entrance' })}
+                tooltipTitle={formatMessage({
+                  id: 'Access the revision history page'
+                })}
               />
             )}
             {!!snapshot && (
@@ -221,8 +224,10 @@ const FixedContent = ({
                 content={snapshot.content}
                 isNetwork={snapshot.isNetwork}
                 getAll={snapshot.getAll}
-                startIcon={<TimelineIcon />}
-                tooltipTitle={formatMessage({ id: 'All revisions (entrance + sections)' })}
+                startIcon={<ManageHistoryIcon />}
+                tooltipTitle={formatMessage({
+                  id: 'Page of all types of revision history for this entrance'
+                })}
               />
             )}
           </ButtonGroup>

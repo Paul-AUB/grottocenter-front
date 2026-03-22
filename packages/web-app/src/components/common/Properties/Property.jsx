@@ -34,7 +34,7 @@ const IconWrapper = styled('div')`
 
 const ValueComponent = ({ secondary, value, url }) => {
   const valueText = (
-    <StyledTypography variant={secondary ? 'body2' : 'body1'}>
+    <StyledTypography variant={secondary ? 'body2' : 'body1'} component="div">
       {value || ''}
     </StyledTypography>
   );

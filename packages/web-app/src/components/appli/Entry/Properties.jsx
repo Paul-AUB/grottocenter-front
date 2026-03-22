@@ -2,7 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { Box, Button, ButtonGroup, Chip, Tooltip } from '@mui/material';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Chip,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { Place, Map } from '@mui/icons-material';
 import DataQualityBadge from '../../common/DataQualityBadge';
 import DataQualityHelpButton from '../../common/DataQualityBadge/DataQualityHelpButton';
@@ -30,6 +37,7 @@ const GlobalWrapper = styled('div')`
 const StyledRatings = styled(Ratings)`
   justify-content: space-evenly;
 `;
+
 const computePrecisionSeverity = precision => {
   if (precision === undefined || precision === null) return 'warning';
   if (precision === 0) return 'error';
@@ -38,6 +46,7 @@ const computePrecisionSeverity = precision => {
 
 const Properties = ({ isLoading = false, entrance, dataQuality }) => {
   const { formatMessage } = useIntl();
+
   let precisionText = '';
   if (entrance.precision === 0) {
     precisionText = formatMessage({
@@ -53,25 +62,23 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
     );
   }
 
-  const openOSM = () => {
+  const openOSM = () =>
     window.open(
       `https://www.openstreetmap.org/?mlat=${entrance.latitude}&mlon=${entrance.longitude}`,
       '_blank',
       'noopener,noreferrer'
     );
-  };
-  const openGM = () => {
+  const openGM = () =>
     window.open(
       `https://www.google.com/maps/search/?api=1&query=${entrance.latitude},${entrance.longitude}`,
       '_blank',
       'noopener,noreferrer'
     );
-  };
 
   return (
     <GlobalWrapper>
-      <InfoSection title="Location">
-        <Box display="flex" flexDirection="column">
+      <InfoSection title={formatMessage({ id: 'Location' })}>
+        <Box display="flex" flexDirection="column" gap={1}>
           {entrance.latitude && entrance.longitude && (
             <Property
               loading={isLoading}
@@ -112,42 +119,18 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns:
-                'repeat(auto-fill, minmax(max(24%, 130px), 1fr))'
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 1
             }}>
             <Property
               loading={isLoading}
-              label={formatMessage({ id: 'Country' })}
-              value={entrance.country}
-              url={`/ui/countries/${entrance.country}`}
-              icon={<CustomIcon type="country" />}
-              secondary
-            />
-            <Property
-              loading={isLoading}
-              label={formatMessage({ id: 'Location' })}
+              label={formatMessage({ id: 'City' })}
               value={[entrance.city, entrance.region]
                 .flatMap(f => (f ? [f] : []))
                 .join(', ')}
               icon={<CustomIcon type="location" />}
               secondary
             />
-            {entrance.massifs?.length > 0 && (
-              <Property
-                label={formatMessage({ id: 'Massif' })}
-                value={entrance.massifs[0].name}
-                icon={<CustomIcon type="massif" />}
-                url={`/ui/massifs/${entrance.massifs[0].id}`}
-              />
-            )}
-            {entrance.cave && entrance.cave.entrances.length > 1 && (
-              <Property
-                label={formatMessage({ id: 'Network' })}
-                value={`${entrance.cave.name}`}
-                icon={<CustomIcon type="network" />}
-                url={`/ui/caves/${entrance.cave.id}`}
-              />
-            )}
             {!!entrance.altitude && (
               <Property
                 label={formatMessage({ id: 'Altitude' })}
@@ -163,13 +146,14 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         entrance.cave?.length ||
         entrance.cave?.temperature ||
         entrance.discoveryYear ||
-        entrance.undergroundType) && (
-        <InfoSection title="Characteristics">
+        entrance.undergroundType ||
+        entrance.cave?.isDiving) && (
+        <InfoSection title={formatMessage({ id: 'Characteristics' })}>
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns:
-                'repeat(auto-fill, minmax(max(24%, 120px), 1fr))'
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 1
             }}>
             <DepthProperty depth={entrance.cave?.depth} isLoading={isLoading} />
             <LengthProperty
@@ -194,18 +178,6 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                 icon={<CustomIcon type="category" />}
               />
             )}
-          </Box>
-        </InfoSection>
-      )}
-
-      {entrance.cave?.isDiving && (
-        <InfoSection title="Features">
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns:
-                'repeat(auto-fill, minmax(max(24%, 130px), 1fr))'
-            }}>
             <DivingProperty
               isDiving={entrance.cave?.isDiving}
               isLoading={isLoading}
@@ -213,6 +185,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
           </Box>
         </InfoSection>
       )}
+
       {entrance.cave?.exploringOrganizations?.length > 0 && (
         <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
           <Box
@@ -232,22 +205,19 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         </InfoSection>
       )}
       {dataQuality != null && (
-        <Box display="flex" flexDirection="column" gap={0.5}>
-          <span style={{ fontWeight: 600 }}>
-            {formatMessage({ id: 'Data quality' })}
-          </span>
-          <Box display="flex" alignItems="center" gap={1}>
+        <InfoSection title={formatMessage({ id: 'Data quality' })}>
+          <Box display="flex" alignItems="center" gap={2}>
             <DataQualityBadge value={dataQuality} size={32} />
-            <span>
+            <Typography variant="body2">
               {dataQuality >= 70
                 ? formatMessage({ id: 'Good' })
                 : dataQuality >= 40
                   ? formatMessage({ id: 'Satisfactory' })
                   : formatMessage({ id: 'Insufficient' })}
-            </span>
+            </Typography>
             <DataQualityHelpButton />
           </Box>
-        </Box>
+        </InfoSection>
       )}
       {!!entrance.stats &&
         !!entrance.stats.approach &&
