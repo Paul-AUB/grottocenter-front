@@ -24,7 +24,16 @@ import {
   LengthProperty,
   TemperatureProperty,
   DivingProperty,
-  OrganizationProperty
+  OrganizationProperty,
+  HasBatProperty,
+  DangerFloodingProperty,
+  DangerCO2Property,
+  NeedCleanGearProperty,
+  DangerPollutionProperty,
+  DangerRockfallProperty,
+  HasRulesProperty,
+  NeedStayOnTrailProperty,
+  IsTouristicProperty
 } from '../../common/CaveProperties';
 
 const GlobalWrapper = styled('div')`
@@ -141,7 +150,16 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         entrance.cave?.temperature ||
         entrance.discoveryYear ||
         entrance.undergroundType ||
-        entrance.cave?.isDiving) && (
+        entrance.cave?.isDiving ||
+        entrance.hasBat ||
+        entrance.dangerFlooding ||
+        entrance.dangerCO2 ||
+        entrance.needCleanGear ||
+        entrance.dangerPollution ||
+        entrance.dangerRockfall ||
+        entrance.hasRules ||
+        entrance.needStayOnTrail ||
+        entrance.isTouristic) && (
         <InfoSection title={formatMessage({ id: 'Characteristics' })}>
           <Box
             sx={{
@@ -174,6 +192,39 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
             )}
             <DivingProperty
               isDiving={entrance.cave?.isDiving}
+              isLoading={isLoading}
+            />
+            <HasBatProperty hasBat={entrance.hasBat} isLoading={isLoading} />
+            <DangerFloodingProperty
+              dangerFlooding={entrance.dangerFlooding}
+              isLoading={isLoading}
+            />
+            <DangerCO2Property
+              dangerCO2={entrance.dangerCO2}
+              isLoading={isLoading}
+            />
+            <NeedCleanGearProperty
+              needCleanGear={entrance.needCleanGear}
+              isLoading={isLoading}
+            />
+            <DangerPollutionProperty
+              dangerPollution={entrance.dangerPollution}
+              isLoading={isLoading}
+            />
+            <DangerRockfallProperty
+              dangerRockfall={entrance.dangerRockfall}
+              isLoading={isLoading}
+            />
+            <HasRulesProperty
+              hasRules={entrance.hasRules}
+              isLoading={isLoading}
+            />
+            <NeedStayOnTrailProperty
+              needStayOnTrail={entrance.needStayOnTrail}
+              isLoading={isLoading}
+            />
+            <IsTouristicProperty
+              isTouristic={entrance.isTouristic}
               isLoading={isLoading}
             />
           </Box>

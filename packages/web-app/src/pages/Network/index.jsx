@@ -29,21 +29,30 @@ const FAKE_CAVE = {
       name: 'Grotte de Choranche',
       latitude: 45.0768,
       longitude: 5.3958,
-      country: 'FR'
+      country: 'FR',
+      isTouristic: true,
+      hasRules: true,
+      needStayOnTrail: true,
+      hasBat: true
     },
     {
       id: 15,
       name: 'Goule Noire',
       latitude: 45.0812,
       longitude: 5.4021,
-      country: 'FR'
+      country: 'FR',
+      dangerFlooding: true,
+      dangerCO2: true,
+      dangerPollution: true,
+      dangerRockfall: true
     },
     {
       id: 16,
       name: 'Puits du Pylône',
       latitude: 45.0734,
       longitude: 5.3897,
-      country: 'FR'
+      country: 'FR',
+      needCleanGear: true
     }
   ],
   exploringOrganizations: [
