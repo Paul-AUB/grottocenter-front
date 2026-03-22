@@ -23,7 +23,7 @@ const InlineData = ({ icon, numberData, text }) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 0.5
+        gap: '4px'
       }}>
       <StyledLine>
         <StyledIcon>{icon}</StyledIcon>
