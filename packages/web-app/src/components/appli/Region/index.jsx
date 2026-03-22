@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
-import { Box, Button, Card } from '@mui/material';
+import { Button, Card } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -58,16 +58,6 @@ const Region = ({
   return (
     <div ref={componentRef}>
     <FixedLayout>
-      <Box sx={{ margin: '8px' }}>
-        <Button
-          variant="outlined"
-          onClick={() => navigate(`/ui/countries/${countryId}`)}
-          startIcon={<ArrowBackIcon />}
-          size="small"
-          color="primary">
-          {formatMessage({ id: 'Back to Country' })}
-        </Button>
-      </Box>
       {region && (
         <FixedContent
           displayShare
@@ -76,6 +66,16 @@ const Region = ({
           isSubscribed={isSubscribed}
           isSubscribeLoading={isSubscribeLoading}
           onChangeSubscribe={canSubscribe ? handleChangeSubscribe : undefined}
+          subheader={
+            <Button
+              variant="outlined"
+              onClick={() => navigate(`/ui/countries/${countryId}`)}
+              startIcon={<ArrowBackIcon />}
+              size="small"
+              color="primary">
+              {formatMessage({ id: 'Back to Country' })}
+            </Button>
+          }
           content={
             position && (
               <CustomMapContainer

@@ -63,16 +63,6 @@ const Country = ({
   return (
     <div ref={componentRef}>
     <FixedLayout>
-      <Box sx={{ margin: '8px' }}>
-        <Button
-          variant="outlined"
-          onClick={() => navigate('/ui/countries')}
-          startIcon={<ArrowBackIcon />}
-          size="small"
-          color="primary">
-          {formatMessage({ id: 'Back to List' })}
-        </Button>
-      </Box>
       {country && (
         <FixedContent
           displayShare
@@ -82,6 +72,16 @@ const Country = ({
           isSubscribed={isSubscribed}
           isSubscribeLoading={isSubscribeLoading}
           onChangeSubscribe={canSubscribe ? handleChangeSubscribe : undefined}
+          subheader={
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/ui/countries')}
+              startIcon={<ArrowBackIcon />}
+              size="small"
+              color="primary">
+              {formatMessage({ id: 'Back to List' })}
+            </Button>
+          }
           content={
             !isEmpty(position) && (
               <Box sx={{ minHeight: 200 }}>
