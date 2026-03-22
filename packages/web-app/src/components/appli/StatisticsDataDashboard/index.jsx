@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import { styled } from '@mui/material/styles';
 import { fetchStatisticsCountry } from '../../../actions/Country/GetStatisticsCountry';
 import { fetchStatisticsMassif } from '../../../actions/Massif/GetStatisticsMassif';
 import { fetchStatisticsRegion } from '../../../actions/Region/GetStatisticsRegion';
@@ -13,32 +11,9 @@ import SpecificsCaves from './components/SpecificsCaves';
 import CavesData from './components/CavesData/index';
 import CavesStatistics from './components/CavesStatistics';
 import Alert from '../../common/Alert';
+import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 
-const Title = styled(Typography)`
-  padding-left: 15px;
-  vertical-align: middle;
-  display: inline-flex;
-`;
-
-const TitleBox = styled(Box)`
-  background-color: ${({ theme }) => theme.palette.primary.light};
-  color: #ffffff;
-  padding: 15px 30px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-`;
-
-const DataBox = styled(Box)`
-  margin-top: 30px;
-`;
-
-const DashboardBox = styled(Box)`
-  background-color: ${({ theme }) => theme.palette.backgroundColor};
-  margin: 10px 0;
-`;
-
-const StatisticsDataDashboard = ({ countryId, massifId, regionId, hideTitle = false }) => {
+const StatisticsDataDashboard = ({ countryId, massifId, regionId, description }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
 
@@ -92,50 +67,24 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId, hideTitle = fa
     }
   }, [countryId, regionId]);
 
-  return (
-    <>
-      {!hideTitle && (
-        <Typography variant="h3" gutterBottom>
-          {formatMessage({ id: 'More information' })}
-        </Typography>
-      )}
-      {(loadingCountry || loadingMassif || loadingRegion) && (
-        <Box
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: '-50px'
-          }}>
-          <Skeleton height={300} width="100%" /> {/* Map Skeleton */}
-        </Box>
-      )}
-      {data && data.nb_caves > 0 && !errorMassif && !errorCountry && !errorRegion && (
-        <DashboardBox>
-          <>
-            <TitleBox boxShadow="1" border="1">
-              <AssessmentIcon fontSize="large" />
-              {/* Main Title */}
-              <Title variant="h4">
-                {(() => {
-                  if (entityType === 'country') {
-                    return formatMessage({
-                      id: 'Discover the numbers about this country and its massifs and caves.'
-                    });
-                  }
-                  if (entityType === 'region') {
-                    return formatMessage({
-                      id: 'Discover the numbers about this region and its caves.'
-                    });
-                  }
-                  return formatMessage({
-                    id: 'Discover the numbers about this massif and its caves.'
-                  });
-                })()}
-              </Title>
-            </TitleBox>
+  const isLoading = loadingCountry || loadingMassif || loadingRegion;
+  const hasError = errorMassif || errorCountry || errorRegion;
+  const hasData = data && data.nb_caves > 0 && !hasError;
+  const isEmpty =
+    !isLoading &&
+    !hasData &&
+    (!data || data.nb_caves === undefined || data.nb_caves === 0);
 
-            {/* Other components */}
-            <DataBox>
+  return (
+    <ScrollableContent
+      anchorId="statistics"
+      title={formatMessage({ id: 'More information' })}
+      subheader={description}
+      content={
+        <>
+            {isLoading && <Skeleton height={200} width="100%" />}
+          {hasData && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <CavesData
                 title={
                   entityType === 'country'
@@ -147,65 +96,52 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId, hideTitle = fa
                 nbDivingCaves={data.diving_caves}
                 nbNetworks={data.nb_networks}
                 url={(() => {
-                  if (entityType === 'country') {
+                  if (entityType === 'country')
                     return `/ui/countries/${countryId}/entrances`;
-                  }
-                  if (entityType === 'region') {
+                  if (entityType === 'region')
                     return `/ui/countries/${countryId}/regions/${regionId}/entrances`;
-                  }
                   return `/ui/massifs/${massifId}/entrances`;
                 })()}
               />
-            </DataBox>
-            <DataBox>
               <CavesStatistics
                 avgDepth={data.avg.avg_depth}
                 avgLength={data.avg.avg_length}
                 totalLength={data.total_length}
               />
-            </DataBox>
-            <DataBox>
               <SpecificsCaves
                 maxDepthCave={data.cave_with_max_depth}
                 maxLengthCave={data.cave_with_max_length}
                 parentEntity={(() => {
-                  if (entityType === 'country') {
+                  if (entityType === 'country')
                     return formatMessage({ id: 'country' });
-                  }
-                  if (entityType === 'region') {
+                  if (entityType === 'region')
                     return formatMessage({ id: 'region' });
-                  }
                   return formatMessage({ id: 'massif' });
                 })()}
               />
-            </DataBox>
-          </>
-          <hr />
-        </DashboardBox>
-      )}
-      {(errorMassif || errorCountry || errorRegion || 
-        (data && data.nb_caves === 0) || 
-        (!loadingCountry && !loadingMassif && !loadingRegion && (!data || data.nb_caves === undefined))) && (
-        <Alert
-          severity="info"
-          title={(() => {
-            if (entityType === 'country') {
-              return formatMessage({
-                id: 'There is currently not enough information about this country.'
-              });
-            }
-            if (entityType === 'region') {
-              return formatMessage({
-                id: 'There is currently not enough information about this region.'
-              });
-            }
-            return formatMessage({
-              id: 'There is currently not enough information about this massif.'
-            });
-          })()}
-        />
-      )}
-    </>
+            </Box>
+          )}
+          {(hasError || isEmpty) && (
+            <Alert
+              severity="info"
+              title={(() => {
+                if (entityType === 'country')
+                  return formatMessage({
+                    id: 'There is currently not enough information about this country.'
+                  });
+                if (entityType === 'region')
+                  return formatMessage({
+                    id: 'There is currently not enough information about this region.'
+                  });
+                return formatMessage({
+                  id: 'There is currently not enough information about this massif.'
+                });
+              })()}
+            />
+          )}
+        </>
+      }
+    />
   );
 };
 
@@ -214,7 +150,7 @@ StatisticsDataDashboard.propTypes = {
   countryId: PropTypes.string,
   massifId: PropTypes.number,
   regionId: PropTypes.string,
-  hideTitle: PropTypes.bool
+  description: PropTypes.string
 };
 
 export default StatisticsDataDashboard;

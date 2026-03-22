@@ -212,13 +212,11 @@ const Massif = ({ isLoading, error, massif }) => {
               isEditAllowed={!massif.isDeleted}
               isAddAllowed={!massif.descriptions?.length}
             />
-            <ScrollableContent
-              dense
-              anchorId="statistics"
-              title={formatMessage({ id: 'More information' })}
-              content={
-                <StatisticsDataDashboard massifId={massifIdInt} hideTitle />
-              }
+            <StatisticsDataDashboard
+              massifId={massifIdInt}
+              description={formatMessage({
+                id: 'Discover the numbers about this massif and its caves.'
+              })}
             />
             <Documents
               documents={massif?.documents ?? []}

@@ -34,13 +34,14 @@ const StyledCardContent = styled(CardContent)`
   }
 `;
 
-const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subTitle = false }) => {
+const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subTitle = false, subheader }) => {
   useAnchorScroll(anchorId);
 
   return (
     <Card id={anchorId}>
       <CardHeader
         $dense={dense ? 1 : 0}
+        subheader={subheader}
         title={
           <Title>
             <Typography
@@ -70,7 +71,8 @@ ScrollableContent.propTypes = {
   content: PropTypes.node.isRequired,
   anchorId: PropTypes.string,
   dense: PropTypes.bool,
-  subTitle: PropTypes.bool
+  subTitle: PropTypes.bool,
+  subheader: PropTypes.node
 };
 
 export default ScrollableContent;

@@ -12,7 +12,7 @@ import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
-import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
+
 import Alert from '../../common/Alert';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
@@ -108,16 +108,12 @@ const Region = ({
         </Card>
       )}
       {region && (
-        <ScrollableContent
-          anchorId="statistics"
-          title={formatMessage({ id: 'More information' })}
-          content={
-            <StatisticsDataDashboard
-              regionId={regionId}
-              countryId={countryId}
-              hideTitle
-            />
-          }
+        <StatisticsDataDashboard
+          regionId={regionId}
+          countryId={countryId}
+          description={formatMessage({
+            id: 'Discover the numbers about this region and its caves.'
+          })}
         />
       )}
     </FixedLayout>
