@@ -23,43 +23,55 @@ const styledImg = { width: '100%', height: 'auto' };
 const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
   const { formatMessage } = useIntl();
 
-  const tooltipText = `${formatMessage({ id: 'Calculated on' })} ${
-    totalLength.nb_data
-  } ${formatMessage({ id: 'caves' })}`;
+  const tooltipText = totalLength
+    ? `${formatMessage({ id: 'Calculated on' })} ${totalLength.nb_data} ${formatMessage({ id: 'caves' })}`
+    : '';
+
+  const blocks = [
+    avgDepth != null && (
+      <InfoBlock
+        key="depth"
+        icon={<img style={styledImg} src={depthIcon} alt={formatMessage({ id: 'Depth icon' })} />}
+        numberData={avgDepth}
+        text={formatMessage({ id: 'average depth' })}
+      />
+    ),
+    avgLength != null && (
+      <InfoBlock
+        key="length"
+        icon={<img style={styledImg} src={lengthIcon} alt={formatMessage({ id: 'Length icon' })} />}
+        numberData={avgLength}
+        text={formatMessage({ id: 'average length' })}
+      />
+    ),
+    totalLength != null && (
+      <InfoBlock
+        key="total"
+        icon={
+          <Tooltip title={tooltipText}>
+            <img style={styledImg} src={lengthIcon} alt={formatMessage({ id: 'Length icon' })} />
+          </Tooltip>
+        }
+        numberData={totalLength.value}
+        text={formatMessage({ id: 'cumulated length' })}
+      />
+    ),
+  ].filter(Boolean);
+
+  const cols = blocks.map((_, i) => (i < blocks.length - 1 ? ['1fr', 'auto'] : ['1fr'])).flat();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h4" textAlign="center" pb={2}>
         {formatMessage({ id: 'Caves statistics' })}
       </Typography>
-      <StyledBox>
-        {avgDepth && (
-          <InfoBlock
-            icon={<img style={styledImg} src={depthIcon} alt={formatMessage({ id: 'Depth icon' })} />}
-            numberData={avgDepth}
-            text={formatMessage({ id: 'average depth' })}
-          />
-        )}
-        <Divider orientation="vertical" flexItem />
-        {avgLength && (
-          <InfoBlock
-            icon={<img style={styledImg} src={lengthIcon} alt={formatMessage({ id: 'Length icon' })} />}
-            numberData={avgLength}
-            text={formatMessage({ id: 'average length' })}
-          />
-        )}
-        <Divider orientation="vertical" flexItem />
-        {totalLength && (
-          <InfoBlock
-            icon={
-              <Tooltip title={tooltipText}>
-                <img style={styledImg} src={lengthIcon} alt={formatMessage({ id: 'Length icon' })} />
-              </Tooltip>
-            }
-            numberData={totalLength.value}
-            text={formatMessage({ id: 'cumulated length' })}
-          />
-        )}
+      <StyledBox style={{ gridTemplateColumns: cols.join(' ') }}>
+        {blocks.map((block, i) => (
+          <React.Fragment key={block.key}>
+            {block}
+            {i < blocks.length - 1 && <Divider orientation="vertical" flexItem />}
+          </React.Fragment>
+        ))}
       </StyledBox>
     </Box>
   );
