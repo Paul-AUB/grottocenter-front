@@ -11,15 +11,13 @@ export const filterValidPositions = positions =>
     e => typeof e.latitude === 'number' && typeof e.longitude === 'number'
   );
 
-const MultipleMarkers = ({ positions, zoom }) => {
+const MultipleMarkers = ({ positions }) => {
   const map = useMap();
   const updateEntranceMarkers = useMarkers({
     icon: EntranceMarker,
     tooltipContent: entrance => entrance.name,
     shouldFitMapBound: true
   });
-
-  if (zoom) map.setZoom(zoom);
 
   const validPositions = useMemo(
     () => filterValidPositions(positions),
@@ -29,6 +27,17 @@ const MultipleMarkers = ({ positions, zoom }) => {
   useEffect(() => {
     if (validPositions.length === 0) return;
     updateEntranceMarkers(validPositions);
+
+    // fitBounds (called inside updateEntranceMarkers on first load) may run
+    // before Leaflet's ResizeObserver settles the map dimensions. Re-fit once
+    // after the first resize event so all markers are guaranteed to be visible.
+    const latLngs = validPositions.map(p => [p.latitude, p.longitude]);
+    const onResize = () => {
+      map.fitBounds(latLngs, { padding: [40, 40], maxZoom: 16 });
+      map.off('resize', onResize);
+    };
+    map.on('resize', onResize);
+    return () => map.off('resize', onResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validPositions]);
 
