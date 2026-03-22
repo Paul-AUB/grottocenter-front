@@ -109,7 +109,7 @@ const StatisticsDataDashboard = ({
                 }}>
                 <Paper
                   variant="outlined"
-                  sx={{ p: 4, borderRadius: 2, bgcolor: 'grey.50' }}>
+                  sx={{ p: 1, px: 4, borderRadius: 2, bgcolor: 'grey.50' }}>
                   <CavesData
                     title={
                       entityType === 'country'
