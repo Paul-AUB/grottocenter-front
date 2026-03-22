@@ -125,8 +125,8 @@ const Country = ({
           />
           <ScrollableContent
             anchorId="statistics"
-            title={formatMessage({ id: 'Statistics' })}
-            content={<StatisticsDataDashboard countryId={country.id} />}
+            title={formatMessage({ id: 'More information' })}
+            content={<StatisticsDataDashboard countryId={country.id} hideTitle />}
           />
         </>
       )}
