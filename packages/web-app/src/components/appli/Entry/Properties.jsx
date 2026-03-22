@@ -7,6 +7,7 @@ import {
   Button,
   ButtonGroup,
   Chip,
+  Paper,
   Tooltip,
   Typography
 } from '@mui/material';
@@ -80,6 +81,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
 
   return (
     <GlobalWrapper>
+      <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
       <InfoSection title={formatMessage({ id: 'Location' })}>
         <Box display="flex" flexDirection="column" gap={1}>
           {entrance.latitude && entrance.longitude && (
@@ -144,6 +146,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
           </Box>
         </Box>
       </InfoSection>
+      </Paper>
 
       {(entrance.cave?.depth ||
         entrance.cave?.length ||
@@ -160,6 +163,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         entrance.hasRules ||
         entrance.needStayOnTrail ||
         entrance.isTouristic) && (
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
         <InfoSection title={formatMessage({ id: 'Characteristics' })}>
           <Box
             sx={{
@@ -229,40 +233,45 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
             />
           </Box>
         </InfoSection>
+        </Paper>
       )}
 
       {entrance.cave?.exploringOrganizations?.length > 0 && (
-        <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                sm: 'repeat(2, 1fr)',
-                md: 'repeat(3, 1fr)',
-                lg: 'repeat(4, 1fr)'
-              }
-            }}>
-            {entrance.cave.exploringOrganizations.map(org => (
-              <OrganizationProperty key={org.id} organization={org} />
-            ))}
-          </Box>
-        </InfoSection>
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                  lg: 'repeat(4, 1fr)'
+                }
+              }}>
+              {entrance.cave.exploringOrganizations.map(org => (
+                <OrganizationProperty key={org.id} organization={org} />
+              ))}
+            </Box>
+          </InfoSection>
+        </Paper>
       )}
       {dataQuality != null && (
-        <InfoSection title={formatMessage({ id: 'Data quality' })}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <DataQualityBadge value={dataQuality} size={32} />
-            <Typography variant="body2">
-              {dataQuality >= 70
-                ? formatMessage({ id: 'Good' })
-                : dataQuality >= 40
-                  ? formatMessage({ id: 'Satisfactory' })
-                  : formatMessage({ id: 'Insufficient' })}
-            </Typography>
-            <DataQualityHelpButton />
-          </Box>
-        </InfoSection>
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          <InfoSection title={formatMessage({ id: 'Data quality' })}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <DataQualityBadge value={dataQuality} size={32} />
+              <Typography variant="body2">
+                {dataQuality >= 70
+                  ? formatMessage({ id: 'Good' })
+                  : dataQuality >= 40
+                    ? formatMessage({ id: 'Satisfactory' })
+                    : formatMessage({ id: 'Insufficient' })}
+              </Typography>
+              <DataQualityHelpButton />
+            </Box>
+          </InfoSection>
+        </Paper>
       )}
       {!!entrance.stats &&
         !!entrance.stats.approach &&

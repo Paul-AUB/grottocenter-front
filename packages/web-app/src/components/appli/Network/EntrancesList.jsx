@@ -9,6 +9,7 @@ import {
   ListItemButton,
   ListItemText,
   ListItemIcon,
+  Paper,
   Tooltip
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -110,10 +111,12 @@ const EntrancesList = ({
   if (inline) {
     return (
       <Box sx={{ height: '100%', overflow: 'auto' }}>
-        <InfoSection
-          title={`${formatMessage({ id: 'Entrances' })}${entrances?.length > 0 ? ` (${entrances.length})` : ''}`}>
-          {listContent}
-        </InfoSection>
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          <InfoSection
+            title={`${formatMessage({ id: 'Entrances' })}${entrances?.length > 0 ? ` (${entrances.length})` : ''}`}>
+            {listContent}
+          </InfoSection>
+        </Paper>
       </Box>
     );
   }
