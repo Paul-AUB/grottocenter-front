@@ -6,7 +6,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Link as RouterLink } from 'react-router-dom';
 
 import FixedLayout from '../../common/Layouts/Fixed';
@@ -141,7 +140,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
             subheader={
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Breadcrumbs
-                  separator={<NavigateNextIcon fontSize="small" />}
+                  separator="·"
                   sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
                   {entrance.country && (
                     <Link
