@@ -12,7 +12,7 @@ const DataQualityHelpButton = () => {
     <>
       <IconButton
         size="small"
-        color="secondary"
+        sx={{ color: 'text.secondary' }}
         onClick={e => setAnchor(e.currentTarget)}>
         <HelpOutlineIcon fontSize="small" />
       </IconButton>
