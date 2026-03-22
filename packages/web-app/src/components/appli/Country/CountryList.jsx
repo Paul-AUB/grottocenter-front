@@ -47,8 +47,7 @@ const CountryList = ({ countries = [] }) => {
           row.english
         )
       })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [countries, locale]
+    [countries, locale, formatMessage]
   );
 
   const filtered = useMemo(() => {
