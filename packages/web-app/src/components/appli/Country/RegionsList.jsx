@@ -114,9 +114,6 @@ const RegionsList = ({ countryId }) => {
 
   return (
     <>
-      <Typography variant="h6" gutterBottom>
-        {formatMessage({ id: 'Regions' })}
-      </Typography>
       <TableContainer component={Paper} style={{ width: '500px' }}>
         <Table size="small">
           <TableHead>

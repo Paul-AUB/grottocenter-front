@@ -7,11 +7,13 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Paper
+  Paper,
+  Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import GCLink from '../../common/GCLink';
+import CustomIcon from '../../common/CustomIcon';
 import getLocalizedCountryName from '../../../helpers/countryName';
 import { AVAILABLE_LANGUAGES } from '../../../conf/config';
 
@@ -24,9 +26,15 @@ const CountryList = ({ countries = [] }) => {
 
   return (
     <FixedContent
-      title={formatMessage({
-        id: 'Countries : Sovereign countries and autonomous territories (ISO 3166-1)'
-      })}
+      title={formatMessage({ id: 'Countries' })}
+      icon={<CustomIcon type="country" />}
+      subheader={
+        <Typography variant="subtitle2" color="text.secondary">
+          {formatMessage({
+            id: 'Sovereign countries and autonomous territories (ISO 3166-1)'
+          })}
+        </Typography>
+      }
       content={
         <TableContainer component={Paper} sx={{ maxWidth: 500 }}>
           <Table size="small">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
@@ -30,6 +30,7 @@ const Region = ({
 }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
+  const componentRef = useRef();
   const isLoading = status === REDUCER_STATUS.LOADING;
 
   const {
@@ -55,6 +56,7 @@ const Region = ({
       : null;
 
   return (
+    <div ref={componentRef}>
     <FixedLayout>
       <Box sx={{ margin: '8px' }}>
         <Button
@@ -70,6 +72,7 @@ const Region = ({
         <FixedContent
           displayShare
           title={region.name}
+          printRef={componentRef}
           isSubscribed={isSubscribed}
           isSubscribeLoading={isSubscribeLoading}
           onChangeSubscribe={canSubscribe ? handleChangeSubscribe : undefined}
@@ -118,6 +121,7 @@ const Region = ({
         />
       )}
     </FixedLayout>
+    </div>
   );
 };
 
