@@ -110,6 +110,7 @@ export const EntrancePropTypes = PropTypes.shape({
   histories: PropTypes.arrayOf(HistoryPropTypes),
   comments: PropTypes.arrayOf(CommentPropTypes),
 
+  dataQuality: PropTypes.number,
   stats: PropTypes.shape({
     aestheticism: PropTypes.number,
     caving: PropTypes.number,

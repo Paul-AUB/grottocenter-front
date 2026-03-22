@@ -11,6 +11,8 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
+
+
 import CustomIcon from '../../common/CustomIcon';
 
 import Properties from './Properties';
@@ -130,7 +132,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
           <FixedContent
             displayShare
             subheader={
-              <Box>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Breadcrumbs
                   separator={<NavigateNextIcon fontSize="small" />}
                   sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
@@ -263,7 +265,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
                     <Map positions={mapPositions} loading={isLoading} />
                   )}
 
-                  <Properties entrance={entrance} />
+                  <Properties entrance={entrance} dataQuality={entrance.dataQuality} />
                 </HalfSplitContainer>
               </>
             }

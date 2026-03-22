@@ -37,6 +37,7 @@ const FAKE_ENTRANCE = {
       { id: 1, name: 'Spéléo Club Rosnéen', url: '/ui/organizations/1' }
     ]
   },
+  dataQuality: 65,
   stats: { approach: 3, aestheticism: 4, caving: 3 },
   author: { id: 1, name: 'Thomas Cabotiau' },
   dateInscription: '2008-07-29',

@@ -4,6 +4,8 @@ import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { Box, Button, ButtonGroup, Chip, Tooltip } from '@mui/material';
 import { Place, Map } from '@mui/icons-material';
+import DataQualityBadge from '../../common/DataQualityBadge';
+import DataQualityHelpButton from '../../common/DataQualityBadge/DataQualityHelpButton';
 
 import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
@@ -34,9 +36,8 @@ const computePrecisionSeverity = precision => {
   return 'success';
 };
 
-const Properties = ({ isLoading = false, entrance }) => {
+const Properties = ({ isLoading = false, entrance, dataQuality }) => {
   const { formatMessage } = useIntl();
-
   let precisionText = '';
   if (entrance.precision === 0) {
     precisionText = formatMessage({
@@ -231,6 +232,24 @@ const Properties = ({ isLoading = false, entrance }) => {
           </Box>
         </InfoSection>
       )}
+      {dataQuality != null && (
+        <Box display="flex" flexDirection="column" gap={0.5}>
+          <span style={{ fontWeight: 600 }}>
+            {formatMessage({ id: 'Data quality' })}
+          </span>
+          <Box display="flex" alignItems="center" gap={1}>
+            <DataQualityBadge value={dataQuality} size={32} />
+            <span>
+              {dataQuality >= 70
+                ? formatMessage({ id: 'Good' })
+                : dataQuality >= 40
+                  ? formatMessage({ id: 'Satisfactory' })
+                  : formatMessage({ id: 'Insufficient' })}
+            </span>
+            <DataQualityHelpButton />
+          </Box>
+        </Box>
+      )}
       {!!entrance.stats &&
         !!entrance.stats.approach &&
         !!entrance.stats.aestheticism &&
@@ -248,7 +267,8 @@ const Properties = ({ isLoading = false, entrance }) => {
 
 Properties.propTypes = {
   isLoading: PropTypes.bool,
-  entrance: EntrancePropTypes
+  entrance: EntrancePropTypes,
+  dataQuality: PropTypes.number
 };
 
 export default Properties;
