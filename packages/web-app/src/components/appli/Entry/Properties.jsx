@@ -53,13 +53,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
       id: 'Precision unavailable for restricted access entrance.'
     });
   } else if (entrance.precision !== undefined && entrance.precision !== null) {
-    precisionText = formatMessage(
-      {
-        id: 'Precision: ±{precision}m',
-        defaultMessage: 'Precision: ±{precision}m'
-      },
-      { precision: entrance.precision }
-    );
+    precisionText = `±${entrance.precision}m`;
   }
 
   const openOSM = () =>
