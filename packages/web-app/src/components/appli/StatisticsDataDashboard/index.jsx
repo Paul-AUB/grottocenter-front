@@ -13,7 +13,12 @@ import CavesStatistics from './components/CavesStatistics';
 import Alert from '../../common/Alert';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 
-const StatisticsDataDashboard = ({ countryId, massifId, regionId, description }) => {
+const StatisticsDataDashboard = ({
+  countryId,
+  massifId,
+  regionId,
+  description
+}) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
 
@@ -82,11 +87,13 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId, description })
       subheader={description}
       content={
         <>
-            {isLoading && <Skeleton height={200} width="100%" />}
+          {isLoading && <Skeleton height={200} width="100%" />}
           {hasData && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {/* KPI banner: 3 key metrics full width */}
-              <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+              <Paper
+                variant="outlined"
+                sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
                 <CavesStatistics
                   avgDepth={data.avg.avg_depth}
                   avgLength={data.avg.avg_length}
@@ -94,8 +101,15 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId, description })
                 />
               </Paper>
               {/* 2 columns: counts (left) + specific caves stacked (right) */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
-                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                  gap: 2
+                }}>
+                <Paper
+                  variant="outlined"
+                  sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
                   <CavesData
                     title={
                       entityType === 'country'
@@ -115,7 +129,9 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId, description })
                     })()}
                   />
                 </Paper>
-                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+                <Paper
+                  variant="outlined"
+                  sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
                   <SpecificsCaves
                     maxDepthCave={data.cave_with_max_depth}
                     maxLengthCave={data.cave_with_max_length}
