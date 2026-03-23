@@ -15,6 +15,7 @@ import Alert from '../../common/Alert';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import CountryPropTypes from './propTypes';
+import { isMobile } from 'react-device-detect';
 import { useSubscriptions } from '../../../hooks';
 import getLocalizedCountryName from '../../../helpers/countryName';
 import CustomIcon from '../../common/CustomIcon';
@@ -87,7 +88,7 @@ const Country = ({
               <Box sx={{ minHeight: 200 }}>
                 <CustomMapContainer
                   center={position}
-                  dragging
+                  dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
                   forceCentering
                   scrollWheelZoom={false}
                   wholePage={false}

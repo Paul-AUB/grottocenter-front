@@ -16,6 +16,7 @@ import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import Alert from '../../common/Alert';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
+import { isMobile } from 'react-device-detect';
 import { useSubscriptions, useScrollToHashOnLoad } from '../../../hooks';
 
 const Region = ({
@@ -80,7 +81,7 @@ const Region = ({
             position && (
               <CustomMapContainer
                 center={position}
-                dragging
+                dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
                 forceCentering
                 scrollWheelZoom={false}
                 wholePage={false}
