@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Paper } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
@@ -22,9 +22,6 @@ const StatisticsDataDashboard = ({
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
 
-  const [data, setData] = useState({});
-  const [entityType, setEntityType] = useState();
-
   const { dataMassif, loadingMassif, errorMassif } = useSelector(
     state => state.statisticsMassif
   );
@@ -47,30 +44,10 @@ const StatisticsDataDashboard = ({
     }
   }, [countryId, massifId, regionId, dispatch]);
 
-  useEffect(() => {
-    setData(dataCountry);
-    setEntityType('country');
-  }, [dataCountry]);
-
-  useEffect(() => {
-    setData(dataMassif);
-    setEntityType('massif');
-  }, [dataMassif]);
-
-  useEffect(() => {
-    setData(dataRegion);
-    setEntityType('region');
-  }, [dataRegion]);
-
-  useEffect(() => {
-    if (regionId) {
-      setEntityType('region');
-    } else if (countryId) {
-      setEntityType('country');
-    } else {
-      setEntityType('massif');
-    }
-  }, [countryId, regionId]);
+  // eslint-disable-next-line no-nested-ternary
+  const data = regionId && countryId ? dataRegion : countryId ? dataCountry : dataMassif;
+  // eslint-disable-next-line no-nested-ternary
+  const entityType = regionId ? 'region' : countryId ? 'country' : 'massif';
 
   const isLoading = loadingCountry || loadingMassif || loadingRegion;
   const hasError = errorMassif || errorCountry || errorRegion;
