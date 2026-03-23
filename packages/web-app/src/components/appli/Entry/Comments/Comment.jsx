@@ -1,4 +1,4 @@
-import { ListItem, Box, ListItemText, ListItemIcon } from '@mui/material';
+import { ListItem, Box, ListItemText, Typography } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
@@ -15,6 +15,7 @@ import CreateCommentForm from '../../EntitiesForm/Comment';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 import Ratings from '../Ratings';
 import Contribution from '../../../common/Contribution/Contribution';
+import AuthorAndDate from '../../../common/Contribution/AuthorAndDate';
 import Duration from '../../../common/Properties/Duration';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
@@ -27,19 +28,8 @@ const StyledListItemText = styled(ListItemText)`
   width: 100%;
 `;
 
-const StyledListItemIcon = styled(ListItemIcon)`
-  width: 100%;
-  flex-direction: column;
-`;
 const StyledRatings = styled(Ratings)`
-  gap: 20px;
-  padding-bottom: 10px;
-`;
-const DurationContainer = styled('div')`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 20px;
+  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
 const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
@@ -125,7 +115,7 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
           />
         </Box>
       ) : (
-        <Box>
+        <>
           <StyledListItemText
             style={{ margin: 0 }}
             disableTypography
@@ -144,13 +134,32 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
                 reviewer={comment.reviewer}
                 dateReviewed={comment.dateReviewed}
                 isDeleted={comment.isDeleted}
+                hideAttribution
               />
             }
           />
           {(comment.aestheticism || comment.caving || comment.approach ||
-            (comment.eTTrail && comment.eTTrail.length > 0) ||
-            (comment.eTUnderground && comment.eTUnderground.length > 0)) && (
-            <StyledListItemIcon>
+            comment.eTTrail?.length > 0 ||
+            comment.eTUnderground?.length > 0) && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, pt: 1 }}>
+              {(comment.eTTrail?.length > 0 || comment.eTUnderground?.length > 0) && (
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {comment.eTTrail?.length > 0 && (
+                    <Duration
+                      image={timeToGoIcon}
+                      durationStr={comment.eTTrail}
+                      title={formatMessage({ id: 'Time to go' })}
+                    />
+                  )}
+                  {comment.eTUnderground?.length > 0 && (
+                    <Duration
+                      image={undergroundTimeIcon}
+                      durationStr={comment.eTUnderground}
+                      title={formatMessage({ id: 'Underground time' })}
+                    />
+                  )}
+                </Box>
+              )}
               {(comment.aestheticism || comment.caving || comment.approach) && (
                 <StyledRatings
                   interest={comment.aestheticism}
@@ -159,27 +168,24 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
                   size="small"
                 />
               )}
-              {(comment.eTTrail?.length > 0 || comment.eTUnderground?.length > 0) && (
-                <DurationContainer>
-                  {!!comment.eTTrail && comment.eTTrail.length > 0 && (
-                    <Duration
-                      image={timeToGoIcon}
-                      durationStr={comment.eTTrail}
-                      title={formatMessage({ id: 'Time to go' })}
-                    />
-                  )}
-                  {!!comment.eTUnderground && comment.eTUnderground.length > 0 && (
-                    <Duration
-                      image={undergroundTimeIcon}
-                      durationStr={comment.eTUnderground}
-                      title={formatMessage({ id: 'Underground time' })}
-                    />
-                  )}
-                </DurationContainer>
-              )}
-            </StyledListItemIcon>
+            </Box>
           )}
-        </Box>
+          {(comment.author || comment.reviewer) && (
+            <Typography variant="caption" color="text.secondary" component="div">
+              {comment.author && (
+                <AuthorAndDate author={comment.author} date={comment.dateInscription} />
+              )}
+              {comment.author && comment.reviewer && ' · '}
+              {comment.reviewer && (
+                <AuthorAndDate
+                  author={comment.reviewer}
+                  date={comment.dateReviewed}
+                  verb={comment.author ? 'Updated' : ''}
+                />
+              )}
+            </Typography>
+          )}
+        </>
       )}
     </ListItemStyled>
   );

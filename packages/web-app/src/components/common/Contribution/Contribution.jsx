@@ -16,7 +16,8 @@ const Contribution = ({
   dateReviewed,
   withHours = false,
   isDeleted = false,
-  isDeletedWithHeader = false
+  isDeletedWithHeader = false,
+  hideAttribution = false
 }) => {
   const { formatMessage } = useIntl();
 
@@ -39,7 +40,7 @@ const Contribution = ({
           <Linkify options={linkifyOptions}>{body}</Linkify>
         </MultilinesTypography>
       )}
-      {(author || reviewer) && (
+      {!hideAttribution && (author || reviewer) && (
         <Typography component="div" variant="caption" sx={{ mt: 3 }}>
           {author && (
             <AuthorAndDate
@@ -77,7 +78,8 @@ Contribution.propTypes = {
   ]),
   withHours: PropTypes.bool,
   isDeleted: PropTypes.bool,
-  isDeletedWithHeader: PropTypes.bool
+  isDeletedWithHeader: PropTypes.bool,
+  hideAttribution: PropTypes.bool
 };
 
 export default Contribution;
