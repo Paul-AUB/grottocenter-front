@@ -20,9 +20,7 @@ import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
   display: flow-root;
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
-  padding-top: ${({ theme }) => theme.spacing(1)};
-  padding-bottom: ${({ theme }) => theme.spacing(1)};
+  padding: 0;
 `;
 
 const StyledListItemText = styled(ListItemText)`
