@@ -190,7 +190,8 @@ const Person = ({
           {(nbOrganizations > 0 || canEdit) && (
             <ScrollableContent
               anchorId="organizations"
-              title={`${formatMessage({ id: 'Organizations' })} (${nbOrganizations})`}
+              title={formatMessage({ id: 'Organizations' })}
+              count={nbOrganizations}
               content={
                 <EntitiesList
                   type="organization"
@@ -212,7 +213,8 @@ const Person = ({
           {(nbNetworks > 0 || nbEntrances > 0 || canEdit) && (
             <ScrollableContent
               anchorId="related-caves"
-              title={`${formatMessage({ id: 'Explored caves' })} (${nbNetworks + nbEntrances})`}
+              title={formatMessage({ id: 'Explored caves' })}
+              count={nbNetworks + nbEntrances}
               icon={
                 canEdit && (
                   <Tooltip
@@ -252,7 +254,8 @@ const Person = ({
           {nbDocuments > 0 && (
             <ScrollableContent
               anchorId="documents"
-              title={`${formatMessage({ id: 'Documents' })} (${nbDocuments})`}
+              title={formatMessage({ id: 'Documents' })}
+              count={nbDocuments}
               content={<DocumentsList documents={person.documents} />}
             />
           )}

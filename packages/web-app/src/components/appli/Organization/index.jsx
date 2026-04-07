@@ -225,7 +225,8 @@ const Organization = ({ error, isLoading, organization }) => {
         <>
           <ScrollableContent
             anchorId="members"
-            title={`${formatMessage({ id: 'Members or former members' })} (${(organization.cavers ?? []).length})`}
+            title={formatMessage({ id: 'Members or former members' })}
+            count={(organization.cavers ?? []).length}
             icon={
               isAuth && (
                 <Tooltip
@@ -277,7 +278,8 @@ const Organization = ({ error, isLoading, organization }) => {
           {(organization.documents ?? []).length > 0 && (
             <ScrollableContent
               anchorId="documents"
-              title={`${formatMessage({ id: 'Collections' })} (${(organization.documents ?? []).length})`}
+              title={formatMessage({ id: 'Collections' })}
+              count={(organization.documents ?? []).length}
               content={
                 <DocumentsList
                   documents={organization.documents}
@@ -298,7 +300,8 @@ const Organization = ({ error, isLoading, organization }) => {
             canManageCaves) && (
             <ScrollableContent
               anchorId="related-caves"
-              title={`${formatMessage({ id: 'Explored caves' })} (${(organization.exploredNetworks ?? []).length + (organization.exploredEntrances ?? []).length})`}
+              title={formatMessage({ id: 'Explored caves' })}
+              count={(organization.exploredNetworks ?? []).length + (organization.exploredEntrances ?? []).length}
               icon={
                 canManageCaves && (
                   <Tooltip

@@ -218,7 +218,8 @@ const Massif = ({ isLoading, error, massif }) => {
               <ScrollableContent
                 dense
                 anchorId="networks"
-                title={`${formatMessage({ id: 'Networks list' })} (${massif.networks.length})`}
+                title={formatMessage({ id: 'Networks list' })}
+                count={massif.networks.length}
                 content={<EntitiesList type="cave" entities={massif.networks} />}
               />
             )}
