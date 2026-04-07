@@ -6,7 +6,7 @@ import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
+import { Box, Card, Divider, Link, Stack, Typography } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -135,8 +135,17 @@ const Organization = ({ error, isLoading, organization }) => {
             (organization.country ||
               organization.yearBirth ||
               organization.isOfficialPartner) && (
-              <Breadcrumbs
-                separator="·"
+              <Stack
+                direction="row"
+                divider={
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    sx={{ mx: 1, borderColor: 'text.secondary' }}
+                  />
+                }
+                alignItems="center"
+                flexWrap="wrap"
                 sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
                 {organization.country && (
                   <Link
@@ -150,20 +159,16 @@ const Organization = ({ error, isLoading, organization }) => {
                   </Link>
                 )}
                 {organization.yearBirth && (
-                  <Typography
-                    component="span"
-                    sx={{ fontSize: 'inherit', color: 'inherit' }}>
+                  <Typography component="span" sx={{ fontSize: 'inherit', color: 'inherit' }}>
                     {`${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
                   </Typography>
                 )}
                 {organization.isOfficialPartner && (
-                  <Typography
-                    component="span"
-                    sx={{ fontSize: 'inherit', color: 'inherit' }}>
+                  <Typography component="span" sx={{ fontSize: 'inherit', color: 'inherit' }}>
                     {formatMessage({ id: 'Official partner' })}
                   </Typography>
                 )}
-              </Breadcrumbs>
+              </Stack>
             )
           }
           title={organization.name ?? ''}

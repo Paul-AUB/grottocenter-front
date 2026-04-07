@@ -173,7 +173,7 @@ const Person = ({
               }
             />
           )}
-          {nbOrganizations > 0 && (
+          {(nbOrganizations > 0 || canEdit) && (
             <ScrollableContent
               anchorId="organizations"
               title={`${formatMessage({ id: 'Organizations' })} (${nbOrganizations})`}
@@ -183,6 +183,14 @@ const Person = ({
                   entities={person.organizations}
                   onItemRemove={canEdit ? handleLeaveOrganization : null}
                   toolTipTitle={formatMessage({ id: 'Leave organization' })}
+                  emptyMessage={
+                    <Alert
+                      severity="info"
+                      title={formatMessage({
+                        id: 'This person is not a member of any organization yet.'
+                      })}
+                    />
+                  }
                 />
               }
             />
@@ -205,10 +213,10 @@ const Person = ({
                       onClick={() => setIsCaveSearchVisible(v => !v)}
                       startIcon={
                         isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
-                      }
-                      >{formatMessage({
-                          id: isCaveSearchVisible ? 'Cancel' : 'Add'
-                        })}
+                      }>
+                      {formatMessage({
+                        id: isCaveSearchVisible ? 'Cancel' : 'Add'
+                      })}
                     </Button>
                   </Tooltip>
                 )

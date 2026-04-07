@@ -33,16 +33,16 @@ const RelatedCaves = ({
     return entranceData.cave?.id;
   }, []);
 
-  const handleUnlinkCave = async caveId => {
+  const handleUnlinkCave = useCallback(async caveId => {
     try {
       await dispatch(unlinkCave(caveId, entityId, isOrganization));
       onRefresh();
     } catch (error) {
       console.error('Error unlinking cave:', error);
     }
-  };
+  }, [dispatch, entityId, isOrganization, onRefresh]);
 
-  const handleUnlinkEntrance = async entranceId => {
+  const handleUnlinkEntrance = useCallback(async entranceId => {
     try {
       const caveId = await fetchCaveIdFromEntrance(entranceId);
       if (caveId) {
@@ -51,7 +51,7 @@ const RelatedCaves = ({
     } catch (error) {
       console.error('Error unlinking cave:', error);
     }
-  };
+  }, [fetchCaveIdFromEntrance, handleUnlinkCave]);
 
   const onSubmitForm = useCallback(async selectedEntrances => {
     onToggleCaveSearch(false);
@@ -90,23 +90,30 @@ const RelatedCaves = ({
       : 'Remove from my explored caves'
   });
 
+  const isEmpty =
+    (exploredNetworks ?? []).length === 0 &&
+    (exploredEntrances ?? []).length === 0;
+
   return (
     <>
       {isCaveSearchVisible && <SearchCaveForm onSubmit={onSubmitForm} />}
       {isAdding ? (
         <Alert severity="info" title={formatMessage({ id: 'Loading ...' })} />
+      ) : isEmpty && !isCaveSearchVisible ? (
+        <Alert
+          severity="info"
+          title={formatMessage({ id: 'No explored caves found.' })}
+        />
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <EntitiesList
             type="cave"
-
             entities={exploredNetworks}
             onItemRemove={canManageCaves ? handleUnlinkCave : null}
             toolTipTitle={toolTipTitle}
           />
           <EntitiesList
             type="entrance"
-
             entities={exploredEntrances}
             onItemRemove={canManageCaves ? handleUnlinkEntrance : null}
             toolTipTitle={toolTipTitle}

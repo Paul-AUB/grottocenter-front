@@ -219,7 +219,7 @@ const Massif = ({ isLoading, error, massif }) => {
                 dense
                 anchorId="networks"
                 title={`${formatMessage({ id: 'Networks list' })} (${massif.networks.length})`}
-                content={<EntitiesList type="cave" variant="card" entities={massif.networks} />}
+                content={<EntitiesList type="cave" entities={massif.networks} />}
               />
             )}
             <Documents

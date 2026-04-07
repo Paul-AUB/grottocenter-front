@@ -21,7 +21,7 @@ const EntitiesList = ({
   const { formatMessage } = useIntl();
   const compareKey = type === 'person' ? 'nickname' : 'name';
   const sorted = useMemo(
-    () => entities.slice().sort((a, b) => a[compareKey]?.localeCompare(b[compareKey])),
+    () => entities.slice().sort((a, b) => (a[compareKey] ?? '').localeCompare(b[compareKey] ?? '')),
     [entities, compareKey]
   );
 

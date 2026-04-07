@@ -46,9 +46,7 @@ const PersonProperties = ({ person }) => {
           gridTemplateColumns: 'auto 1fr',
           columnGap: 3,
           rowGap: 0.75,
-          alignItems: 'center',
-          touchAction: 'manipulation',
-          userSelect: 'none'
+          alignItems: 'center'
         }}>
         <Typography variant="h5" color="text.secondary">
           {formatMessage({ id: 'Nickname' })}
