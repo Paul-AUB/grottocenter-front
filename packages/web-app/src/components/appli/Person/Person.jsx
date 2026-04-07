@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 import { useUserProperties, usePermissions } from '../../../hooks';
 import subscriptionsType from '../../../types/subscriptions.type';
@@ -25,7 +26,9 @@ import PersonProperties from '../../common/Person/PersonProperties';
 import SubscriptionsList from '../../common/Subscriptions/SubscriptionsList';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
 import { leaveOrganization } from '../../../actions/Organization/LeaveOrganization';
+import { joinOrganization } from '../../../actions/Organization/JoinOrganization';
 import { fetchPerson } from '../../../actions/Person/GetPerson';
+import SearchOrganizationForm from '../Form/SearchOrganizationForm';
 import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
@@ -46,6 +49,7 @@ const Person = ({
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
+  const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [pendingLeaveOrg, setPendingLeaveOrg] = useState(null);
 
   const userId = useUserProperties()?.id ?? null;
@@ -80,6 +84,19 @@ const Person = ({
     setPendingLeaveOrg(null);
     await handleLeaveOrganization(id);
   }, [pendingLeaveOrg, handleLeaveOrganization]);
+
+  const handleJoinOrganization = useCallback(async organizations => {
+    if (!person?.id || organizations.length === 0) return;
+    try {
+      await Promise.all(
+        organizations.map(org => dispatch(joinOrganization(person.id, org.id)))
+      );
+      dispatch(fetchPerson(person.id));
+    } catch (err) {
+      console.error('Error joining organization:', err);
+    }
+    setIsOrgSearchVisible(false);
+  }, [dispatch, person?.id]);
 
   let onDelete = null;
   if (person && (permissions.isAdmin || permissions.isModerator)) {
@@ -192,21 +209,50 @@ const Person = ({
               anchorId="organizations"
               title={formatMessage({ id: 'Organizations' })}
               count={nbOrganizations}
-              content={
-                <EntitiesList
-                  type="organization"
-                  entities={person.organizations}
-                  onItemRemove={canEdit ? requestLeaveOrganization : null}
-                  toolTipTitle={formatMessage({ id: 'Leave organization' })}
-                  emptyMessage={
-                    <Alert
-                      severity="info"
-                      title={formatMessage({
-                        id: 'This person is not a member of any organization yet.'
+              icon={
+                canEdit && (
+                  <Tooltip
+                    title={formatMessage({
+                      id: isOrgSearchVisible
+                        ? 'Cancel this search'
+                        : 'Join'
+                    })}>
+                    <Button
+                      color={isOrgSearchVisible ? 'inherit' : 'secondary'}
+                      variant="outlined"
+                      onClick={() => setIsOrgSearchVisible(v => !v)}
+                      startIcon={
+                        isOrgSearchVisible ? <CancelIcon /> : <PersonAddIcon />
+                      }>
+                      {formatMessage({
+                        id: isOrgSearchVisible ? 'Cancel' : 'Join'
                       })}
-                    />
-                  }
-                />
+                    </Button>
+                  </Tooltip>
+                )
+              }
+              content={
+                <>
+                  {isOrgSearchVisible && (
+                    <SearchOrganizationForm onSubmit={handleJoinOrganization} />
+                  )}
+                  <EntitiesList
+                    type="organization"
+                    entities={person.organizations}
+                    onItemRemove={canEdit ? requestLeaveOrganization : null}
+                    toolTipTitle={formatMessage({ id: 'Leave organization' })}
+                    emptyMessage={
+                      !isOrgSearchVisible && (
+                        <Alert
+                          severity="info"
+                          title={formatMessage({
+                            id: 'This person is not a member of any organization yet.'
+                          })}
+                        />
+                      )
+                    }
+                  />
+                </>
               }
             />
           )}
