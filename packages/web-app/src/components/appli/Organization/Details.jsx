@@ -43,7 +43,7 @@ const StatItem = ({ src, alt, count, label }) => (
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 0.5,
+        gap: '4px',
         cursor: 'default'
       }}>
       <img src={src} alt={alt} style={{ height: 40, width: 40 }} />

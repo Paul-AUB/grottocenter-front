@@ -7,7 +7,7 @@ import { depthIcon, lengthIcon } from '../../../assets/icons';
 import CustomIcon from '../CustomIcon';
 
 const StatBadge = ({ src, alt, value }) => (
-  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+  <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
     <img src={src} alt={alt} style={{ height: 24, width: 24 }} />
     <Typography variant="body2" color="text.secondary">
       {value}
@@ -53,7 +53,7 @@ const cardPaperSx = {
 const cardLinkSx = {
   display: 'flex',
   alignItems: 'stretch',
-  gap: 1.5,
+  gap: '12px',
   p: 2,
   flex: 1,
   minWidth: 0,

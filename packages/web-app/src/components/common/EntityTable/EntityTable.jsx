@@ -199,7 +199,7 @@ const EmptyState = () => (
       alignItems: 'center',
       justifyContent: 'center',
       py: 8,
-      gap: 1.5,
+      gap: '12px',
       color: 'text.disabled'
     }}>
     <SearchOffIcon sx={{ fontSize: 56 }} />
@@ -408,7 +408,7 @@ const EntityTable = ({
           <Toolbar
             disableGutters
             variant="dense"
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 48 }}>
+            sx={{ display: 'flex', alignItems: 'center', gap: '4px', minHeight: 48 }}>
             {nbTotalRows != null && !isLoading && (
               <Typography variant="body2" color="text.secondary" sx={{ mr: 'auto' }}>
                 {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
