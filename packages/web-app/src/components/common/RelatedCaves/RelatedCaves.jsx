@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { Divider } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
 
 import EntitiesList from '../entitiesList/EntitiesList';
 import Alert from '../Alert';
@@ -14,20 +13,25 @@ import { linkCave } from '../../../actions/Cave/LinkCave';
 import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
 import { getEntranceUrl } from '../../../conf/apiRoutes';
 
-const DividerStyled = styled(Divider)`
-  background-color: ${props => props.theme.palette.divider};
-`;
-
-const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganization, canManageCaves, onRefresh, isCaveSearchVisible, onToggleCaveSearch }) => {
+const RelatedCaves = ({
+  exploredEntrances,
+  exploredNetworks,
+  entityId,
+  isOrganization,
+  canManageCaves,
+  onRefresh,
+  isCaveSearchVisible,
+  onToggleCaveSearch
+}) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const [isAdding, setIsAdding] = useState(false);
 
-  const fetchCaveIdFromEntrance = async entranceId => {
+  const fetchCaveIdFromEntrance = useCallback(async entranceId => {
     const response = await fetch(`${getEntranceUrl}${entranceId}`);
     const entranceData = await response.json();
     return entranceData.cave?.id;
-  };
+  }, []);
 
   const handleUnlinkCave = async caveId => {
     try {
@@ -49,7 +53,7 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganiz
     }
   };
 
-  const onSubmitForm = async selectedEntrances => {
+  const onSubmitForm = useCallback(async selectedEntrances => {
     onToggleCaveSearch(false);
     setIsAdding(true);
 
@@ -63,7 +67,9 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganiz
             await dispatch(linkCave(caveId, entityId, isOrganization));
           } catch (error) {
             if (error.body?.message?.includes('already')) {
-              console.warn(`Cave ${caveId} is already linked to entity ${entityId}`);
+              console.warn(
+                `Cave ${caveId} is already linked to entity ${entityId}`
+              );
             } else {
               console.error(`Error linking cave ${caveId}:`, error);
             }
@@ -76,41 +82,36 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganiz
     } finally {
       setIsAdding(false);
     }
-  };
+  }, [dispatch, entityId, fetchCaveIdFromEntrance, isOrganization, onRefresh, onToggleCaveSearch]);
 
-  const toolTipTitle = formatMessage({ id: isOrganization ? 'Remove from organization' : 'Remove from my explored caves' });
+  const toolTipTitle = formatMessage({
+    id: isOrganization
+      ? 'Remove from organization'
+      : 'Remove from my explored caves'
+  });
 
   return (
     <>
-      {isCaveSearchVisible && (
-        <>
-          <SearchCaveForm onSubmit={onSubmitForm} />
-          <DividerStyled />
-        </>
-      )}
+      {isCaveSearchVisible && <SearchCaveForm onSubmit={onSubmitForm} />}
       {isAdding ? (
         <Alert severity="info" title={formatMessage({ id: 'Loading ...' })} />
       ) : (
-        <>
-          {exploredNetworks.length === 0 && exploredEntrances.length === 0 ? (
-            <Alert severity="info" title={formatMessage({ id: 'No explored caves found.' })} />
-          ) : (
-            <>
-              <EntitiesList
-                type="cave"
-                entites={exploredNetworks}
-                onItemRemove={canManageCaves ? handleUnlinkCave : null}
-                toolTipTitle={toolTipTitle}
-              />
-              <EntitiesList
-                type="entrance"
-                entites={exploredEntrances}
-                onItemRemove={canManageCaves ? handleUnlinkEntrance : null}
-                toolTipTitle={toolTipTitle}
-              />
-            </>
-          )}
-        </>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <EntitiesList
+            type="cave"
+
+            entities={exploredNetworks}
+            onItemRemove={canManageCaves ? handleUnlinkCave : null}
+            toolTipTitle={toolTipTitle}
+          />
+          <EntitiesList
+            type="entrance"
+
+            entities={exploredEntrances}
+            onItemRemove={canManageCaves ? handleUnlinkEntrance : null}
+            toolTipTitle={toolTipTitle}
+          />
+        </Box>
       )}
     </>
   );

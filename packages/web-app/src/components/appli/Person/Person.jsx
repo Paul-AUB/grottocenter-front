@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
-import { Box, Button, Card, Tooltip } from '@mui/material';
+import { Button, Card, Chip, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -80,13 +80,17 @@ const Person = ({
 
   let title = '';
   if (person) {
-    title += `${formatMessage({ id: 'Profile page of the user' })} : `;
     if (person.name && person.surname) {
-      title += `${person.name} ${person.surname}`;
+      title = `${person.name} ${person.surname}`;
     } else {
-      title += `${person.nickname}`;
+      title = person.nickname ?? '';
     }
   }
+
+  const nbOrganizations = (person?.organizations ?? []).length;
+  const nbDocuments = (person?.documents ?? []).length;
+  const nbNetworks = (person?.exploredNetworks ?? []).length;
+  const nbEntrances = (person?.exploredEntrances ?? []).length;
 
   return (
     <FixedLayout>
@@ -95,8 +99,25 @@ const Person = ({
           displayShare
           icon={<CustomIcon type="caver" />}
           title={title}
+          titleAdornment={
+            canEdit && (
+              <Chip
+                label={formatMessage({ id: 'You' }).toUpperCase()}
+                sx={{
+                  ml: 3,
+                  fontSize: '1.4rem',
+                  letterSpacing: 1.5,
+                  verticalAlign: 'middle',
+                  bgcolor: 'secondary.main',
+                  fontWeight: 700
+                }}
+              />
+            )
+          }
           onEdit={
-            canEdit ? () => navigate(`/ui/persons/${person?.id}/edit`) : undefined
+            canEdit
+              ? () => navigate(`/ui/persons/${person?.id}/edit`)
+              : undefined
           }
           onDelete={onDelete}
           content={
@@ -111,21 +132,15 @@ const Person = ({
                   onDeletePress(entity?.id, true);
                 }}
               />
-              <Box
-                alignItems="start"
-                display="flex"
-                flexBasis="300px"
-                justifyContent="space-between">
-                <PersonProperties person={person} />
-              </Box>
+              <PersonProperties person={person} />
             </>
           }
         />
       )}
       {isLoading && (
         <Card sx={{ padding: 3 }}>
-          <Skeleton width={600} />
-          <Skeleton height={200} width="100%" />
+          <Skeleton />
+          <Skeleton height={200} />
           <Skeleton height={100} />
           <Skeleton height={100} />
           <Skeleton height={100} />
@@ -158,55 +173,67 @@ const Person = ({
               }
             />
           )}
-          <ScrollableContent
-            anchorId="documents"
-            title={formatMessage({ id: 'Documents' })}
-            content={<DocumentsList documents={person.documents} />}
-          />
-          <ScrollableContent
-            anchorId="organizations"
-            title={formatMessage({ id: 'Organizations' })}
-            content={
-              <EntitiesList
-                type="organization"
-                entites={person.organizations}
-                onItemRemove={canEdit ? handleLeaveOrganization : null}
-                toolTipTitle={formatMessage({ id: 'Leave organization' })}
-              />
-            }
-          />
-          <ScrollableContent
-            anchorId="related-caves"
-            title={formatMessage({ id: 'Explored caves' })}
-            icon={
-              canEdit && (
-                <Tooltip
-                  title={formatMessage({
-                    id: isCaveSearchVisible ? 'Cancel this search' : 'Add a cave'
-                  })}>
-                  <Button
-                    color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                    variant="outlined"
-                    onClick={() => setIsCaveSearchVisible(v => !v)}
-                    startIcon={isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />}>
-                    {formatMessage({ id: isCaveSearchVisible ? 'Cancel' : 'Add' })}
-                  </Button>
-                </Tooltip>
-              )
-            }
-            content={
-              <RelatedCaves
-                exploredEntrances={person.exploredEntrances}
-                exploredNetworks={person.exploredNetworks}
-                entityId={person.id}
-                isOrganization={false}
-                canManageCaves={canEdit}
-                onRefresh={handleRefresh}
-                isCaveSearchVisible={isCaveSearchVisible}
-                onToggleCaveSearch={setIsCaveSearchVisible}
-              />
-            }
-          />
+          {nbOrganizations > 0 && (
+            <ScrollableContent
+              anchorId="organizations"
+              title={`${formatMessage({ id: 'Organizations' })} (${nbOrganizations})`}
+              content={
+                <EntitiesList
+                  type="organization"
+                  entities={person.organizations}
+                  onItemRemove={canEdit ? handleLeaveOrganization : null}
+                  toolTipTitle={formatMessage({ id: 'Leave organization' })}
+                />
+              }
+            />
+          )}
+          {(nbNetworks > 0 || nbEntrances > 0 || canEdit) && (
+            <ScrollableContent
+              anchorId="related-caves"
+              title={`${formatMessage({ id: 'Explored caves' })} (${nbNetworks + nbEntrances})`}
+              icon={
+                canEdit && (
+                  <Tooltip
+                    title={formatMessage({
+                      id: isCaveSearchVisible
+                        ? 'Cancel this search'
+                        : 'Add a cave'
+                    })}>
+                    <Button
+                      color={isCaveSearchVisible ? 'inherit' : 'secondary'}
+                      variant="outlined"
+                      onClick={() => setIsCaveSearchVisible(v => !v)}
+                      startIcon={
+                        isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
+                      }
+                      >{formatMessage({
+                          id: isCaveSearchVisible ? 'Cancel' : 'Add'
+                        })}
+                    </Button>
+                  </Tooltip>
+                )
+              }
+              content={
+                <RelatedCaves
+                  exploredEntrances={person.exploredEntrances}
+                  exploredNetworks={person.exploredNetworks}
+                  entityId={person.id}
+                  isOrganization={false}
+                  canManageCaves={canEdit}
+                  onRefresh={handleRefresh}
+                  isCaveSearchVisible={isCaveSearchVisible}
+                  onToggleCaveSearch={setIsCaveSearchVisible}
+                />
+              }
+            />
+          )}
+          {nbDocuments > 0 && (
+            <ScrollableContent
+              anchorId="documents"
+              title={`${formatMessage({ id: 'Documents' })} (${nbDocuments})`}
+              content={<DocumentsList documents={person.documents} />}
+            />
+          )}
         </>
       )}
     </FixedLayout>

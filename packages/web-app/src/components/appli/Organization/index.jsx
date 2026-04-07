@@ -2,11 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import { Box, Card } from '@mui/material';
+import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -15,7 +15,6 @@ import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
-import BadgesSection from './BadgesSection';
 import Details from './Details';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import Alert from '../../common/Alert';
@@ -132,24 +131,40 @@ const Organization = ({ error, isLoading, organization }) => {
           icon={<CustomIcon type="organization" />}
           onEdit={!error ? onEdit : null}
           onDelete={!error ? onDelete : null}
-          avatar={
-            <BadgesSection
-              nbCavers={(organization.cavers ?? []).length}
-              nbExploredEntrances={(organization.exploredEntrances ?? []).length}
-              nbExploredNetworks={(organization.exploredNetworks ?? []).length}
-            />
-          }
           subheader={
-            <>
-              {organization.yearBirth &&
-                `${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
-              {organization.yearBirth &&
-                organization.isOfficialPartner &&
-                ` - `}
-              {organization.isOfficialPartner && (
-                <>{formatMessage({ id: 'Official partner' })}</>
-              )}
-            </>
+            (organization.country ||
+              organization.yearBirth ||
+              organization.isOfficialPartner) && (
+              <Breadcrumbs
+                separator="·"
+                sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
+                {organization.country && (
+                  <Link
+                    component={RouterLink}
+                    to={`/ui/countries/${organization.country}`}
+                    underline="hover"
+                    color="inherit"
+                    sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <CustomIcon type="country" size={16} />
+                    {organization.country}
+                  </Link>
+                )}
+                {organization.yearBirth && (
+                  <Typography
+                    component="span"
+                    sx={{ fontSize: 'inherit', color: 'inherit' }}>
+                    {`${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
+                  </Typography>
+                )}
+                {organization.isOfficialPartner && (
+                  <Typography
+                    component="span"
+                    sx={{ fontSize: 'inherit', color: 'inherit' }}>
+                    {formatMessage({ id: 'Official partner' })}
+                  </Typography>
+                )}
+              </Breadcrumbs>
+            )
           }
           title={organization.name ?? ''}
           content={
@@ -183,9 +198,7 @@ const Organization = ({ error, isLoading, organization }) => {
       )}
       {isLoading && (
         <Card sx={{ padding: 3 }}>
-          <Box style={{ display: 'flex', justifyContent: 'center' }}>
-            <Skeleton height={150} width={800} />
-          </Box>
+          <Skeleton height={150} />
           <Skeleton height={100} />
           <Skeleton height={100} />
           <Skeleton height={100} />
@@ -205,7 +218,7 @@ const Organization = ({ error, isLoading, organization }) => {
         <>
           <ScrollableContent
             anchorId="members"
-            title={formatMessage({ id: 'Members (former members)' })}
+            title={`${formatMessage({ id: 'Members or former members' })} (${(organization.cavers ?? []).length})`}
             icon={
               isAuth && (
                 <Tooltip
@@ -219,10 +232,15 @@ const Organization = ({ error, isLoading, organization }) => {
                     disabled={isJoining}
                     startIcon={
                       isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
-                    }>
-                    {isMember
-                      ? formatMessage({ id: 'Leave organization' })
-                      : formatMessage({ id: 'Join organization' })}
+                    }
+                    sx={{ minWidth: 0 }}>
+                    <Box
+                      component="span"
+                      sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                      {isMember
+                        ? formatMessage({ id: 'Leave organization' })
+                        : formatMessage({ id: 'Join organization' })}
+                    </Box>
                   </Button>
                 </Tooltip>
               )
@@ -231,9 +249,17 @@ const Organization = ({ error, isLoading, organization }) => {
               <>
                 <EntitiesList
                   type="person"
-                  entites={organization.cavers}
+                  entities={organization.cavers}
                   onItemRemove={isAdmin ? handleRemoveMember : null}
                   toolTipTitle={formatMessage({ id: 'Remove from organization' })}
+                  emptyMessage={
+                    <Alert
+                      severity="info"
+                      title={formatMessage({
+                        id: 'This organization has no members yet.'
+                      })}
+                    />
+                  }
                 />
                 {joinLeaveError && (
                   <Alert severity="error" title={joinLeaveError} />
@@ -241,55 +267,61 @@ const Organization = ({ error, isLoading, organization }) => {
               </>
             }
           />
-          <ScrollableContent
-            anchorId="documents"
-            title={formatMessage({ id: 'Collections' })}
-            content={
-              <DocumentsList
-                documents={organization.documents}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
+          {(organization.documents ?? []).length > 0 && (
+            <ScrollableContent
+              anchorId="documents"
+              title={`${formatMessage({ id: 'Collections' })} (${(organization.documents ?? []).length})`}
+              content={
+                <DocumentsList
+                  documents={organization.documents}
+                  emptyMessageComponent={
+                    <Alert
+                      severity="info"
+                      title={formatMessage({
+                        id: 'This organization has no documents listed yet.'
+                      })}
+                    />
+                  }
+                />
+              }
+            />
+          )}
+          {((organization.exploredNetworks ?? []).length > 0 ||
+            (organization.exploredEntrances ?? []).length > 0 ||
+            canManageCaves) && (
+            <ScrollableContent
+              anchorId="related-caves"
+              title={`${formatMessage({ id: 'Explored caves' })} (${(organization.exploredNetworks ?? []).length + (organization.exploredEntrances ?? []).length})`}
+              icon={
+                canManageCaves && (
+                  <Tooltip
                     title={formatMessage({
-                      id: 'This organization has no documents listed yet.'
-                    })}
-                  />
-                }
-              />
-            }
-          />
-          <ScrollableContent
-            anchorId="related-caves"
-            title={formatMessage({ id: 'Explored caves' })}
-            icon={
-              canManageCaves && (
-                <Tooltip
-                  title={formatMessage({
-                    id: isCaveSearchVisible ? 'Cancel this search' : 'Add a cave'
-                  })}>
-                  <Button
-                    color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                    variant="outlined"
-                    onClick={() => setIsCaveSearchVisible(v => !v)}
-                    startIcon={isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />}>
-                    {formatMessage({ id: isCaveSearchVisible ? 'Cancel' : 'Add' })}
-                  </Button>
-                </Tooltip>
-              )
-            }
-            content={
-              <RelatedCaves
-                exploredEntrances={organization.exploredEntrances}
-                exploredNetworks={organization.exploredNetworks}
-                entityId={organization.id}
-                isOrganization={true}
-                canManageCaves={canManageCaves}
-                onRefresh={handleRefresh}
-                isCaveSearchVisible={isCaveSearchVisible}
-                onToggleCaveSearch={setIsCaveSearchVisible}
-              />
-            }
-          />
+                      id: isCaveSearchVisible ? 'Cancel this search' : 'Add a cave'
+                    })}>
+                    <Button
+                      color={isCaveSearchVisible ? 'inherit' : 'secondary'}
+                      variant="outlined"
+                      onClick={() => setIsCaveSearchVisible(v => !v)}
+                      startIcon={isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />}>
+                      {formatMessage({ id: isCaveSearchVisible ? 'Cancel' : 'Add' })}
+                    </Button>
+                  </Tooltip>
+                )
+              }
+              content={
+                <RelatedCaves
+                  exploredEntrances={organization.exploredEntrances}
+                  exploredNetworks={organization.exploredNetworks}
+                  entityId={organization.id}
+                  isOrganization={true}
+                  canManageCaves={canManageCaves}
+                  onRefresh={handleRefresh}
+                  isCaveSearchVisible={isCaveSearchVisible}
+                  onToggleCaveSearch={setIsCaveSearchVisible}
+                />
+              }
+            />
+          )}
         </>
       )}
     </FixedLayout>
