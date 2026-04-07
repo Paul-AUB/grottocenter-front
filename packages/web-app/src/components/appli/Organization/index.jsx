@@ -6,11 +6,12 @@ import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import { Box, Card, Divider, Link, Stack, Typography } from '@mui/material';
+import { Box, Card, Link, Stack, Typography } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import HandshakeIcon from '@mui/icons-material/Handshake';
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -138,11 +139,9 @@ const Organization = ({ error, isLoading, organization }) => {
               <Stack
                 direction="row"
                 divider={
-                  <Divider
-                    orientation="vertical"
-                    flexItem
-                    sx={{ mx: 1, borderColor: 'text.secondary' }}
-                  />
+                  <Typography component="span" color="text.secondary" sx={{ mx: 1 }}>
+                    ·
+                  </Typography>
                 }
                 alignItems="center"
                 flexWrap="wrap"
@@ -164,9 +163,12 @@ const Organization = ({ error, isLoading, organization }) => {
                   </Typography>
                 )}
                 {organization.isOfficialPartner && (
-                  <Typography component="span" sx={{ fontSize: 'inherit', color: 'inherit' }}>
-                    {formatMessage({ id: 'Official partner' })}
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <HandshakeIcon sx={{ fontSize: 'inherit' }} />
+                    <Typography component="span" sx={{ fontSize: 'inherit', color: 'inherit' }}>
+                      {formatMessage({ id: 'Official partner' })}
+                    </Typography>
+                  </Box>
                 )}
               </Stack>
             )

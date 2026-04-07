@@ -2,10 +2,11 @@ import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { Box } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 
 import EntitiesList from '../entitiesList/EntitiesList';
 import Alert from '../Alert';
+import StandardDialog from '../StandardDialog';
 import { NetworkPropTypes } from '../../../types/grotto.type';
 import { EntranceSimplePropTypes } from '../../../types/entrance.type';
 import SearchCaveForm from '../../appli/Form/SearchCaveForm';
@@ -26,6 +27,7 @@ const RelatedCaves = ({
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const [isAdding, setIsAdding] = useState(false);
+  const [pendingRemove, setPendingRemove] = useState(null);
 
   const fetchCaveIdFromEntrance = useCallback(async entranceId => {
     const response = await fetch(`${getEntranceUrl}${entranceId}`);
@@ -52,6 +54,31 @@ const RelatedCaves = ({
       console.error('Error unlinking cave:', error);
     }
   }, [fetchCaveIdFromEntrance, handleUnlinkCave]);
+
+  const requestUnlinkCave = useCallback(caveId => {
+    const cave = (exploredNetworks ?? []).find(n => n.id === caveId);
+    setPendingRemove({ id: caveId, type: 'cave', label: cave?.name });
+  }, [exploredNetworks]);
+
+  const requestUnlinkEntrance = useCallback(entranceId => {
+    const entrance = (exploredEntrances ?? []).find(e => e.id === entranceId);
+    setPendingRemove({ id: entranceId, type: 'entrance', label: entrance?.name });
+  }, [exploredEntrances]);
+
+  const handleConfirmRemove = useCallback(async () => {
+    if (!pendingRemove) return;
+    const { id, type } = pendingRemove;
+    setPendingRemove(null);
+    if (type === 'cave') {
+      await handleUnlinkCave(id);
+    } else {
+      await handleUnlinkEntrance(id);
+    }
+  }, [pendingRemove, handleUnlinkCave, handleUnlinkEntrance]);
+
+  const handleCancelRemove = useCallback(() => {
+    setPendingRemove(null);
+  }, []);
 
   const onSubmitForm = useCallback(async selectedEntrances => {
     onToggleCaveSearch(false);
@@ -109,17 +136,39 @@ const RelatedCaves = ({
           <EntitiesList
             type="cave"
             entities={exploredNetworks}
-            onItemRemove={canManageCaves ? handleUnlinkCave : null}
+            onItemRemove={canManageCaves ? requestUnlinkCave : null}
             toolTipTitle={toolTipTitle}
           />
           <EntitiesList
             type="entrance"
             entities={exploredEntrances}
-            onItemRemove={canManageCaves ? handleUnlinkEntrance : null}
+            onItemRemove={canManageCaves ? requestUnlinkEntrance : null}
             toolTipTitle={toolTipTitle}
           />
         </Box>
       )}
+
+      <StandardDialog
+        open={!!pendingRemove}
+        onClose={handleCancelRemove}
+        fullWidth
+        maxWidth="xs"
+        title={toolTipTitle}
+        actions={
+          <>
+            <Button onClick={handleCancelRemove} variant="text">
+              {formatMessage({ id: 'Cancel' })}
+            </Button>
+            <Button onClick={handleConfirmRemove} color="error" autoFocus>
+              {formatMessage({ id: 'Remove' })}
+            </Button>
+          </>
+        }>
+        {formatMessage(
+          { id: 'Are you sure you want to unlink {name}?' },
+          { name: <Typography component="span" fontWeight={700}>{pendingRemove?.label ?? '?'}</Typography> }
+        )}
+      </StandardDialog>
     </>
   );
 };

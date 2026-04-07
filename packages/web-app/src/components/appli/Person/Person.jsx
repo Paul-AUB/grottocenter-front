@@ -2,7 +2,8 @@ import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
-import { Button, Card, Chip, Tooltip } from '@mui/material';
+import { Button, Card, Chip, Tooltip, Typography } from '@mui/material';
+import StandardDialog from '../../common/StandardDialog';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -45,6 +46,7 @@ const Person = ({
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
+  const [pendingLeaveOrg, setPendingLeaveOrg] = useState(null);
 
   const userId = useUserProperties()?.id ?? null;
   let canEdit = false;
@@ -57,7 +59,7 @@ const Person = ({
     dispatch(fetchPerson(person.id));
   }, [dispatch, person?.id]);
 
-  const handleLeaveOrganization = async organizationId => {
+  const handleLeaveOrganization = useCallback(async organizationId => {
     if (!person?.id) return;
     try {
       await dispatch(leaveOrganization(person.id, organizationId));
@@ -65,7 +67,19 @@ const Person = ({
     } catch (err) {
       console.error('Error leaving organization:', err);
     }
-  };
+  }, [dispatch, person?.id]);
+
+  const requestLeaveOrganization = useCallback(organizationId => {
+    const org = (person?.organizations ?? []).find(o => o.id === organizationId);
+    setPendingLeaveOrg({ id: organizationId, label: org?.name });
+  }, [person?.organizations]);
+
+  const handleConfirmLeaveOrg = useCallback(async () => {
+    if (!pendingLeaveOrg) return;
+    const { id } = pendingLeaveOrg;
+    setPendingLeaveOrg(null);
+    await handleLeaveOrganization(id);
+  }, [pendingLeaveOrg, handleLeaveOrganization]);
 
   let onDelete = null;
   if (person && (permissions.isAdmin || permissions.isModerator)) {
@@ -181,7 +195,7 @@ const Person = ({
                 <EntitiesList
                   type="organization"
                   entities={person.organizations}
-                  onItemRemove={canEdit ? handleLeaveOrganization : null}
+                  onItemRemove={canEdit ? requestLeaveOrganization : null}
                   toolTipTitle={formatMessage({ id: 'Leave organization' })}
                   emptyMessage={
                     <Alert
@@ -244,6 +258,33 @@ const Person = ({
           )}
         </>
       )}
+      <StandardDialog
+        open={!!pendingLeaveOrg}
+        onClose={() => setPendingLeaveOrg(null)}
+        fullWidth
+        maxWidth="xs"
+        title={formatMessage({ id: 'Leave organization' })}
+        actions={
+          <>
+            <Button onClick={() => setPendingLeaveOrg(null)} variant="text">
+              {formatMessage({ id: 'Cancel' })}
+            </Button>
+            <Button onClick={handleConfirmLeaveOrg} color="error" autoFocus>
+              {formatMessage({ id: 'Leave' })}
+            </Button>
+          </>
+        }>
+        {formatMessage(
+          { id: 'Are you sure you want to leave {name}?' },
+          {
+            name: (
+              <Typography component="span" fontWeight={700}>
+                {pendingLeaveOrg?.label ?? '?'}
+              </Typography>
+            )
+          }
+        )}
+      </StandardDialog>
     </FixedLayout>
   );
 };

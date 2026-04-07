@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Chip, Divider, Typography } from '@mui/material';
+import { Box, Chip, Typography } from '@mui/material';
 
 const PersonProperties = ({ person }) => {
   const { formatMessage } = useIntl();
@@ -12,7 +12,7 @@ const PersonProperties = ({ person }) => {
     .join(', ');
 
   const detailRows = [
-    { label: formatMessage({ id: 'Id' }), value: `#${person.id}` },
+    { label: formatMessage({ id: 'Id' }), value: `${person.id}` },
     person.name && {
       label: formatMessage({ id: 'Caver.Name', defaultMessage: 'Name' }),
       value: person.name
@@ -31,35 +31,55 @@ const PersonProperties = ({ person }) => {
   ].filter(Boolean);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {person.isBanned && (
         <Chip
           label={formatMessage({ id: 'Banned' })}
           color="error"
           size="small"
-          sx={{ alignSelf: 'flex-start', mb: 0.5 }}
+          sx={{ alignSelf: 'flex-start' }}
         />
       )}
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'auto 1fr',
-          columnGap: 3,
-          rowGap: 0.75,
-          alignItems: 'center'
-        }}>
-        <Typography variant="h5" color="text.secondary">
-          {formatMessage({ id: 'Nickname' })}
-        </Typography>
-        <Typography variant="h5">{person.nickname}</Typography>
-        <Divider sx={{ gridColumn: '1 / -1', my: 0.5, width: '40%' }} />
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ minWidth: '120px', flexShrink: 0 }}>
+            {formatMessage({ id: 'Nickname' })}
+          </Typography>
+          <Box>
+            <Typography
+              variant="h5"
+              fontWeight={700}
+              color="primary"
+              lineHeight={1.2}>
+              {person.nickname}
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mt: '2px' }}>
+              {formatMessage({
+                id: 'The nickname defines how other users see you.'
+              })}
+            </Typography>
+          </Box>
+        </Box>
         {detailRows.map(({ label, value }) => (
-          <React.Fragment key={label}>
-            <Typography variant="h5" color="text.secondary">
+          <Box
+            key={label}
+            sx={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ minWidth: '120px', flexShrink: 0 }}>
               {label}
             </Typography>
-            <Typography variant="h5">{value}</Typography>
-          </React.Fragment>
+            <Typography variant="body1" fontWeight={500}>
+              {value}
+            </Typography>
+          </Box>
         ))}
       </Box>
     </Box>
