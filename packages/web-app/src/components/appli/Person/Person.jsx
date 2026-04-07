@@ -6,8 +6,8 @@ import { Button, Card, Chip, Tooltip, Typography } from '@mui/material';
 import StandardDialog from '../../common/StandardDialog';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 import { useUserProperties, usePermissions } from '../../../hooks';
@@ -274,7 +274,7 @@ const Person = ({
                       variant="outlined"
                       onClick={() => setIsCaveSearchVisible(v => !v)}
                       startIcon={
-                        isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
+                        isCaveSearchVisible ? <CancelIcon /> : <CheckCircleIcon />
                       }>
                       {formatMessage({
                         id: isCaveSearchVisible ? 'Cancel' : 'Add'

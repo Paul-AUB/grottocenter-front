@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Box, Button, Stack } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 import {
   fetchAdvancedSearchResults,
@@ -47,30 +47,17 @@ const SearchCaveForm = ({ onSubmit }) => {
         resourceType={ADVANCED_SEARCH_TYPES.ENTRANCES}
         resetResults={resetAdvancedSearch}
       />
-      <SearchResults onSelected={handleSelection} hideExport />
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        justifyContent="center"
-        spacing={1}
-        sx={{ mt: 3 }}>
+      <SearchResults onSelected={handleSelection} hideExport compact />
+      <Box sx={{ mt: 2, mb: 3, textAlign: 'center' }}>
         <Button
           disabled={selectedEntrances.length === 0}
           color="primary"
           variant="contained"
           type="submit"
-          fullWidth
-          sx={{ maxWidth: { sm: 200 } }}
           onClick={handleOnSubmit}>
           {formatMessage({ id: 'Associate' })}
         </Button>
-        <Button
-          variant="outlined"
-          fullWidth
-          sx={{ maxWidth: { sm: 200 } }}
-          onClick={resetForm}>
-          {formatMessage({ id: 'Reset' })}
-        </Button>
-      </Stack>
+      </Box>
     </Box>
   );
 };

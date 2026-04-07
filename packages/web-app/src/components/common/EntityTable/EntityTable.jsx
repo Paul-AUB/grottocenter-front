@@ -62,7 +62,9 @@ const applyColumnVisibility = (columns, storedVisibility) => {
   }
 };
 
-export const getStoredRowsPerPage = (pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS) => {
+export const getStoredRowsPerPage = (
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS
+) => {
   const stored = localStorage.getItem('entityTable_rowsPerPage');
   if (stored) {
     const value = parseInt(stored, 10);
@@ -168,8 +170,13 @@ const VisibleColumnsMenu = ({ columns, setColumns, entityType }) => {
               setColumns(newColumns);
               if (entityType) {
                 const storageKey = `entityTable_${entityType}_columns`;
-                const visibleColumns = newColumns.filter(col => col[0]).map(col => col[1]);
-                localStorage.setItem(storageKey, JSON.stringify(visibleColumns));
+                const visibleColumns = newColumns
+                  .filter(col => col[0])
+                  .map(col => col[1]);
+                localStorage.setItem(
+                  storageKey,
+                  JSON.stringify(visibleColumns)
+                );
               }
             }}>
             <Checkbox
@@ -225,7 +232,8 @@ const EntityTable = ({
   onSortChange,
   onCSVDownload,
   isNewQuery = false,
-  shouldHideFooter = false
+  shouldHideFooter = false,
+  compact = false
 }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -301,7 +309,9 @@ const EntityTable = ({
     const allowedFields = ALLOWED_SORT_FIELDS[entityType];
     if (!allowedFields || !allowedFields.has(property)) {
       // eslint-disable-next-line no-console
-      console.warn(`Sort blocked: field "${property}" is not allowed for entity type "${entityType}"`);
+      console.warn(
+        `Sort blocked: field "${property}" is not allowed for entity type "${entityType}"`
+      );
       return;
     }
 
@@ -340,16 +350,25 @@ const EntityTable = ({
   };
 
   useEffect(() => {
-    const storageKey = `entityTable_${entityType}_columns`;
-    const stored = localStorage.getItem(storageKey);
-    let column = stored
-      ? applyColumnVisibility(entityConfig.columns, stored)
-      : entityConfig.columns;
-    
+    let column;
+    if (compact) {
+      column = entityConfig.columns.map(col => {
+        const newCol = [...col];
+        newCol[0] = col[1] === 'name';
+        return newCol;
+      });
+    } else {
+      const storageKey = `entityTable_${entityType}_columns`;
+      const stored = localStorage.getItem(storageKey);
+      column = stored
+        ? applyColumnVisibility(entityConfig.columns, stored)
+        : entityConfig.columns;
+    }
+
     if (entityColumnsModifier) entityColumnsModifier(column);
     setEntityColumns(column);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entityType]);
+  }, [entityType, compact]);
 
   useEffect(() => {
     if (!isNewQuery) return;
@@ -364,42 +383,43 @@ const EntityTable = ({
   const visibleColumns = entityColumns.filter(e => e[0]);
   const colSpan = visibleColumns.length + (onSelected ? 1 : 0);
 
-  const TableContent = pageRows.length === 0
-    ? (
+  const TableContent =
+    pageRows.length === 0 ? (
       <TableRow>
         <TableCell colSpan={colSpan} sx={{ border: 0, p: 0 }}>
           <EmptyState />
         </TableCell>
       </TableRow>
-    )
-    : pageRows.map(doc => {
-      const isItemSelected = selected.includes(doc.id);
-      return (
-        <TableRow
-          hover
-          onClick={event => handleRowClick(event, doc)}
-          role="checkbox"
-          tabIndex={-1}
-          key={doc.id}
-          selected={isItemSelected}
-          sx={{ cursor: 'pointer' }}>
-          {onSelected && (
-            <TableCell padding="checkbox">
-              <Checkbox
-                color="primary"
-                checked={isItemSelected}
-                onClick={event => handleRowSelect(event, doc)}
-              />
-            </TableCell>
-          )}
-          {visibleColumns.map(column => (
-            <TableCell key={column[1]}>
-              {renderCell(doc, column[1], column[4])}
-            </TableCell>
-          ))}
-        </TableRow>
-      );
-    });
+    ) : (
+      pageRows.map(doc => {
+        const isItemSelected = selected.includes(doc.id);
+        return (
+          <TableRow
+            hover
+            onClick={event => handleRowClick(event, doc)}
+            role="checkbox"
+            tabIndex={-1}
+            key={doc.id}
+            selected={isItemSelected}
+            sx={{ cursor: 'pointer' }}>
+            {onSelected && (
+              <TableCell padding="checkbox">
+                <Checkbox
+                  color="primary"
+                  checked={isItemSelected}
+                  onClick={event => handleRowSelect(event, doc)}
+                />
+              </TableCell>
+            )}
+            {visibleColumns.map(column => (
+              <TableCell key={column[1]}>
+                {renderCell(doc, column[1], column[4])}
+              </TableCell>
+            ))}
+          </TableRow>
+        );
+      })
+    );
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -408,17 +428,27 @@ const EntityTable = ({
           <Toolbar
             disableGutters
             variant="dense"
-            sx={{ display: 'flex', alignItems: 'center', gap: '4px', minHeight: 48 }}>
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              minHeight: 48
+            }}>
             {nbTotalRows != null && !isLoading && (
-              <Typography variant="body2" color="text.secondary" sx={{ mr: 'auto' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mr: 'auto' }}>
                 {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
               </Typography>
             )}
-            <VisibleColumnsMenu
-              columns={entityColumns}
-              setColumns={setEntityColumns}
-              entityType={entityType}
-            />
+            {!compact && (
+              <VisibleColumnsMenu
+                columns={entityColumns}
+                setColumns={setEntityColumns}
+                entityType={entityType}
+              />
+            )}
             {onCSVDownload &&
               (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
                 <Button
@@ -426,15 +456,25 @@ const EntityTable = ({
                   size="small"
                   onClick={() => {
                     const c = entityColumns.filter(e => e[0]);
-                    onCSVDownload(c.map(e => e[5] || e[1]), c.map(e => e[2]));
+                    onCSVDownload(
+                      c.map(e => e[5] || e[1]),
+                      c.map(e => e[2])
+                    );
                   }}
                   startIcon={<DescriptionIcon />}>
                   {!isMobile && <Translate>Export to CSV</Translate>}
                 </Button>
               ) : (
-                <Tooltip title={formatMessage({ id: 'Export unavailable above 10000 results' })}>
+                <Tooltip
+                  title={formatMessage({
+                    id: 'Export unavailable above 10000 results'
+                  })}>
                   <span>
-                    <Button variant="text" size="small" disabled startIcon={<DescriptionIcon />}>
+                    <Button
+                      variant="text"
+                      size="small"
+                      disabled
+                      startIcon={<DescriptionIcon />}>
                       {!isMobile && <Translate>Export to CSV</Translate>}
                     </Button>
                   </span>
@@ -445,8 +485,9 @@ const EntityTable = ({
         </>
       )}
       {isLoading && <LinearProgress color="secondary" />}
-      <TableContainer>
-        <Table stickyHeader sx={{ minWidth: 750 }} size="small">
+      <TableContainer
+        sx={compact ? { overflowX: 'auto', maxWidth: '100%' } : undefined}>
+        <Table stickyHeader sx={{ minWidth: compact ? 300 : 750 }} size="small">
           {isLoading ? (
             <LoadingTableHead />
           ) : (
@@ -496,7 +537,8 @@ EntityTable.propTypes = {
   onSortChange: PropTypes.func,
   onCSVDownload: PropTypes.func,
   isNewQuery: PropTypes.bool,
-  shouldHideFooter: PropTypes.bool
+  shouldHideFooter: PropTypes.bool,
+  compact: PropTypes.bool
 };
 
 export default EntityTable;
