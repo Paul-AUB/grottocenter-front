@@ -36,6 +36,7 @@ import MoveEntranceToCave from './pages/MoveEntranceToCave';
 import NetworkPage from './pages/Network';
 import PersonPage from './pages/Person';
 import OrganizationPage from './pages/Organization';
+import EntranceEdit from './pages/EntityEdit/Entrance/EntranceEdit';
 import MassifEdit from './pages/EntityEdit/Massif/MassifEdit';
 import PersonEdit from './pages/PersonEdit';
 import OrganizationEdit from './pages/EntityEdit/Organization/OrganizationEdit';
@@ -69,6 +70,7 @@ const router = createBrowserRouter(
       <Route path="/ui/api" element={<Api />} />
       <Route path="/ui/:type/:id/snapshots" element={<SnapshotPage />} />
       <Route path="/ui/entrances/:id?/move" element={<MoveEntranceToCave />} />
+      <Route path="/ui/entrances/:entranceId/edit" element={<EntranceEdit />} />
       <Route path="/ui/entrances/:entranceId?" element={<EntryPage />} />
       <Route path="/ui/caves/:caveId?" element={<NetworkPage />} />
       <Route

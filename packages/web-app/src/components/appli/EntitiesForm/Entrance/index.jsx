@@ -52,7 +52,11 @@ const defaultEntranceValues = {
   yearDiscovery: ''
 };
 
-export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
+export const EntranceForm = ({
+  caveValues = null,
+  entranceValues = null,
+  onCancel
+}) => {
   const isNewEntrance = entranceValues === null || caveValues === null;
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
@@ -82,7 +86,7 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     reset,
     control,
     getValues,
-    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
       entrance: entranceValues || defaultEntranceValues,
@@ -174,11 +178,9 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
           isReadonly={!isNewEntrance && entityType === ENTRANCE_ONLY}
         />
         <FormActionRow
-          isDirty={isDirty}
           isNew={isNewEntrance}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
-          isResetAllowed={isNewEntrance}
+          onCancel={onCancel}
         />
       </form>
 
@@ -212,7 +214,8 @@ EntranceForm.propTypes = {
     isDiving: PropTypes.bool,
     depth: PropTypes.number,
     length: PropTypes.number
-  })
+  }),
+  onCancel: PropTypes.func
 };
 
 export default EntranceForm;

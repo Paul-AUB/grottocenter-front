@@ -42,8 +42,14 @@ const Map = () => {
   const params = useParams();
   const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
-  const [location, setLocation] = useState(defaultCoord);
-  const [zoom, setZoom] = useState(defaultZoom);
+  const [location, setLocation] = useState(() => {
+    const target = decodeMapTarget(params.target);
+    return target ? { lat: target.lat, lng: target.lng } : defaultCoord;
+  });
+  const [zoom] = useState(() => {
+    const target = decodeMapTarget(params.target);
+    return target ? target.zoom : defaultZoom;
+  });
   const networks = useSelector(state => state.map.networks);
   const networksCoordinates = useSelector(
     state => state.map.networksCoordinates
@@ -56,8 +62,6 @@ const Map = () => {
   const massifs = useSelector(state => state.map.massifs);
   const massifsCoordinates = useSelector(state => state.map.massifsCoordinates);
   const { open } = useSelector(state => state.sideMenu);
-  const { projections } = useSelector(state => state.projections);
-
   // urlDebounceRef: update the URL only once the user has truly settled,
   // avoiding lagging due to URL updates.
   // Leaflet always handles the visual movement immediately on its own.
@@ -113,18 +117,11 @@ const Map = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Capture the URL target present when the component first mounts.
-  // The initial position only needs to be set once; after that Leaflet owns its position.
+  // When there is no URL target, fall back to the user's geolocation once available.
   const initialTargetRef = useRef(params.target);
-
   useEffect(() => {
-    const target = decodeMapTarget(initialTargetRef.current);
-    if (target) {
-      setLocation({ lat: target.lat, lng: target.lng });
-      setZoom(target.zoom);
-    } else {
+    if (!decodeMapTarget(initialTargetRef.current) && geoLocation) {
       setLocation(geoLocation);
-      setZoom(defaultZoom);
     }
   }, [geoLocation]);
 
@@ -154,7 +151,6 @@ const Map = () => {
         massifPolygons={massifs}
         onUpdate={handleUpdate}
         isSideMenuOpen={open}
-        projectionsList={projections}
         mapRef={mapRef}
       />
     </Suspense>

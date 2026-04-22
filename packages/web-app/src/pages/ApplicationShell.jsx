@@ -1,14 +1,15 @@
-import React, { useRef, useEffect } from 'react';
+import React, { forwardRef, useRef, useEffect } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
 import createDebounce from 'redux-debounced';
 import { isMobileOnly } from 'react-device-detect';
-import { SnackbarProvider } from 'notistack';
+import { SnackbarContent, SnackbarProvider } from 'notistack';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
+import { Alert } from '@mui/material';
 
 import GCReducer from '../reducers/GCReducer';
 import { bootstrapIntl } from '../actions/Intl';
@@ -68,6 +69,27 @@ HydratedIntlProvider.propTypes = {
   children: PropTypes.node
 };
 
+// Custom notistack snackbar with standard MUI typography (body1 = 1rem)
+const AppSnackbar = forwardRef(({ id: _id, message, variant, ...rest }, ref) => {
+  const severity = variant === 'default' ? 'info' : variant;
+  return (
+    <SnackbarContent ref={ref} {...rest}>
+      <Alert severity={severity} sx={{ width: '100%', typography: 'body1' }}>
+        {message}
+      </Alert>
+    </SnackbarContent>
+  );
+});
+AppSnackbar.displayName = 'AppSnackbar';
+
+const SNACKBAR_COMPONENTS = {
+  default: AppSnackbar,
+  info: AppSnackbar,
+  success: AppSnackbar,
+  error: AppSnackbar,
+  warning: AppSnackbar
+};
+
 const MainWrapper = styled('main')`
   flex-grow: 1;
   transition: ${({ theme, $isSideMenuOpen }) =>
@@ -110,7 +132,7 @@ const ApplicationLayout = () => {
 
 const ApplicationShell = () => (
   <div>
-    <SnackbarProvider maxSnack={3}>
+    <SnackbarProvider maxSnack={3} Components={SNACKBAR_COMPONENTS}>
       <Provider store={gcStore}>
         <HydratedIntlProvider onError={customOnIntlError}>
           <ErrorHandler />
