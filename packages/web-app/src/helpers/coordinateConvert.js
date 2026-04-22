@@ -18,7 +18,7 @@ export const decimalToDMS = (decimal, isLatitude) => {
   return `${deg}°${min}'${sec}"${direction}`;
 };
 
-// Accepts "48°31'24.2"N", "48 31 24.2 N", "48d31m24.2s N", "-48.5234"
+// Accepts "48°31'24.2"N", "48 31 24.2 N", "48d31m24.2s N", "48°31.402'N" (DDM), "-48.5234"
 export const parseDMS = str => {
   if (!str) return NaN;
   const cleaned = str.trim();
@@ -28,6 +28,16 @@ export const parseDMS = str => {
   if (dmsMatch) {
     const [, sign, d, m, s, dir] = dmsMatch;
     let decimal = +d + +m / 60 + parseFloat(s.replace(',', '.')) / 3600;
+    if (sign === '-' || (dir && /^[SWsw]$/.test(dir))) decimal = -decimal;
+    return decimal;
+  }
+  // DDM: "48°31.402'N" — degrees + decimal minutes
+  const ddmMatch = cleaned.match(
+    /^(-?)(\d+)\s*[°d]\s*(\d+(?:[.,]\d+)?)\s*[m']\s*([NSEWnsew])?$/
+  );
+  if (ddmMatch) {
+    const [, sign, d, m, dir] = ddmMatch;
+    let decimal = +d + parseFloat(m.replace(',', '.')) / 60;
     if (sign === '-' || (dir && /^[SWsw]$/.test(dir))) decimal = -decimal;
     return decimal;
   }

@@ -8,9 +8,13 @@ const useProjections = () => {
     state => state.projections?.projections ?? []
   );
 
+  const isLoading = useSelector(
+    state => state.projections?.loading ?? false
+  );
+
   useEffect(() => {
-    if (projections.length === 0) dispatch(fetchProjections());
-  }, [dispatch, projections.length]);
+    if (projections.length === 0 && !isLoading) dispatch(fetchProjections());
+  }, [dispatch, projections.length, isLoading]);
 
   return projections;
 };
