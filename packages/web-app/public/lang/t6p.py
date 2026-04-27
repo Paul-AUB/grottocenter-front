@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+import json, os
+DIR = os.path.dirname(os.path.abspath(__file__))
+
+T = {
+    'Message': {'fr': 'Message', 'es': 'Mensaje', 'de': 'Nachricht', 'it': 'Messaggio', 'pt': 'Mensagem', 'nl': 'Bericht', 'ca': 'Missatge', 'ro': 'Mesaj', 'bg': 'Съобщение', 'el': 'Μήνυμα', 'ar': 'رسالة', 'he': 'הודעה', 'id': 'Pesan', 'ja': 'メッセージ'},
+    'Meta Information': {'fr': 'Méta-informations', 'es': 'Meta información', 'de': 'Meta-Informationen', 'it': 'Meta informazioni', 'pt': 'Meta informação', 'nl': 'Meta-informatie', 'ca': 'Meta informació', 'ro': 'Meta informații', 'bg': 'Мета информация', 'el': 'Μετα-πληροφορίες', 'ar': 'معلومات وصفية', 'he': 'מידע מטא', 'id': 'Meta informasi', 'ja': 'メタ情報'},
+    'Moderate vertex count. May impact performance on older devices.': {'fr': 'Nombre de sommets modéré. Peut affecter les performances sur les appareils plus anciens.', 'es': 'Número de vértices moderado. Puede afectar el rendimiento en dispositivos más antiguos.', 'de': 'Mäßige Anzahl von Scheitelpunkten. Kann die Leistung auf älteren Geräten beeinträchtigen.', 'it': 'Numero di vertici moderato. Potrebbe influire sulle prestazioni sui dispositivi più vecchi.', 'pt': 'Número moderado de vértices. Pode afetar o desempenho em dispositivos mais antigos.', 'nl': 'Gematigd aantal hoekpunten. Kan de prestaties op oudere apparaten beïnvloeden.', 'ca': 'Nombre de vèrtexs moderat. Pot afectar el rendiment en dispositius antics.', 'ro': 'Număr moderat de vârfuri. Poate afecta performanța pe dispozitive mai vechi.', 'bg': 'Умерен брой върхове. Може да влияе на производителността на по-стари устройства.', 'el': 'Μέτριος αριθμός κορυφών. Μπορεί να επηρεάσει την απόδοση σε παλαιότερες συσκευές.', 'ar': 'عدد رؤوس متوسط. قد يؤثر على الأداء في الأجهزة القديمة.', 'he': 'מספר קדקודים מתון. עלול להשפיע על הביצועים במכשירים ישנים.', 'id': 'Jumlah titik sedang. Dapat memengaruhi kinerja pada perangkat lama.', 'ja': '中程度の頂点数。古いデバイスではパフォーマンスに影響する可能性があります。'},
+    'Moderator': {'fr': 'Modérateur', 'es': 'Moderador', 'de': 'Moderator', 'it': 'Moderatore', 'pt': 'Moderador', 'nl': 'Moderator', 'ca': 'Moderador', 'ro': 'Moderator', 'bg': 'Модератор', 'el': 'Συντονιστής', 'ar': 'مشرف', 'he': 'מנחה', 'id': 'Moderator', 'ja': 'モデレーター'},
+    'Modified name': {'fr': 'Nom modifié', 'es': 'Nombre modificado', 'de': 'Geänderter Name', 'it': 'Nome modificato', 'pt': 'Nome modificado', 'nl': 'Gewijzigde naam', 'ca': 'Nom modificat', 'ro': 'Nume modificat', 'bg': 'Променено име', 'el': 'Τροποποιημένο όνομα', 'ar': 'الاسم المعدَّل', 'he': 'שם שונה', 'id': 'Nama diubah', 'ja': '変更された名前'},
+    'Modified nickname': {'fr': 'Pseudo modifié', 'es': 'Apodo modificado', 'de': 'Geänderter Spitzname', 'it': 'Soprannome modificato', 'pt': 'Apelido modificado', 'nl': 'Gewijzigde bijnaam', 'ca': 'Sobrenom modificat', 'ro': 'Pseudonim modificat', 'bg': 'Променен псевдоним', 'el': 'Τροποποιημένο ψευδώνυμο', 'ar': 'اسم الشهرة المعدَّل', 'he': 'כינוי שונה', 'id': 'Nama panggilan diubah', 'ja': '変更されたニックネーム'},
+    'Modified surname': {'fr': 'Nom de famille modifié', 'es': 'Apellido modificado', 'de': 'Geänderter Nachname', 'it': 'Cognome modificato', 'pt': 'Apelido modificado', 'nl': 'Gewijzigde achternaam', 'ca': 'Cognom modificat', 'ro': 'Prenume modificat', 'bg': 'Променена фамилия', 'el': 'Τροποποιημένο επώνυμο', 'ar': 'اللقب المعدَّل', 'he': 'שם משפחה שונה', 'id': 'Nama belakang diubah', 'ja': '変更された姓'},
+    'More information': {'fr': "Plus d'informations", 'es': 'Más información', 'de': 'Weitere Informationen', 'it': 'Ulteriori informazioni', 'pt': 'Mais informações', 'nl': 'Meer informatie', 'ca': 'Més informació', 'ro': 'Mai multe informații', 'bg': 'Повече информация', 'el': 'Περισσότερες πληροφορίες', 'ar': 'مزيد من المعلومات', 'he': 'מידע נוסף', 'id': 'Informasi lebih lanjut', 'ja': '詳細情報'},
+    'Move this line down': {'fr': 'Déplacer cette ligne vers le bas', 'es': 'Mover esta línea hacia abajo', 'de': 'Diese Zeile nach unten verschieben', 'it': 'Sposta questa riga in basso', 'pt': 'Mover esta linha para baixo', 'nl': 'Verplaats deze lijn naar beneden', 'ca': 'Mou aquesta línia cap avall', 'ro': 'Mutați această linie în jos', 'bg': 'Преместете този ред надолу', 'el': 'Μετακίνηση αυτής της γραμμής προς τα κάτω', 'ar': 'تحريك هذا السطر للأسفل', 'he': 'הזז שורה זו למטה', 'id': 'Pindahkan baris ini ke bawah', 'ja': 'この行を下に移動'},
+    'Move this line up': {'fr': 'Déplacer cette ligne vers le haut', 'es': 'Mover esta línea hacia arriba', 'de': 'Diese Zeile nach oben verschieben', 'it': 'Sposta questa riga in alto', 'pt': 'Mover esta linha para cima', 'nl': 'Verplaats deze lijn naar boven', 'ca': 'Mou aquesta línia cap amunt', 'ro': 'Mutați această linie în sus', 'bg': 'Преместете този ред нагоре', 'el': 'Μετακίνηση αυτής της γραμμής προς τα πάνω', 'ar': 'تحريك هذا السطر للأعلى', 'he': 'הזז שורה זו למעלה', 'id': 'Pindahkan baris ini ke atas', 'ja': 'この行を上に移動'},
+    'Moving Image': {'fr': 'Image animée', 'es': 'Imagen en movimiento', 'de': 'Bewegtes Bild', 'it': 'Immagine in movimento', 'pt': 'Imagem em movimento', 'nl': 'Bewegend beeld', 'ca': 'Imatge en moviment', 'ro': 'Imagine în mișcare', 'bg': 'Движеща се снимка', 'el': 'Κινούμενη εικόνα', 'ar': 'صورة متحركة', 'he': 'תמונה נעה', 'id': 'Gambar bergerak', 'ja': '動画'},
+    'Moving...': {'fr': 'Déplacement...', 'es': 'Moviendo...', 'de': 'Wird verschoben...', 'it': 'Spostamento in corso...', 'pt': 'A mover...', 'nl': 'Verplaatsen...', 'ca': 'Movent...', 'ro': 'Se mută...', 'bg': 'Преместване...', 'el': 'Μετακίνηση...', 'ar': 'جارٍ التحريك...', 'he': 'מזיז...', 'id': 'Memindahkan...', 'ja': '移動中...'},
+    'Name': {'fr': 'Nom', 'es': 'Nombre', 'de': 'Name', 'it': 'Nome', 'pt': 'Nome', 'nl': 'Naam', 'ca': 'Nom', 'ro': 'Nume', 'bg': 'Име', 'el': 'Όνομα', 'ar': 'الاسم', 'he': 'שם', 'id': 'Nama', 'ja': '名前'},
+    'Native': {'fr': 'Natif', 'es': 'Nativo', 'de': 'Einheimisch', 'it': 'Nativo', 'pt': 'Nativo', 'nl': 'Inheems', 'ca': 'Natiu', 'ro': 'Nativ', 'bg': 'Родно', 'el': 'Ντόπιο', 'ar': 'أصلي', 'he': 'מקומי', 'id': 'Asli', 'ja': 'ネイティブ'},
+    'Need support? Request access? {0}': {'fr': 'Besoin d\'aide ? Demander un accès ? {0}', 'es': '¿Necesitas ayuda? ¿Solicitar acceso? {0}', 'de': 'Hilfe benötigt? Zugang anfordern? {0}', 'it': 'Hai bisogno di supporto? Richiedere l\'accesso? {0}', 'pt': 'Precisa de suporte? Solicitar acesso? {0}', 'nl': 'Hulp nodig? Toegang aanvragen? {0}', 'ca': 'Necessites ajuda? Sol·licitar accés? {0}', 'ro': 'Aveți nevoie de asistență? Solicitați acces? {0}', 'bg': 'Нуждаете се от помощ? Заявете достъп? {0}', 'el': 'Χρειάζεστε υποστήριξη; Αίτηση πρόσβασης; {0}', 'ar': 'هل تحتاج دعمًا؟ طلب وصول؟ {0}', 'he': 'צריך תמיכה? לבקש גישה? {0}', 'id': 'Butuh dukungan? Minta akses? {0}', 'ja': 'サポートが必要ですか？アクセスをリクエストしますか？{0}'},
+    'Network entrances': {'fr': 'Entrées du réseau', 'es': 'Entradas de la red', 'de': 'Netzwerkeingänge', 'it': 'Ingressi della rete', 'pt': 'Entradas da rede', 'nl': 'Netwerkeingangen', 'ca': 'Entrades de la xarxa', 'ro': 'Intrările rețelei', 'bg': 'Входове на мрежата', 'el': 'Είσοδοι δικτύου', 'ar': 'مداخل الشبكة', 'he': 'כניסות הרשת', 'id': 'Pintu masuk jaringan', 'ja': 'ネットワーク入口'},
+    'Network icon': {'fr': 'Icône réseau', 'es': 'Icono red', 'de': 'Netzwerk-Symbol', 'it': 'Icona rete', 'pt': 'Ícone rede', 'nl': 'Netwerk icoon', 'ca': 'Icona xarxa', 'ro': 'Pictogramă rețea', 'bg': 'Икона мрежа', 'el': 'Εικονίδιο δικτύου', 'ar': 'أيقونة الشبكة', 'he': 'אייקון רשת', 'id': 'Ikon jaringan', 'ja': 'ネットワークアイコン'},
+    'Networks and caves': {'fr': 'Réseaux et cavités', 'es': 'Redes y cuevas', 'de': 'Netzwerke und Höhlen', 'it': 'Reti e grotte', 'pt': 'Redes e cavernas', 'nl': 'Netwerken en grotten', 'ca': 'Xarxes i coves', 'ro': 'Rețele și peșteri', 'bg': 'Мрежи и пещери', 'el': 'Δίκτυα και σπήλαια', 'ar': 'الشبكات والكهوف', 'he': 'רשתות ומערות', 'id': 'Jaringan dan gua', 'ja': 'ネットワークと洞窟'},
+}
+
+with open(os.path.join(DIR, 'en.json'), encoding='utf-8') as f:
+    en = json.load(f)
+
+total = 0
+for lang in ['fr','es','it','pt','de','nl','ca','ro','bg','el','ar','he','id','ja']:
+    path = os.path.join(DIR, f'{lang}.json')
+    with open(path, encoding='utf-8') as f:
+        d = json.load(f)
+    n = 0
+    for k, langs in T.items():
+        if k in en and lang in langs and (k not in d or d[k] == en[k]):
+            d[k] = langs[lang]; n += 1
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(dict(sorted(d.items())), f, ensure_ascii=False, indent=2)
+    total += n
+    print(f'{lang}: +{n}')
+print(f'Total: {total}')
