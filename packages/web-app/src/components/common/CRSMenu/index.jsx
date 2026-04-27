@@ -11,11 +11,16 @@ import {
   MenuItem
 } from '@mui/material';
 import { groupBy } from 'ramda';
-import getLocalizedCountryName from '../../../helpers/countryName';
 import Translate from '../Translate';
 import { WGS84_DD, DMS_CODE } from '../../../hooks';
 
-const CRSMenu = ({ anchorEl, onClose, preferred, projections, onSelect }) => {
+const CRSMenu = ({
+  anchorEl = null,
+  onClose,
+  preferred,
+  projections = [],
+  onSelect
+}) => {
   const { formatMessage, locale } = useIntl();
 
   const worldLabel = formatMessage({ id: 'World' });
@@ -25,8 +30,7 @@ const CRSMenu = ({ anchorEl, onClose, preferred, projections, onSelect }) => {
       Object.entries(
         groupBy(
           p =>
-            getLocalizedCountryName(p, formatMessage, locale, p.en_name) ||
-            worldLabel,
+            p[`${locale}_name`] || p.en_name || worldLabel,
           projections
         )
       )
@@ -37,7 +41,7 @@ const CRSMenu = ({ anchorEl, onClose, preferred, projections, onSelect }) => {
         .sort(([a], [b]) =>
           a === worldLabel ? -1 : b === worldLabel ? 1 : a.localeCompare(b)
         ),
-    [projections, formatMessage, locale, worldLabel]
+    [projections, locale, worldLabel]
   );
 
   return (
@@ -105,9 +109,5 @@ CRSMenu.propTypes = {
   onSelect: PropTypes.func.isRequired
 };
 
-CRSMenu.defaultProps = {
-  anchorEl: null,
-  projections: []
-};
 
 export default CRSMenu;

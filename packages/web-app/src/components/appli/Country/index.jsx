@@ -53,12 +53,7 @@ const Country = ({
   let title = '';
   if (isLoading) title = <Skeleton />;
   if (status === REDUCER_STATUS.SUCCEEDED) {
-    title = getLocalizedCountryName(
-      country,
-      formatMessage,
-      locale,
-      country.nativeName
-    );
+    title = getLocalizedCountryName(country.id, locale, country.nativeName);
   }
 
   return (
