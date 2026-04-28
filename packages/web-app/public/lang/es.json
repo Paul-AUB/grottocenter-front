@@ -1834,7 +1834,7 @@
   "cave size small threshold": "profundidad < {depth}m y longitud < {length}m",
   "cave(s) (1 or multiple entrances)": "cueva(s) (1 o múltiples entradas)",
   "cave(s) are diveable": "cueva(s) son buceables",
-  "cave_with_entrances": "{count, plural, one {cave (1 or multiple entrances)} other {caves (1 or multiple entrances)}}",
+  "cave_with_entrances": "{count, plural, one {cueva (1 o varias entradas)} other {cuevas (1 o varias entradas)}}",
   "cavers": "espeleólogos",
   "cavers take part, day after day, in improving and expanding the database": "espeleólogos toman parte, día tras día , en mejorar y aumentar la base de datos",
   "caves": "grutas",
