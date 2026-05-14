@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "CARSOLOGIA E GEOSPELEOLOGIA",
   "2": "SPELEOLOGIA REGIONALE E CARSOLOGIA",
   "3": "BIOSPELEOLOGIA",
@@ -1091,7 +1091,6 @@
   "Import Id": "ID di importazione",
   "Import Shapefile": "Importa Shapefile",
   "Import source": "Fonte di importazione",
-  "In meters": "In metri",
   "In order to be able to do this, we need your help.": "Per poter fare questo, abbiamo bisogno del tuo aiuto.",
   "index < 40": "indice < 40",
   "index ≥ 70": "indice ≥ 70",
@@ -1299,6 +1298,7 @@
   "Merge and permanently delete": "Unisci ed elimina definitivamente",
   "Message": "Messaggio",
   "Meta Information": "Meta informazioni",
+  "meters": "metri",
   "Mexico": "Messico",
   "Mexico01": "Messico: Chiapas",
   "Mexico02": "Messico: Coahuila",
