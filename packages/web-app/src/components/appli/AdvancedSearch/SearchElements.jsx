@@ -32,6 +32,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LockIcon from '@mui/icons-material/Lock';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { fetchFieldSearch } from '../../../actions/FieldSearch';
@@ -642,7 +643,8 @@ export const ActiveFilterChips = ({
   onRemoveFilter,
   onClearQuery,
   labelMap,
-  translatableValueFields
+  translatableValueFields,
+  lockedKeys = []
 }) => {
   const { formatMessage } = useIntl();
 
@@ -658,6 +660,7 @@ export const ActiveFilterChips = ({
 
   Object.entries(filterState).forEach(([key, value]) => {
     if (value === null || value === '' || value === undefined) return;
+    const isLocked = lockedKeys.includes(key);
     const labelId = labelMap[key] || key;
     const translatedLabel = formatMessage({ id: labelId });
     let formattedValue;
@@ -676,7 +679,8 @@ export const ActiveFilterChips = ({
     chips.push({
       key,
       label: `${translatedLabel}: ${formattedValue}`,
-      onDelete: () => onRemoveFilter(key)
+      onDelete: isLocked ? undefined : () => onRemoveFilter(key),
+      isLocked
     });
   });
 
@@ -687,6 +691,7 @@ export const ActiveFilterChips = ({
       {chips.map(chip => (
         <Chip
           key={chip.key}
+          icon={chip.isLocked ? <LockIcon fontSize="small" /> : undefined}
           label={chip.label}
           onDelete={chip.onDelete}
           size="small"
@@ -704,7 +709,8 @@ ActiveFilterChips.propTypes = {
   onRemoveFilter: PropTypes.func.isRequired,
   onClearQuery: PropTypes.func.isRequired,
   labelMap: PropTypes.shape({}).isRequired,
-  translatableValueFields: PropTypes.instanceOf(Set)
+  translatableValueFields: PropTypes.instanceOf(Set),
+  lockedKeys: PropTypes.arrayOf(PropTypes.string)
 };
 
 export const SearchFilterAccordion = ({
