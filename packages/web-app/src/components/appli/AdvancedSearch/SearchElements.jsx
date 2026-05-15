@@ -696,6 +696,7 @@ export const ActiveFilterChips = ({
           onDelete={chip.onDelete}
           size="small"
           color="primary"
+          variant="outlined"
         />
       ))}
     </Box>
