@@ -83,7 +83,8 @@ const EntranceDetail = ({
         <Typography
           variant="caption"
           color="text.secondary"
-          sx={{ mt: 1, display: 'block' }}>
+          sx={{ mt: 1, display: 'block' }}
+        >
           {formatMessage({
             id: 'Search or click on the map to position the entrance'
           })}
@@ -120,25 +121,6 @@ const EntranceDetail = ({
                 endAdornment: <InputAdornment position="end">m</InputAdornment>
               }}
               value={value}
-              onChange={onChange}
-            />
-          )}
-        />
-        <Controller
-          name="entrance.yearDiscovery"
-          control={control}
-          rules={{ valueAsNumber: true }}
-          render={({ field: { ref, value, onChange } }) => (
-            <TextField
-              fullWidth
-              label={formatMessage({ id: 'Year of discovery' })}
-              type="number"
-              error={!!errors.entrance?.yearDiscovery}
-              inputRef={ref}
-              InputProps={{
-                inputProps: { max: new Date().getFullYear() }
-              }}
-              value={value ?? ''}
               onChange={onChange}
             />
           )}

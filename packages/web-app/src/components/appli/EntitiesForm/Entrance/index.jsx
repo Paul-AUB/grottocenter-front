@@ -94,7 +94,8 @@ export const EntranceForm = ({
   );
   const [entityType, setEntityType] = useState(entityTypeInitialValue);
   const { isAdmin } = usePermissions();
-  const isSensitiveDisabled = !isAdmin && (entranceValues?.isSensitive ?? false);
+  const isSensitiveDisabled =
+    !isAdmin && (entranceValues?.isSensitive ?? false);
 
   const defaultFormValues = useMemo(
     () => ({
@@ -114,15 +115,23 @@ export const EntranceForm = ({
     formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({ defaultValues: defaultFormValues });
 
-  const [lat, lng, caveName, caveLanguage, entranceName, entranceLanguage] =
-    watch([
-      'entrance.latitude',
-      'entrance.longitude',
-      'cave.name',
-      'cave.language',
-      'entrance.name',
-      'entrance.language'
-    ]);
+  const [
+    lat,
+    lng,
+    caveName,
+    caveLanguage,
+    entranceName,
+    entranceLanguage,
+    caveId
+  ] = watch([
+    'entrance.latitude',
+    'entrance.longitude',
+    'cave.name',
+    'cave.language',
+    'entrance.name',
+    'entrance.language',
+    'cave.id'
+  ]);
 
   const isSubmitDisabled =
     (!isSensitiveDisabled && (isCoordEmpty(lat) || isCoordEmpty(lng))) ||
@@ -167,7 +176,10 @@ export const EntranceForm = ({
         entityType !== ENTRANCE_AND_CAVE ||
         !hasCaveChanged(caveData, caveValues);
 
-      const entranceUnchanged = !hasEntranceChanged(entranceDataFmt, entranceValues);
+      const entranceUnchanged = !hasEntranceChanged(
+        entranceDataFmt,
+        entranceValues
+      );
 
       if (caveUnchanged && entranceUnchanged) {
         onInfo(formatMessage({ id: 'No changes detected' }));
@@ -222,9 +234,13 @@ export const EntranceForm = ({
           getValues={getValues}
           isNewEntrance={isNewEntrance}
         />
-        {(isNewEntrance || entityType === ENTRANCE_AND_CAVE) && (
-          <CaveDetail control={control} errors={errors} />
-        )}
+        <CaveDetail
+          control={control}
+          errors={errors}
+          isReadonly={entityType === ENTRANCE_ONLY}
+          isShared={entityType === ENTRANCE_ONLY}
+          caveId={caveId}
+        />
         <EntranceAttributes control={control} />
         <FormActionRow
           isNew={isNewEntrance}
@@ -240,7 +256,8 @@ export const EntranceForm = ({
               display: 'block',
               mt: 1,
               textAlign: { xs: 'left', sm: 'right' }
-            }}>
+            }}
+          >
             {formatMessage({
               id: 'Fill in the required fields to create the entrance'
             })}

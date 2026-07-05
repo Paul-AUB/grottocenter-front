@@ -1,20 +1,20 @@
-import {
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  InputAdornment,
-  Switch,
-  TextField
-} from '@mui/material';
+import { Alert, Box, InputAdornment, Link, TextField } from '@mui/material';
 import React from 'react';
 import { Controller } from 'react-hook-form';
+import { Link as RouterLink } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import Translate from '../../../common/Translate';
 
 import { FormRow, FormSection } from '../utils/FormContainers';
+import BoolToggleChip from '../utils/BoolToggleChip';
 
-const CaveDetail = ({ control, errors, isReadonly = false }) => {
+const CaveDetail = ({
+  control,
+  errors,
+  isReadonly = false,
+  isShared = false,
+  caveId
+}) => {
   const { formatMessage } = useIntl();
 
   const validateTemperature = value => {
@@ -41,102 +41,129 @@ const CaveDetail = ({ control, errors, isReadonly = false }) => {
   };
 
   return (
-    <FormSection title="Physical characteristics">
+    <FormSection title="Characteristics">
+      {isShared && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {formatMessage({
+            id: 'These characteristics belong to the cave and are shared by all its entrances.'
+          })}
+          {caveId ? (
+            <>
+              {' '}
+              <Link component={RouterLink} to={`/ui/caves/${caveId}`}>
+                {formatMessage({ id: 'View the cave' })}
+              </Link>
+            </>
+          ) : null}
+        </Alert>
+      )}
       <FormRow>
         <Controller
           name="cave.depth"
-        control={control}
-        rules={{ valueAsNumber: true, validate: validateDistance }}
-        render={({ field: { ref, value, onChange } }) => (
-          <TextField
-            disabled={isReadonly}
-            label={formatMessage({ id: 'Depth' })}
-            type="number"
-            error={!!errors.cave?.depth}
-            inputRef={ref}
-            InputProps={{
-              endAdornment: <InputAdornment position="start">m</InputAdornment>
-            }}
-            helperText={errors.cave?.depth?.message}
-            value={value ?? ''}
-            onChange={onChange}
-          />
-        )}
-      />
-      <Controller
-        name="cave.length"
-        control={control}
-        rules={{ valueAsNumber: true, validate: validateDistance }}
-        render={({ field: { ref, value, onChange } }) => (
-          <TextField
-            disabled={isReadonly}
-            label={formatMessage({ id: 'Length' })}
-            type="number"
-            error={!!errors.cave?.length}
-            inputRef={ref}
-            InputProps={{
-              endAdornment: <InputAdornment position="start">m</InputAdornment>
-            }}
-            helperText={errors.cave?.length?.message}
-            value={value ?? ''}
-            onChange={onChange}
-          />
-        )}
-      />
-      <Controller
-        name="cave.temperature"
-        control={control}
-        rules={{
-          valueAsNumber: true,
-          validate: validateTemperature
-        }}
-        render={({ field: { ref, value, onChange } }) => (
-          <TextField
-            disabled={isReadonly}
-            label={formatMessage({ id: 'Temperature' })}
-            type="number"
-            error={!!errors.cave?.temperature}
-            inputRef={ref}
-            InputProps={{
-              endAdornment: <InputAdornment position="start">°C</InputAdornment>
-            }}
-            helperText={errors.cave?.temperature?.message}
-            value={value ?? ''}
-            onChange={onChange}
-          />
-        )}
-      />
-      <Controller
-        name="cave.isDiving"
-        control={control}
-        defaultValue={false}
-        render={({ field: { ref, value, onChange } }) => (
-          <FormControl
-            margin="dense"
-            disabled={isReadonly}
-            component="fieldset"
-            error={!!errors.cave?.isDiving}>
-            <FormLabel component="legend">
-              <Translate>Diving cave</Translate>
-            </FormLabel>
-            <FormControlLabel
-              control={
-                <Switch
-                  inputRef={ref}
-                  checked={value}
-                  onChange={e => onChange(e.target.checked)}
-                />
-              }
-              label={
-                value
-                  ? formatMessage({ id: 'Yes' })
-                  : formatMessage({ id: 'No' })
-              }
+          control={control}
+          rules={{ valueAsNumber: true, validate: validateDistance }}
+          render={({ field: { ref, value, onChange } }) => (
+            <TextField
+              disabled={isReadonly}
+              label={formatMessage({ id: 'Depth' })}
+              type="number"
+              error={!!errors.cave?.depth}
+              inputRef={ref}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">m</InputAdornment>
+                )
+              }}
+              helperText={errors.cave?.depth?.message}
+              value={value ?? ''}
+              onChange={onChange}
             />
-          </FormControl>
-        )}
-      />
+          )}
+        />
+        <Controller
+          name="cave.length"
+          control={control}
+          rules={{ valueAsNumber: true, validate: validateDistance }}
+          render={({ field: { ref, value, onChange } }) => (
+            <TextField
+              disabled={isReadonly}
+              label={formatMessage({ id: 'Development' })}
+              type="number"
+              error={!!errors.cave?.length}
+              inputRef={ref}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">m</InputAdornment>
+                )
+              }}
+              helperText={errors.cave?.length?.message}
+              value={value ?? ''}
+              onChange={onChange}
+            />
+          )}
+        />
+        <Controller
+          name="cave.temperature"
+          control={control}
+          rules={{
+            valueAsNumber: true,
+            validate: validateTemperature
+          }}
+          render={({ field: { ref, value, onChange } }) => (
+            <TextField
+              disabled={isReadonly}
+              label={formatMessage({ id: 'Temperature' })}
+              type="number"
+              error={!!errors.cave?.temperature}
+              inputRef={ref}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">°C</InputAdornment>
+                )
+              }}
+              helperText={errors.cave?.temperature?.message}
+              value={value ?? ''}
+              onChange={onChange}
+            />
+          )}
+        />
+        <Controller
+          name="entrance.yearDiscovery"
+          control={control}
+          rules={{ valueAsNumber: true }}
+          render={({ field: { ref, value, onChange } }) => (
+            <TextField
+              fullWidth
+              label={formatMessage({ id: 'Year of discovery' })}
+              type="number"
+              error={!!errors.entrance?.yearDiscovery}
+              inputRef={ref}
+              InputProps={{
+                inputProps: { max: new Date().getFullYear() }
+              }}
+              value={value ?? ''}
+              onChange={onChange}
+            />
+          )}
+        />
       </FormRow>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+        {/* Diving belongs to the cave (locked when shared); touristic site is
+            an entrance-level attribute (always editable). */}
+        <BoolToggleChip
+          name="cave.isDiving"
+          label="Diving cave"
+          icon="diving_cave"
+          control={control}
+          disabled={isReadonly}
+        />
+        <BoolToggleChip
+          name="entrance.isTouristic"
+          label="Touristic site"
+          icon="touristic"
+          control={control}
+        />
+      </Box>
     </FormSection>
   );
 };
@@ -146,12 +173,16 @@ CaveDetail.propTypes = {
     cave: PropTypes.shape({
       depth: PropTypes.shape({ message: PropTypes.string }),
       length: PropTypes.shape({ message: PropTypes.string }),
-      temperature: PropTypes.shape({ message: PropTypes.string }),
-      isDiving: PropTypes.shape({ message: PropTypes.string })
+      temperature: PropTypes.shape({ message: PropTypes.string })
+    }),
+    entrance: PropTypes.shape({
+      yearDiscovery: PropTypes.shape({ message: PropTypes.string })
     })
   }),
   control: PropTypes.shape({}),
-  isReadonly: PropTypes.bool
+  isReadonly: PropTypes.bool,
+  isShared: PropTypes.bool,
+  caveId: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 };
 
 export default CaveDetail;
