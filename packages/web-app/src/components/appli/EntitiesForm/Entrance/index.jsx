@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -15,7 +14,6 @@ import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
 import { useIntl } from 'react-intl';
 import { usePermissions, useNotification } from '../../../../hooks';
-import LicenseBox from '../utils/LicenseBox';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import EditTypeSelection from './EditTypeSelection';
 import EntranceDetail from './EntranceDetail';
@@ -248,24 +246,7 @@ export const EntranceForm = ({
           disabled={isSubmitDisabled}
           onCancel={onCancel}
         />
-        {isSubmitDisabled && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{
-              display: 'block',
-              mt: 1,
-              textAlign: { xs: 'left', sm: 'right' }
-            }}
-          >
-            {formatMessage({
-              id: 'Fill in the required fields to create the entrance'
-            })}
-          </Typography>
-        )}
       </form>
-
-      <LicenseBox />
     </FormContainer>
   );
 };

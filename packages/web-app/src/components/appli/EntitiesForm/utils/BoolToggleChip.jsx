@@ -27,17 +27,13 @@ const BoolToggleChip = ({ name, label, icon, control, disabled = false }) => (
           gap: 1,
           borderRadius: 2,
           px: 1.5,
-          color: 'text.disabled',
+          color: 'text.secondary',
           borderColor: 'divider',
-          opacity: 0.85,
-          '& img': { filter: 'grayscale(1)', opacity: 0.6 },
           '&.Mui-selected': {
             color: 'primary.main',
             fontWeight: 700,
-            opacity: 1,
             borderColor: 'primary.main',
             backgroundColor: theme => alpha(theme.palette.primary.main, 0.14),
-            '& img': { filter: 'none', opacity: 1 },
             '&:hover': {
               backgroundColor: theme => alpha(theme.palette.primary.main, 0.22)
             }

@@ -5,8 +5,13 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { FormRow, FormSection } from '../utils/FormContainers';
+import { FormSection } from '../utils/FormContainers';
 import BoolToggleChip from '../utils/BoolToggleChip';
+
+// Each numeric field grows evenly but keeps a minimum width, so the row wraps
+// gracefully (4-up on wide screens, 2–3 on medium, 1 on mobile) instead of
+// squeezing long labels like "Development" / "Year of discovery".
+const fieldSx = { flex: '1 1 200px' };
 
 const CaveDetail = ({
   control,
@@ -45,19 +50,19 @@ const CaveDetail = ({
       {isShared && (
         <Alert severity="info" sx={{ mb: 2 }}>
           {formatMessage({
-            id: 'These characteristics belong to the cave and are shared by all its entrances.'
+            id: 'Some of these characteristics are locked here because they are defined at the network level and shared by all its entrances.'
           })}
           {caveId ? (
             <>
               {' '}
               <Link component={RouterLink} to={`/ui/caves/${caveId}`}>
-                {formatMessage({ id: 'View the cave' })}
+                {formatMessage({ id: 'View the network' })}
               </Link>
             </>
           ) : null}
         </Alert>
       )}
-      <FormRow>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
         <Controller
           name="cave.depth"
           control={control}
@@ -65,6 +70,7 @@ const CaveDetail = ({
           render={({ field: { ref, value, onChange } }) => (
             <TextField
               disabled={isReadonly}
+              sx={fieldSx}
               label={formatMessage({ id: 'Depth' })}
               type="number"
               error={!!errors.cave?.depth}
@@ -87,6 +93,7 @@ const CaveDetail = ({
           render={({ field: { ref, value, onChange } }) => (
             <TextField
               disabled={isReadonly}
+              sx={fieldSx}
               label={formatMessage({ id: 'Development' })}
               type="number"
               error={!!errors.cave?.length}
@@ -112,6 +119,7 @@ const CaveDetail = ({
           render={({ field: { ref, value, onChange } }) => (
             <TextField
               disabled={isReadonly}
+              sx={fieldSx}
               label={formatMessage({ id: 'Temperature' })}
               type="number"
               error={!!errors.cave?.temperature}
@@ -133,7 +141,7 @@ const CaveDetail = ({
           rules={{ valueAsNumber: true }}
           render={({ field: { ref, value, onChange } }) => (
             <TextField
-              fullWidth
+              sx={fieldSx}
               label={formatMessage({ id: 'Year of discovery' })}
               type="number"
               error={!!errors.entrance?.yearDiscovery}
@@ -146,7 +154,7 @@ const CaveDetail = ({
             />
           )}
         />
-      </FormRow>
+      </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
         {/* Diving belongs to the cave (locked when shared); touristic site is
             an entrance-level attribute (always editable). */}

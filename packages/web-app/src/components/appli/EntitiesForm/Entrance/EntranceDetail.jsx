@@ -1,9 +1,9 @@
 import {
+  Box,
   FormControlLabel,
   InputAdornment,
   Switch,
-  TextField,
-  Typography
+  TextField
 } from '@mui/material';
 import React, { useRef, useState } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
@@ -13,7 +13,7 @@ import { usePermissions, useNearbyEntrances } from '../../../../hooks';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 import Alert from '../../../common/Alert';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
-import { FormRow, FormSection } from '../utils/FormContainers';
+import { FormSection } from '../utils/FormContainers';
 
 const EntranceDetail = ({
   control,
@@ -49,47 +49,6 @@ const EntranceDetail = ({
 
   return (
     <FormSection title="Location">
-      <Controller
-        name="entrance.isSensitive"
-        control={control}
-        defaultValue={false}
-        render={({ field: { ref, value, onChange } }) => (
-          <FormControlLabel
-            control={
-              <Switch
-                inputRef={ref}
-                disabled={isSensitiveDisabled}
-                checked={value}
-                onChange={e => onChange(e.target.checked)}
-              />
-            }
-            label={formatMessage({ id: 'Restricted access entrance' })}
-          />
-        )}
-      />
-      {(isSensitive || isSensitiveDisabled) && (
-        <Alert
-          disableMargins
-          severity={isSensitiveDisabled ? 'info' : 'warning'}
-          content={formatMessage({
-            id: isSensitiveDisabled
-              ? "You can't unrestrict a cave access."
-              : 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
-          })}
-        />
-      )}
-
-      {!isSensitiveDisabled && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ mt: 1, display: 'block' }}
-        >
-          {formatMessage({
-            id: 'Search or click on the map to position the entrance'
-          })}
-        </Typography>
-      )}
       {!isSensitiveDisabled && (
         <CoordinateFormSection
           control={control}
@@ -105,14 +64,23 @@ const EntranceDetail = ({
           onZoomChange={setMapZoom}
         />
       )}
-      <FormRow>
+
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 2,
+          mt: 2
+        }}
+      >
         <Controller
           name="entrance.altitude"
           control={control}
           rules={{ valueAsNumber: true }}
           render={({ field: { ref, value, onChange } }) => (
             <TextField
-              fullWidth
+              sx={{ flex: '1 1 200px' }}
               label={formatMessage({ id: 'Altitude' })}
               type="number"
               error={!!errors.entrance?.altitude}
@@ -125,7 +93,35 @@ const EntranceDetail = ({
             />
           )}
         />
-      </FormRow>
+        <Controller
+          name="entrance.isSensitive"
+          control={control}
+          defaultValue={false}
+          render={({ field: { ref, value, onChange } }) => (
+            <FormControlLabel
+              control={
+                <Switch
+                  inputRef={ref}
+                  disabled={isSensitiveDisabled}
+                  checked={value}
+                  onChange={e => onChange(e.target.checked)}
+                />
+              }
+              label={formatMessage({ id: 'Restricted access entrance' })}
+            />
+          )}
+        />
+      </Box>
+      {(isSensitive || isSensitiveDisabled) && (
+        <Alert
+          severity={isSensitiveDisabled ? 'info' : 'warning'}
+          content={formatMessage({
+            id: isSensitiveDisabled
+              ? "You can't unrestrict a cave access."
+              : 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
+          })}
+        />
+      )}
     </FormSection>
   );
 };
