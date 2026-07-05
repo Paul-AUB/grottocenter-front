@@ -58,7 +58,7 @@ const EditTypeSelection = ({
               >
                 <InputText
                   formKey="cave.name"
-                  labelName="Entrance name (which is also the cave name)"
+                  labelName="Entrance name"
                   control={control}
                   isError={!!errors?.cave?.name}
                   isRequired
