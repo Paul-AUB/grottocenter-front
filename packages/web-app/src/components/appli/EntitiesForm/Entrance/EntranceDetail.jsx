@@ -1,10 +1,4 @@
-import {
-  Box,
-  FormControlLabel,
-  InputAdornment,
-  Switch,
-  TextField
-} from '@mui/material';
+import { Box, FormControlLabel, Switch } from '@mui/material';
 import React, { useRef, useState } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -14,6 +8,7 @@ import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 import Alert from '../../../common/Alert';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormSection } from '../utils/FormContainers';
+import NumberField from '../utils/NumberField';
 
 const EntranceDetail = ({
   control,
@@ -74,24 +69,13 @@ const EntranceDetail = ({
           mt: 2
         }}
       >
-        <Controller
+        <NumberField
           name="entrance.altitude"
           control={control}
-          rules={{ valueAsNumber: true }}
-          render={({ field: { ref, value, onChange } }) => (
-            <TextField
-              sx={{ flex: '1 1 200px' }}
-              label={formatMessage({ id: 'Altitude' })}
-              type="number"
-              error={!!errors.entrance?.altitude}
-              inputRef={ref}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">m</InputAdornment>
-              }}
-              value={value}
-              onChange={onChange}
-            />
-          )}
+          label="Altitude"
+          icon="altitude"
+          unit="m"
+          isError={!!errors.entrance?.altitude}
         />
         <Controller
           name="entrance.isSensitive"

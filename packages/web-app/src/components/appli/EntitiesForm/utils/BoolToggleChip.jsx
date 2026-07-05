@@ -37,8 +37,18 @@ const BoolToggleChip = ({ name, label, icon, control, disabled = false }) => (
             '&:hover': {
               backgroundColor: theme => alpha(theme.palette.primary.main, 0.22)
             }
+          },
+          // Grey out the icon when disabled...
+          '&.Mui-disabled img': { filter: 'grayscale(1)', opacity: 0.5 },
+          // ...and neutralize the "selected" accent so a disabled-but-true chip
+          // reads as greyed rather than active.
+          '&.Mui-disabled.Mui-selected': {
+            color: 'text.disabled',
+            borderColor: 'divider',
+            backgroundColor: 'action.disabledBackground'
           }
-        }}>
+        }}
+      >
         {value && <CheckIcon fontSize="small" />}
         <CustomIcon type={icon} size={20} />
         <Translate>{label}</Translate>

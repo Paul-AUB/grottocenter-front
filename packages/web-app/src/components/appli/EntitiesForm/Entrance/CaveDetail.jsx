@@ -1,17 +1,12 @@
-import { Alert, Box, InputAdornment, Link, TextField } from '@mui/material';
+import { Alert, Box, Link } from '@mui/material';
 import React from 'react';
-import { Controller } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
 import { FormSection } from '../utils/FormContainers';
 import BoolToggleChip from '../utils/BoolToggleChip';
-
-// Each numeric field grows evenly but keeps a minimum width, so the row wraps
-// gracefully (4-up on wide screens, 2–3 on medium, 1 on mobile) instead of
-// squeezing long labels like "Development" / "Year of discovery".
-const fieldSx = { flex: '1 1 200px' };
+import NumberField from '../utils/NumberField';
 
 const CaveDetail = ({
   control,
@@ -63,96 +58,46 @@ const CaveDetail = ({
         </Alert>
       )}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-        <Controller
+        <NumberField
           name="cave.depth"
           control={control}
+          label="Depth"
+          icon="depth"
+          unit="m"
+          disabled={isReadonly}
+          isError={!!errors.cave?.depth}
+          helperText={errors.cave?.depth?.message}
           rules={{ valueAsNumber: true, validate: validateDistance }}
-          render={({ field: { ref, value, onChange } }) => (
-            <TextField
-              disabled={isReadonly}
-              sx={fieldSx}
-              label={formatMessage({ id: 'Depth' })}
-              type="number"
-              error={!!errors.cave?.depth}
-              inputRef={ref}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start">m</InputAdornment>
-                )
-              }}
-              helperText={errors.cave?.depth?.message}
-              value={value ?? ''}
-              onChange={onChange}
-            />
-          )}
         />
-        <Controller
+        <NumberField
           name="cave.length"
           control={control}
+          label="Development"
+          icon="length"
+          unit="m"
+          disabled={isReadonly}
+          isError={!!errors.cave?.length}
+          helperText={errors.cave?.length?.message}
           rules={{ valueAsNumber: true, validate: validateDistance }}
-          render={({ field: { ref, value, onChange } }) => (
-            <TextField
-              disabled={isReadonly}
-              sx={fieldSx}
-              label={formatMessage({ id: 'Development' })}
-              type="number"
-              error={!!errors.cave?.length}
-              inputRef={ref}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start">m</InputAdornment>
-                )
-              }}
-              helperText={errors.cave?.length?.message}
-              value={value ?? ''}
-              onChange={onChange}
-            />
-          )}
         />
-        <Controller
+        <NumberField
           name="cave.temperature"
           control={control}
-          rules={{
-            valueAsNumber: true,
-            validate: validateTemperature
-          }}
-          render={({ field: { ref, value, onChange } }) => (
-            <TextField
-              disabled={isReadonly}
-              sx={fieldSx}
-              label={formatMessage({ id: 'Temperature' })}
-              type="number"
-              error={!!errors.cave?.temperature}
-              inputRef={ref}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start">°C</InputAdornment>
-                )
-              }}
-              helperText={errors.cave?.temperature?.message}
-              value={value ?? ''}
-              onChange={onChange}
-            />
-          )}
+          label="Temperature"
+          icon="temperature"
+          unit="°C"
+          disabled={isReadonly}
+          isError={!!errors.cave?.temperature}
+          helperText={errors.cave?.temperature?.message}
+          rules={{ valueAsNumber: true, validate: validateTemperature }}
         />
-        <Controller
+        <NumberField
           name="entrance.yearDiscovery"
           control={control}
-          rules={{ valueAsNumber: true }}
-          render={({ field: { ref, value, onChange } }) => (
-            <TextField
-              sx={fieldSx}
-              label={formatMessage({ id: 'Year of discovery' })}
-              type="number"
-              error={!!errors.entrance?.yearDiscovery}
-              inputRef={ref}
-              InputProps={{
-                inputProps: { max: new Date().getFullYear() }
-              }}
-              value={value ?? ''}
-              onChange={onChange}
-            />
-          )}
+          label="Year of discovery"
+          icon="discovery_date"
+          isError={!!errors.entrance?.yearDiscovery}
+          inputProps={{ max: new Date().getFullYear() }}
         />
       </Box>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
