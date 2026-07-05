@@ -278,7 +278,12 @@ const CoordinateFormSection = ({
               borderColor: 'divider',
               whiteSpace: 'nowrap',
               flexShrink: 0,
-              alignSelf: 'stretch'
+              alignSelf: 'stretch',
+              // Each field is a MuiFormControl with 4px vertical padding (theme),
+              // insetting its grey box. Matching that margin makes the stretched
+              // button line up exactly with the fields — on desktop (one field's
+              // height) and on mobile (spanning both stacked lat/lng fields).
+              my: '4px'
             }}>
             {crsButtonLabel}
           </Button>
