@@ -145,7 +145,23 @@ export const EntranceForm = ({
 
   const handleUpdateEntityType = type => {
     setEntityType(type);
-    reset({ ...getValues() });
+    const values = getValues();
+    // Clear any previously linked network's data on every toggle (both
+    // directions): otherwise cave.id/depth/length/... from an earlier search
+    // selection lingers in the form even after the search box is cleared or
+    // the checkbox is unchecked and rechecked, showing a stale "shared
+    // network" link/values for a network that's no longer actually selected.
+    reset({
+      ...values,
+      cave: {
+        ...values.cave,
+        id: null,
+        depth: null,
+        length: null,
+        temperature: null,
+        isDiving: false
+      }
+    });
   };
 
   const handleReset = useCallback(() => {
