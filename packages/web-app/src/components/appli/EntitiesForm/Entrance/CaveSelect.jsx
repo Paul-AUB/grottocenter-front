@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 
 import CaveAutoCompleteSearch from '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
 
-// `value` controls the search field's display (the currently linked cave/
-// network's name). It is intentionally NOT backed by the shared `cave.name`
-// RHF field: that field also holds the name of a newly created cave, and
-// writing the searched network's name into it would silently overwrite the
-// user's own entrance name once they switch back to "new cave" mode.
+// `value` is the currently selected cave/network (drives the search field's
+// display). It is intentionally NOT backed by the shared `cave.name` RHF
+// field: that field also holds the name of a newly created cave, and writing
+// the searched network's name into it would silently overwrite the user's own
+// entrance name once they switch back to "new cave" mode.
 const CaveSelection = ({
   control,
   disabled = false,
@@ -55,7 +55,13 @@ const CaveSelection = ({
       onIsDivingChange(Boolean(selection.isDiving));
       onIdChange(Number(selection.id));
     } else {
+      // Cleared via the search's native clear button: drop the linked cave's
+      // id and its shared characteristics so nothing stale lingers.
       onIdChange(null);
+      onLengthChange(null);
+      onDepthChange(null);
+      onTemperatureChange(null);
+      onIsDivingChange(false);
     }
     onSelectionChange?.(selection);
   };
@@ -78,6 +84,9 @@ CaveSelection.propTypes = {
   errors: PropTypes.shape({
     caveName: PropTypes.string
   }),
-  value: PropTypes.shape({ name: PropTypes.string }),
+  value: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    name: PropTypes.string
+  }),
   onSelectionChange: PropTypes.func
 };

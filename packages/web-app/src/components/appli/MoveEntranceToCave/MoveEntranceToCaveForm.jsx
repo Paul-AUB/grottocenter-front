@@ -80,7 +80,10 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
   const isLinkedToANetwork = entrance.cave?.entrances?.length > 1;
 
   const handleOnSelection = selectedCave => {
-    onNewCaveChange({ ...selectedCave, id: Number(selectedCave.id) });
+    // `selectedCave` is null when the search field is cleared.
+    onNewCaveChange(
+      selectedCave ? { ...selectedCave, id: Number(selectedCave.id) } : null
+    );
   };
   const handleResetCave = () => reset();
 

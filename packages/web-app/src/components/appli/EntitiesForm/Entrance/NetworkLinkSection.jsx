@@ -59,9 +59,7 @@ const NetworkLinkSection = ({
             errors={errors}
             value={selectedCave}
             onSelectionChange={selection => {
-              onSelectedCaveChange(
-                selection?.id ? { name: selection.name } : null
-              );
+              onSelectedCaveChange(selection?.id ? selection : null);
               setSelectedNbEntrances(
                 typeof selection?.nbEntrances === 'number'
                   ? selection.nbEntrances
@@ -104,7 +102,10 @@ NetworkLinkSection.propTypes = {
   entityType: PropTypes.oneOf([ENTRANCE_ONLY, ENTRANCE_AND_CAVE]),
   updateEntityType: PropTypes.func.isRequired,
   reset: PropTypes.func.isRequired,
-  selectedCave: PropTypes.shape({ name: PropTypes.string }),
+  selectedCave: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    name: PropTypes.string
+  }),
   onSelectedCaveChange: PropTypes.func.isRequired
 };
 
