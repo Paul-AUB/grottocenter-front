@@ -1,0 +1,62 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { ToggleButton } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import CheckIcon from '@mui/icons-material/Check';
+import { Controller } from 'react-hook-form';
+import CustomIcon from '../../../common/CustomIcon';
+import Translate from '../../../common/Translate';
+
+// A single boolean attribute rendered as an icon toggle chip, wired to a
+// React-Hook-Form Controller. Selected = the attribute applies. Uses
+// ToggleButton for built-in `aria-pressed` accessibility.
+const BoolToggleChip = ({ name, label, icon, control, disabled = false }) => (
+  <Controller
+    name={name}
+    control={control}
+    defaultValue={false}
+    render={({ field: { value, onChange } }) => (
+      <ToggleButton
+        value={name}
+        selected={!!value}
+        disabled={disabled}
+        size="small"
+        onChange={() => onChange(!value)}
+        sx={{
+          textTransform: 'none',
+          gap: 1,
+          borderRadius: 2,
+          px: 1.5,
+          color: 'text.disabled',
+          borderColor: 'divider',
+          opacity: 0.85,
+          '& img': { filter: 'grayscale(1)', opacity: 0.6 },
+          '&.Mui-selected': {
+            color: 'primary.main',
+            fontWeight: 700,
+            opacity: 1,
+            borderColor: 'primary.main',
+            backgroundColor: theme => alpha(theme.palette.primary.main, 0.14),
+            '& img': { filter: 'none', opacity: 1 },
+            '&:hover': {
+              backgroundColor: theme => alpha(theme.palette.primary.main, 0.22)
+            }
+          }
+        }}>
+        {value && <CheckIcon fontSize="small" />}
+        <CustomIcon type={icon} size={20} />
+        <Translate>{label}</Translate>
+      </ToggleButton>
+    )}
+  />
+);
+
+BoolToggleChip.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
+  control: PropTypes.shape({}),
+  disabled: PropTypes.bool
+};
+
+export default BoolToggleChip;

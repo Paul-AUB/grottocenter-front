@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -19,6 +20,7 @@ import FormProgressInfo from '../utils/FormProgressInfo';
 import EditTypeSelection from './EditTypeSelection';
 import EntranceDetail from './EntranceDetail';
 import CaveDetail from './CaveDetail';
+import EntranceAttributes from './EntranceAttributes';
 import {
   makeCaveData,
   makeEntranceData,
@@ -220,17 +222,30 @@ export const EntranceForm = ({
           getValues={getValues}
           isNewEntrance={isNewEntrance}
         />
-        <CaveDetail
-          control={control}
-          errors={errors}
-          isReadonly={!isNewEntrance && entityType === ENTRANCE_ONLY}
-        />
+        {(isNewEntrance || entityType === ENTRANCE_AND_CAVE) && (
+          <CaveDetail control={control} errors={errors} />
+        )}
+        <EntranceAttributes control={control} />
         <FormActionRow
           isNew={isNewEntrance}
           isSubmitting={isSubmitting}
           disabled={isSubmitDisabled}
           onCancel={onCancel}
         />
+        {isSubmitDisabled && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              display: 'block',
+              mt: 1,
+              textAlign: { xs: 'left', sm: 'right' }
+            }}>
+            {formatMessage({
+              id: 'Fill in the required fields to create the entrance'
+            })}
+          </Typography>
+        )}
       </form>
 
       <LicenseBox />

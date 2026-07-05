@@ -12,7 +12,7 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import Translate from '../../../common/Translate';
 
-import { FormRow } from '../utils/FormContainers';
+import { FormRow, FormSection } from '../utils/FormContainers';
 
 const CaveDetail = ({ control, errors, isReadonly = false }) => {
   const { formatMessage } = useIntl();
@@ -41,9 +41,10 @@ const CaveDetail = ({ control, errors, isReadonly = false }) => {
   };
 
   return (
-    <FormRow>
-      <Controller
-        name="cave.depth"
+    <FormSection title="Physical characteristics">
+      <FormRow>
+        <Controller
+          name="cave.depth"
         control={control}
         rules={{ valueAsNumber: true, validate: validateDistance }}
         render={({ field: { ref, value, onChange } }) => (
@@ -135,7 +136,8 @@ const CaveDetail = ({ control, errors, isReadonly = false }) => {
           </FormControl>
         )}
       />
-    </FormRow>
+      </FormRow>
+    </FormSection>
   );
 };
 

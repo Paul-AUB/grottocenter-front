@@ -1,9 +1,9 @@
 import {
   FormControl as MuiFormControl,
-  FormLabel,
   RadioGroup,
   FormControlLabel,
   Button,
+  Box,
   Radio
 } from '@mui/material';
 import React from 'react';
@@ -16,13 +16,13 @@ import CaveSelection from './CaveSelect';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
 import Alert from '../../../common/Alert';
-import { FormRow, FormSectionLabel } from '../utils/FormContainers';
+import { FormRow, FormSection } from '../utils/FormContainers';
 import InputLanguage from '../utils/InputLanguage';
 import InputText from '../utils/InputText';
 import NameSuggestionDropdown from './NameSuggestionDropdown';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)};
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const EditTypeSelection = ({
@@ -51,102 +51,111 @@ const EditTypeSelection = ({
 
   return (
     <>
-      <FormControl component="fieldset" disabled={disabled}>
-        <FormLabel component="legend">
-          {formatMessage({ id: 'The entrance is:' })}
-        </FormLabel>
-        <RadioGroup
-          aria-label={formatMessage({ id: 'entityType' })}
-          name="entityType"
-          value={entityType}
-          onChange={event => {
-            updateEntityType(event.target.value);
-            reset();
-          }}>
-          <FormControlLabel
-            value={ENTRANCE_AND_CAVE}
-            control={<Radio />}
-            label={formatMessage({
-              id: 'The first entrance of a new cave (on Grottocenter)'
-            })}
-          />
-          <FormControlLabel
-            value={ENTRANCE_ONLY}
-            control={<Radio />}
-            label={formatMessage({
-              id: 'Linked to an existing entrance or network'
-            })}
-          />
-        </RadioGroup>
-        {canMoveEntranceToExistingCave && (
-          <Button
-            onClick={() => {
-              navigate(`/ui/entrances/${entranceId}/move`);
-            }}
-            color="secondary">
-            {formatMessage({
-              id: 'Manage network association'
-            })}
-          </Button>
-        )}
-      </FormControl>
-      {entityType === ENTRANCE_AND_CAVE ? (
-        <FormRow>
-          <NameSuggestionDropdown
-            control={control}
-            formKey="cave.name"
-            enabled={isNewEntrance}>
-            <InputText
-              formKey="cave.name"
-              labelName="Entrance name (which is also the cave name)"
-              control={control}
-              isError={!!errors?.cave?.name}
-              isRequired
-              onChangeAdditionalFn={onNameChange}
+      <FormSection title="The entrance is:">
+        <FormControl component="fieldset" disabled={disabled}>
+          <RadioGroup
+            aria-label={formatMessage({ id: 'The entrance is:' })}
+            name="entityType"
+            value={entityType}
+            onChange={event => {
+              updateEntityType(event.target.value);
+              reset();
+            }}>
+            <FormControlLabel
+              value={ENTRANCE_AND_CAVE}
+              control={<Radio />}
+              label={formatMessage({
+                id: 'The first entrance of a new cave (on Grottocenter)'
+              })}
             />
-          </NameSuggestionDropdown>
-          <InputLanguage
-            formKey="cave.language"
-            labelName="Cave name language"
-            control={control}
-            isError={!!errors?.cave?.language}
-          />
-        </FormRow>
-      ) : (
-        <>
-          <CaveSelection
-            control={control}
-            errors={errors}
-            disabled={disabled}
-          />
-          {errors?.caveName && (
-            <Alert severity="error" content={errors.caveName} />
+            <FormControlLabel
+              value={ENTRANCE_ONLY}
+              control={<Radio />}
+              label={formatMessage({
+                id: 'Linked to an existing entrance or network'
+              })}
+            />
+          </RadioGroup>
+          {canMoveEntranceToExistingCave && (
+            <Button
+              onClick={() => {
+                navigate(`/ui/entrances/${entranceId}/move`);
+              }}
+              color="secondary">
+              {formatMessage({
+                id: 'Manage network association'
+              })}
+            </Button>
           )}
-          <FormSectionLabel
-            label={formatMessage({ id: 'Basic Information' })}
-          />
-          <FormRow>
-            <NameSuggestionDropdown
+        </FormControl>
+        {entityType === ENTRANCE_ONLY && (
+          <>
+            <CaveSelection
               control={control}
-              formKey="entrance.name"
-              enabled={isNewEntrance}>
-              <InputText
-                formKey="entrance.name"
-                labelName="Entrance name"
-                control={control}
-                isError={!!errors?.entrance?.name}
-                isRequired
-              />
-            </NameSuggestionDropdown>
-            <InputLanguage
-              formKey="entrance.language"
-              labelName="Entrance name language"
-              control={control}
-              isError={!!errors?.entrance?.language}
+              errors={errors}
+              disabled={disabled}
             />
+            {errors?.caveName && (
+              <Alert severity="error" content={errors.caveName} />
+            )}
+          </>
+        )}
+      </FormSection>
+
+      <FormSection>
+        {entityType === ENTRANCE_AND_CAVE ? (
+          <FormRow>
+            <Box sx={{ flex: 2, minWidth: 0 }}>
+              <NameSuggestionDropdown
+                control={control}
+                formKey="cave.name"
+                enabled={isNewEntrance}>
+                <InputText
+                  formKey="cave.name"
+                  labelName="Entrance name (which is also the cave name)"
+                  control={control}
+                  isError={!!errors?.cave?.name}
+                  isRequired
+                  onChangeAdditionalFn={onNameChange}
+                />
+              </NameSuggestionDropdown>
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <InputLanguage
+                formKey="cave.language"
+                labelName="Cave name language"
+                control={control}
+                isError={!!errors?.cave?.language}
+              />
+            </Box>
           </FormRow>
-        </>
-      )}
+        ) : (
+          <FormRow>
+            <Box sx={{ flex: 2, minWidth: 0 }}>
+              <NameSuggestionDropdown
+                control={control}
+                formKey="entrance.name"
+                enabled={isNewEntrance}>
+                <InputText
+                  formKey="entrance.name"
+                  labelName="Entrance name"
+                  control={control}
+                  isError={!!errors?.entrance?.name}
+                  isRequired
+                />
+              </NameSuggestionDropdown>
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <InputLanguage
+                formKey="entrance.language"
+                labelName="Entrance name language"
+                control={control}
+                isError={!!errors?.entrance?.language}
+              />
+            </Box>
+          </FormRow>
+        )}
+      </FormSection>
     </>
   );
 };

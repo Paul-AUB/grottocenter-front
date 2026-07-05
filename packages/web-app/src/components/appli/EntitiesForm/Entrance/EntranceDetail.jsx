@@ -1,7 +1,6 @@
 import {
   FormControlLabel,
-  FormControl,
-  FormLabel,
+  InputAdornment,
   Switch,
   TextField,
   Typography
@@ -10,66 +9,11 @@ import React, { useRef, useState } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
-import Translate from '../../../common/Translate';
 import { usePermissions, useNearbyEntrances } from '../../../../hooks';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 import Alert from '../../../common/Alert';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
-import { FormRow } from '../utils/FormContainers';
-import { ENTRANCE_HAZARD_FIELDS } from '../../../../conf/entranceCharacteristics';
-
-const FormControlInline = styled(FormControl)`
-  flex-wrap: wrap;
-  align-items: center;
-  flex-direction: row;
-`;
-
-const FormControlLabelInline = styled(FormControlLabel)`
-  padding-left: 10px;
-`;
-
-const BoolSwitch = ({ name, label, control, disabled = false, error = false }) => {
-  const { formatMessage } = useIntl();
-  return (
-    <Controller
-      name={name}
-      control={control}
-      defaultValue={false}
-      render={({ field: { ref, ...field } }) => (
-        <FormControlInline margin="dense" component="fieldset" error={error}>
-          <FormLabel>
-            <Translate>{label}</Translate>
-          </FormLabel>
-          <FormControlLabelInline
-            control={
-              <Switch
-                disabled={disabled}
-                inputRef={ref}
-                {...field}
-                checked={field.value}
-                onChange={e => field.onChange(e.target.checked)}
-              />
-            }
-            label={
-              field.value
-                ? formatMessage({ id: 'Yes' })
-                : formatMessage({ id: 'No' })
-            }
-          />
-        </FormControlInline>
-      )}
-    />
-  );
-};
-
-BoolSwitch.propTypes = {
-  name: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  control: PropTypes.shape({}),
-  disabled: PropTypes.bool,
-  error: PropTypes.bool
-};
+import { FormRow, FormSection } from '../utils/FormContainers';
 
 const EntranceDetail = ({
   control,
@@ -101,43 +45,50 @@ const EntranceDetail = ({
   const initialIsSensitive = useRef(values.entrance.isSensitive).current;
 
   const isSensitiveDisabled = !permissions.isAdmin && initialIsSensitive;
+  const isSensitive = useWatch({ control, name: 'entrance.isSensitive' });
+
   return (
-    <>
-      <BoolSwitch
+    <FormSection title="Location">
+      <Controller
         name="entrance.isSensitive"
-        label="Restricted access entrance"
         control={control}
-        disabled={isSensitiveDisabled}
-        error={!!errors?.entrance?.isSensitive}
+        defaultValue={false}
+        render={({ field: { ref, value, onChange } }) => (
+          <FormControlLabel
+            control={
+              <Switch
+                inputRef={ref}
+                disabled={isSensitiveDisabled}
+                checked={value}
+                onChange={e => onChange(e.target.checked)}
+              />
+            }
+            label={formatMessage({ id: 'Restricted access entrance' })}
+          />
+        )}
       />
-      <Alert
-        disableMargins
-        severity={isSensitiveDisabled ? 'info' : 'warning'}
-        content={formatMessage({
-          id: isSensitiveDisabled
-            ? "You can't unrestrict a cave access."
-            : 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
-        })}
-      />
-
-      <BoolSwitch
-        name="entrance.isTouristic"
-        label="Touristic site"
-        control={control}
-      />
-
-      <Typography variant="subtitle1" sx={{ mt: 2 }}>
-        <Translate>Hazards & restrictions</Translate>
-      </Typography>
-      {ENTRANCE_HAZARD_FIELDS.map(({ field: name, label }) => (
-        <BoolSwitch
-          key={name}
-          name={`entrance.${name}`}
-          label={label}
-          control={control}
+      {(isSensitive || isSensitiveDisabled) && (
+        <Alert
+          disableMargins
+          severity={isSensitiveDisabled ? 'info' : 'warning'}
+          content={formatMessage({
+            id: isSensitiveDisabled
+              ? "You can't unrestrict a cave access."
+              : 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
+          })}
         />
-      ))}
+      )}
 
+      {!isSensitiveDisabled && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 1, display: 'block' }}>
+          {formatMessage({
+            id: 'Search or click on the map to position the entrance'
+          })}
+        </Typography>
+      )}
       {!isSensitiveDisabled && (
         <CoordinateFormSection
           control={control}
@@ -165,6 +116,9 @@ const EntranceDetail = ({
               type="number"
               error={!!errors.entrance?.altitude}
               inputRef={ref}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">m</InputAdornment>
+              }}
               value={value}
               onChange={onChange}
             />
@@ -190,7 +144,7 @@ const EntranceDetail = ({
           )}
         />
       </FormRow>
-    </>
+    </FormSection>
   );
 };
 
