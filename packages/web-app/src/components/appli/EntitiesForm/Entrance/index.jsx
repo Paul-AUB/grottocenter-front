@@ -135,7 +135,7 @@ export const EntranceForm = ({
     (!isSensitiveDisabled && (isCoordEmpty(lat) || isCoordEmpty(lng))) ||
     (entityType === ENTRANCE_AND_CAVE
       ? !caveName || !caveLanguage
-      : !entranceName || !entranceLanguage);
+      : !caveId || !entranceName || !entranceLanguage);
 
   const handleUpdateEntityType = type => {
     setEntityType(type);
@@ -220,10 +220,9 @@ export const EntranceForm = ({
           errors={errors}
           entityType={entityType}
           updateEntityType={handleUpdateEntityType}
-          allowMoveFromCave={!isNewEntrance}
           entranceId={entranceValues?.id}
+          networkSize={caveValues?.entrances?.length}
           reset={handleReset}
-          disabled={!isNewEntrance}
           isNewEntrance={isNewEntrance}
         />
         <EntranceDetail

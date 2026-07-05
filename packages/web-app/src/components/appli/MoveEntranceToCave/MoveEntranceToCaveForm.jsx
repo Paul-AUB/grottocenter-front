@@ -11,7 +11,7 @@ import {
 import { useIntl } from 'react-intl';
 import { useController, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import Alert from '../../common/Alert';
 import CaveAutoCompleteSearch from '../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
@@ -29,7 +29,11 @@ const MODE_DETACH = 'detach';
 const marginBetweenComponents = 4;
 
 const MoveEntranceToCaveForm = ({ entrance }) => {
-  const [mode, setMode] = useState(MODE_MOVE);
+  const [searchParams] = useSearchParams();
+  // Allow deep-linking straight to the detach flow (e.g. from the edit page).
+  const [mode, setMode] = useState(
+    searchParams.get('mode') === MODE_DETACH ? MODE_DETACH : MODE_MOVE
+  );
   const {
     handleSubmit,
     reset,
@@ -57,12 +61,19 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
 
   useEffect(() => {
     if (isSubmitSuccessful && !loading && !apiError) {
-      onSuccess(
-        formatMessage({ id: 'Entrance successfully moved.' })
-      );
+      onSuccess(formatMessage({ id: 'Entrance successfully moved.' }));
       navigate(`/ui/entrances/${entrance.id}`);
     }
-  }, [isSubmitSuccessful, loading, apiError, navigate, entrance.id, onSuccess, formatMessage, newCave]);
+  }, [
+    isSubmitSuccessful,
+    loading,
+    apiError,
+    navigate,
+    entrance.id,
+    onSuccess,
+    formatMessage,
+    newCave
+  ]);
 
   if (!entrance) return null;
 
@@ -86,13 +97,14 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
 
       <Divider />
 
-      <FormControl component="fieldset" sx={{ mb: marginBetweenComponents, mt: marginBetweenComponents }}>
+      <FormControl
+        component="fieldset"
+        sx={{ mb: marginBetweenComponents, mt: marginBetweenComponents }}
+      >
         <FormLabel component="legend">
           {formatMessage({ id: 'What do you want to do?' })}
         </FormLabel>
-        <RadioGroup
-          value={mode}
-          onChange={e => setMode(e.target.value)}>
+        <RadioGroup value={mode} onChange={e => setMode(e.target.value)}>
           <FormControlLabel
             value={MODE_MOVE}
             control={<Radio />}
@@ -140,9 +152,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
         </>
       )}
 
-      {mode === MODE_DETACH && (
-        <DetachEntranceSection entrance={entrance} />
-      )}
+      {mode === MODE_DETACH && <DetachEntranceSection entrance={entrance} />}
     </Box>
   );
 };
