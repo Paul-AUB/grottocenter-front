@@ -1,16 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Button } from '@mui/material';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
 import Alert from '../../../common/Alert';
 import { FormSection } from '../utils/FormContainers';
+import NetworkInlineLink from '../../../common/NetworkInlineLink';
 
 // Edit-mode network status + entry points to the (existing) move/detach flows.
 // Replaces the create-time "The entrance is:" radios, which don't make sense
 // once the entrance exists. The actual operations live on /ui/entrances/:id/move.
-const NetworkMembershipSection = ({ entranceId, isNetwork, networkSize }) => {
+const NetworkMembershipSection = ({
+  entranceId,
+  isNetwork,
+  networkSize,
+  caveId,
+  caveName
+}) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const movePath = `/ui/entrances/${entranceId}/move`;
@@ -21,16 +28,24 @@ const NetworkMembershipSection = ({ entranceId, isNetwork, networkSize }) => {
         severity="info"
         disableMargins
         content={
-          isNetwork
-            ? formatMessage(
-                {
-                  id: 'This entrance belongs to a network of {count, plural, one {# entrance} other {# entrances}}.'
-                },
-                { count: networkSize }
-              )
-            : formatMessage({
-                id: 'This entrance is the only one of its cavity (no network).'
-              })
+          isNetwork && caveId ? (
+            <FormattedMessage
+              id="This entrance belongs to the network {networkLink} of {count, plural, one {# entrance} other {# entrances}}."
+              values={{
+                count: networkSize,
+                networkLink: (
+                  <NetworkInlineLink
+                    caveId={caveId}
+                    label={caveName || formatMessage({ id: 'Network' })}
+                  />
+                )
+              }}
+            />
+          ) : (
+            formatMessage({
+              id: 'This entrance is the only one of its cavity (no network).'
+            })
+          )
         }
       />
       <Box
@@ -62,7 +77,9 @@ NetworkMembershipSection.propTypes = {
   entranceId: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
     .isRequired,
   isNetwork: PropTypes.bool.isRequired,
-  networkSize: PropTypes.number
+  networkSize: PropTypes.number,
+  caveId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  caveName: PropTypes.string
 };
 
 export default NetworkMembershipSection;

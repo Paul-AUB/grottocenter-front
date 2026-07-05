@@ -49,9 +49,9 @@ const CaveSelection = ({
 
   const handleSelection = selection => {
     if (selection?.id) {
-      onLengthChange(Number(selection.length));
-      onDepthChange(Number(selection.depth));
-      onTemperatureChange(Number(selection.temperature));
+      onLengthChange(selection.length ?? null);
+      onDepthChange(selection.depth ?? null);
+      onTemperatureChange(selection.temperature ?? null);
       onIsDivingChange(Boolean(selection.isDiving));
       onIdChange(Number(selection.id));
     } else {

@@ -93,6 +93,10 @@ export const EntranceForm = ({
     [caveValues?.entrances?.length]
   );
   const [entityType, setEntityType] = useState(entityTypeInitialValue);
+  // The name of the cave/network selected via search in create mode (edit
+  // mode already knows it statically from caveValues). Not a form value: used
+  // only to render a named link to that network in CaveDetail.
+  const [selectedCave, setSelectedCave] = useState(null);
   const { isAdmin } = usePermissions();
   const isSensitiveDisabled =
     !isAdmin && (entranceValues?.isSensitive ?? false);
@@ -236,12 +240,16 @@ export const EntranceForm = ({
             entityType={entityType}
             updateEntityType={handleUpdateEntityType}
             reset={handleReset}
+            selectedCave={selectedCave}
+            onSelectedCaveChange={setSelectedCave}
           />
         ) : (
           <NetworkMembershipSection
             entranceId={entranceValues?.id}
             isNetwork={entityType === ENTRANCE_ONLY}
             networkSize={caveValues?.entrances?.length}
+            caveId={caveValues?.id}
+            caveName={caveValues?.name}
           />
         )}
         <CaveDetail
@@ -250,6 +258,7 @@ export const EntranceForm = ({
           isReadonly={entityType === ENTRANCE_ONLY}
           isShared={entityType === ENTRANCE_ONLY}
           caveId={caveId}
+          caveName={isNewEntrance ? selectedCave?.name : caveValues?.name}
         />
         <EntranceAttributes control={control} />
         <FormActionRow

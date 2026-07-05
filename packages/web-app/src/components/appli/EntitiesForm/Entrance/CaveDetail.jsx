@@ -1,19 +1,20 @@
-import { Alert, Box, Link } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
 import { FormSection } from '../utils/FormContainers';
 import BoolToggleChip from '../utils/BoolToggleChip';
 import NumberField from '../utils/NumberField';
+import NetworkInlineLink from '../../../common/NetworkInlineLink';
 
 const CaveDetail = ({
   control,
   errors,
   isReadonly = false,
   isShared = false,
-  caveId
+  caveId,
+  caveName
 }) => {
   const { formatMessage } = useIntl();
 
@@ -42,19 +43,19 @@ const CaveDetail = ({
 
   return (
     <FormSection title="Characteristics">
-      {isShared && (
+      {isShared && caveId && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          {formatMessage({
-            id: 'Some of these characteristics are locked here because they are defined at the network level and shared by all its entrances.'
-          })}
-          {caveId ? (
-            <>
-              {' '}
-              <Link component={RouterLink} to={`/ui/caves/${caveId}`}>
-                {formatMessage({ id: 'View the network' })}
-              </Link>
-            </>
-          ) : null}
+          <FormattedMessage
+            id="Some of these characteristics are locked here because they belong to the network {networkLink} and are shared by all its entrances."
+            values={{
+              networkLink: (
+                <NetworkInlineLink
+                  caveId={caveId}
+                  label={caveName || formatMessage({ id: 'View the network' })}
+                />
+              )
+            }}
+          />
         </Alert>
       )}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
@@ -135,7 +136,8 @@ CaveDetail.propTypes = {
   control: PropTypes.shape({}),
   isReadonly: PropTypes.bool,
   isShared: PropTypes.bool,
-  caveId: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  caveId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  caveName: PropTypes.string
 };
 
 export default CaveDetail;

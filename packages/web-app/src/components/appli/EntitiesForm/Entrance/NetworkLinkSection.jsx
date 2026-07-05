@@ -12,26 +12,29 @@ import { FormSection } from '../utils/FormContainers';
 // with a preview of the outcome (new 2-entrance network vs extending an
 // existing one). Edit-mode network status/actions live in
 // NetworkMembershipSection instead.
+//
+// `selectedCave`/`onSelectedCaveChange` are controlled by the parent (not
+// local state): CaveDetail also needs the selected network's name (to link to
+// it), and it's not backed by the shared `cave.name` RHF field — writing the
+// searched network's name there would bleed into the entrance/cave name field
+// once the user switches back to "new cave" mode.
 const NetworkLinkSection = ({
   control,
   errors,
   entityType,
   updateEntityType,
-  reset
+  reset,
+  selectedCave,
+  onSelectedCaveChange
 }) => {
   const { formatMessage } = useIntl();
-  // Selection-time hints, not values the form submits: the display name and
-  // entrance count of the cave/network chosen in the search below. Kept in
-  // local state (not the shared `cave.name` RHF field) so the linked
-  // network's name never bleeds into the entrance/cave name field once the
-  // user switches back to "new cave" mode.
-  const [selectedCave, setSelectedCave] = useState(null);
+  // Selection-time hint, not a value the form submits.
   const [selectedNbEntrances, setSelectedNbEntrances] = useState(null);
 
   const handleLinkToggle = event => {
     const isLinked = event.target.checked;
     updateEntityType(isLinked ? ENTRANCE_ONLY : ENTRANCE_AND_CAVE);
-    setSelectedCave(null);
+    onSelectedCaveChange(null);
     setSelectedNbEntrances(null);
     reset();
   };
@@ -56,7 +59,9 @@ const NetworkLinkSection = ({
             errors={errors}
             value={selectedCave}
             onSelectionChange={selection => {
-              setSelectedCave(selection?.id ? { name: selection.name } : null);
+              onSelectedCaveChange(
+                selection?.id ? { name: selection.name } : null
+              );
               setSelectedNbEntrances(
                 typeof selection?.nbEntrances === 'number'
                   ? selection.nbEntrances
@@ -98,7 +103,9 @@ NetworkLinkSection.propTypes = {
   }),
   entityType: PropTypes.oneOf([ENTRANCE_ONLY, ENTRANCE_AND_CAVE]),
   updateEntityType: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired
+  reset: PropTypes.func.isRequired,
+  selectedCave: PropTypes.shape({ name: PropTypes.string }),
+  onSelectedCaveChange: PropTypes.func.isRequired
 };
 
 export default NetworkLinkSection;
