@@ -4,19 +4,22 @@ import PropTypes from 'prop-types';
 
 import CaveAutoCompleteSearch from '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
 
-const CaveSelection = ({ control, disabled = false, onSelectionChange }) => {
+// `value` controls the search field's display (the currently linked cave/
+// network's name). It is intentionally NOT backed by the shared `cave.name`
+// RHF field: that field also holds the name of a newly created cave, and
+// writing the searched network's name into it would silently overwrite the
+// user's own entrance name once they switch back to "new cave" mode.
+const CaveSelection = ({
+  control,
+  disabled = false,
+  value,
+  onSelectionChange
+}) => {
   const {
     field: { onChange: onIdChange }
   } = useController({
     control,
     name: 'cave.id',
-    rules: { required: true }
-  });
-  const {
-    field: { onChange: onNameChange, value: caveNameValue }
-  } = useController({
-    control,
-    name: 'cave.name',
     rules: { required: true }
   });
   const {
@@ -51,7 +54,6 @@ const CaveSelection = ({ control, disabled = false, onSelectionChange }) => {
       onTemperatureChange(Number(selection.temperature));
       onIsDivingChange(Boolean(selection.isDiving));
       onIdChange(Number(selection.id));
-      onNameChange(selection.name);
     } else {
       onIdChange(null);
     }
@@ -63,7 +65,7 @@ const CaveSelection = ({ control, disabled = false, onSelectionChange }) => {
       disabled={disabled}
       required
       onSelection={handleSelection}
-      value={{ name: caveNameValue }}
+      value={value}
     />
   );
 };
@@ -76,5 +78,6 @@ CaveSelection.propTypes = {
   errors: PropTypes.shape({
     caveName: PropTypes.string
   }),
+  value: PropTypes.shape({ name: PropTypes.string }),
   onSelectionChange: PropTypes.func
 };

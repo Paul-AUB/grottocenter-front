@@ -19,6 +19,8 @@ import EditTypeSelection from './EditTypeSelection';
 import EntranceDetail from './EntranceDetail';
 import CaveDetail from './CaveDetail';
 import EntranceAttributes from './EntranceAttributes';
+import NetworkLinkSection from './NetworkLinkSection';
+import NetworkMembershipSection from './NetworkMembershipSection';
 import {
   makeCaveData,
   makeEntranceData,
@@ -219,10 +221,6 @@ export const EntranceForm = ({
           control={control}
           errors={errors}
           entityType={entityType}
-          updateEntityType={handleUpdateEntityType}
-          entranceId={entranceValues?.id}
-          networkSize={caveValues?.entrances?.length}
-          reset={handleReset}
           isNewEntrance={isNewEntrance}
         />
         <EntranceDetail
@@ -231,6 +229,21 @@ export const EntranceForm = ({
           getValues={getValues}
           isNewEntrance={isNewEntrance}
         />
+        {isNewEntrance ? (
+          <NetworkLinkSection
+            control={control}
+            errors={errors}
+            entityType={entityType}
+            updateEntityType={handleUpdateEntityType}
+            reset={handleReset}
+          />
+        ) : (
+          <NetworkMembershipSection
+            entranceId={entranceValues?.id}
+            isNetwork={entityType === ENTRANCE_ONLY}
+            networkSize={caveValues?.entrances?.length}
+          />
+        )}
         <CaveDetail
           control={control}
           errors={errors}
