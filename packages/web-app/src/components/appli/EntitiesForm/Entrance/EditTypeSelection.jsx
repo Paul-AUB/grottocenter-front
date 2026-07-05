@@ -1,14 +1,7 @@
-import {
-  FormControl as MuiFormControl,
-  RadioGroup,
-  FormControlLabel,
-  Box,
-  Radio
-} from '@mui/material';
-import React from 'react';
+import { Box, Checkbox, FormControlLabel } from '@mui/material';
+import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
 import { useController } from 'react-hook-form';
 import CaveSelection from './CaveSelect';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
@@ -19,10 +12,6 @@ import InputLanguage from '../utils/InputLanguage';
 import InputText from '../utils/InputText';
 import NameSuggestionDropdown from './NameSuggestionDropdown';
 import NetworkMembershipSection from './NetworkMembershipSection';
-
-const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(2)};
-`;
 
 const EditTypeSelection = ({
   control,
@@ -35,6 +24,11 @@ const EditTypeSelection = ({
   isNewEntrance = false
 }) => {
   const { formatMessage } = useIntl();
+  // Number of entrances already in the selected existing cave/network
+  // (search result's `nbEntrances`), used to preview the outcome of linking:
+  // creating a 2-entrance network vs extending an existing one. Local-only:
+  // it's a selection-time hint, not a value the form submits.
+  const [selectedNbEntrances, setSelectedNbEntrances] = useState(null);
 
   const {
     field: { onChange: onNameChange }
@@ -44,50 +38,18 @@ const EditTypeSelection = ({
     rules: { required: true }
   });
 
+  const handleLinkToggle = event => {
+    const isLinked = event.target.checked;
+    updateEntityType(isLinked ? ENTRANCE_ONLY : ENTRANCE_AND_CAVE);
+    setSelectedNbEntrances(null);
+    reset();
+  };
+
   return (
     <>
-      {isNewEntrance && (
-        <FormSection title="The entrance is:">
-          <FormControl component="fieldset">
-            <RadioGroup
-              aria-label={formatMessage({ id: 'The entrance is:' })}
-              name="entityType"
-              value={entityType}
-              onChange={event => {
-                updateEntityType(event.target.value);
-                reset();
-              }}
-            >
-              <FormControlLabel
-                value={ENTRANCE_AND_CAVE}
-                control={<Radio />}
-                label={formatMessage({
-                  id: 'The first entrance of a new cave (on Grottocenter)'
-                })}
-              />
-              <FormControlLabel
-                value={ENTRANCE_ONLY}
-                control={<Radio />}
-                label={formatMessage({
-                  id: 'Linked to an existing entrance or network'
-                })}
-              />
-            </RadioGroup>
-          </FormControl>
-          {entityType === ENTRANCE_ONLY && (
-            <>
-              <CaveSelection control={control} errors={errors} />
-              {errors?.caveName && (
-                <Alert severity="error" content={errors.caveName} />
-              )}
-            </>
-          )}
-        </FormSection>
-      )}
-
-      <FormSection>
+      <FormRow>
         {entityType === ENTRANCE_AND_CAVE ? (
-          <FormRow>
+          <>
             <Box sx={{ flex: { xs: '1 1 100%', sm: 2 }, minWidth: 0 }}>
               <NameSuggestionDropdown
                 control={control}
@@ -112,9 +74,9 @@ const EditTypeSelection = ({
                 isError={!!errors?.cave?.language}
               />
             </Box>
-          </FormRow>
+          </>
         ) : (
-          <FormRow>
+          <>
             <Box sx={{ flex: { xs: '1 1 100%', sm: 2 }, minWidth: 0 }}>
               <NameSuggestionDropdown
                 control={control}
@@ -138,11 +100,61 @@ const EditTypeSelection = ({
                 isError={!!errors?.entrance?.language}
               />
             </Box>
-          </FormRow>
+          </>
         )}
-      </FormSection>
+      </FormRow>
 
-      {!isNewEntrance && (
+      {isNewEntrance ? (
+        <FormSection title="Network">
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={entityType === ENTRANCE_ONLY}
+                onChange={handleLinkToggle}
+              />
+            }
+            label={formatMessage({
+              id: 'Link to an existing entrance or network'
+            })}
+          />
+          {entityType === ENTRANCE_ONLY && (
+            <>
+              <CaveSelection
+                control={control}
+                errors={errors}
+                onSelectionChange={selection =>
+                  setSelectedNbEntrances(
+                    typeof selection?.nbEntrances === 'number'
+                      ? selection.nbEntrances
+                      : null
+                  )
+                }
+              />
+              {errors?.caveName && (
+                <Alert severity="error" content={errors.caveName} />
+              )}
+              {selectedNbEntrances !== null && (
+                <Alert
+                  severity="info"
+                  disableMargins
+                  content={
+                    selectedNbEntrances <= 1
+                      ? formatMessage({
+                          id: 'Linking to this entrance will create a network of 2 entrances.'
+                        })
+                      : formatMessage(
+                          {
+                            id: 'Linking to this network will extend it to {count} entrances.'
+                          },
+                          { count: selectedNbEntrances + 1 }
+                        )
+                  }
+                />
+              )}
+            </>
+          )}
+        </FormSection>
+      ) : (
         <NetworkMembershipSection
           entranceId={entranceId}
           isNetwork={entityType === ENTRANCE_ONLY}

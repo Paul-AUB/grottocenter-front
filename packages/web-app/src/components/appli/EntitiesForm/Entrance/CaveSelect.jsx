@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import CaveAutoCompleteSearch from '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
 
-const CaveSelection = ({ control, disabled = false }) => {
+const CaveSelection = ({ control, disabled = false, onSelectionChange }) => {
   const {
     field: { onChange: onIdChange }
   } = useController({
@@ -55,6 +55,7 @@ const CaveSelection = ({ control, disabled = false }) => {
     } else {
       onIdChange(null);
     }
+    onSelectionChange?.(selection);
   };
 
   return (
@@ -74,5 +75,6 @@ CaveSelection.propTypes = {
   disabled: PropTypes.bool,
   errors: PropTypes.shape({
     caveName: PropTypes.string
-  })
+  }),
+  onSelectionChange: PropTypes.func
 };
