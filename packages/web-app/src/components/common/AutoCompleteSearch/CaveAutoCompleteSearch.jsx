@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 
-import { fetchQuickSearchRaw } from '../../../actions/Quicksearch';
-import { useDebounce } from '../../../hooks';
+import { useEntitySearch } from '../../../hooks';
 import { entityOptionForSelector } from '../../../helpers/Entity';
 import { AUTOCOMPLETE_MIN_CHARACTERS } from '../../../conf/config';
+
+// Quicksearch entities: stable module-level reference.
+const CAVE_ENTITIES = ['caves'];
 
 // Async single-select search of an existing entrance/network, on the standard
 // MUI Autocomplete + quicksearch pattern used elsewhere in the app (see
@@ -21,44 +23,8 @@ const CaveAutoCompleteSearch = ({
   disabled = false
 }) => {
   const { formatMessage } = useIntl();
-  const [inputValue, setInputValue] = useState('');
-  const debouncedInput = useDebounce(inputValue);
-  const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState([]);
-  const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    const fetchData = async () => {
-      if (
-        !debouncedInput ||
-        debouncedInput.length < AUTOCOMPLETE_MIN_CHARACTERS
-      ) {
-        setResults([]);
-        return;
-      }
-      setIsLoading(true);
-      setHasError(false);
-      try {
-        const rep = await fetchQuickSearchRaw({
-          query: debouncedInput.trim(),
-          entities: ['caves']
-        });
-        if (active) setResults(rep?.results ?? []);
-      } catch {
-        if (active) {
-          setResults([]);
-          setHasError(true);
-        }
-      } finally {
-        if (active) setIsLoading(false);
-      }
-    };
-    fetchData();
-    return () => {
-      active = false;
-    };
-  }, [debouncedInput]);
+  const { inputValue, setInputValue, results, isLoading, hasError } =
+    useEntitySearch(CAVE_ENTITIES);
 
   // Keep the current value matchable so MUI doesn't warn when it isn't part of
   // the latest results (e.g. right after selection, when results are empty).
