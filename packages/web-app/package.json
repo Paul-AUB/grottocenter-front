@@ -26,6 +26,7 @@
     "@mui/x-date-pickers": "^9.7.0",
     "@react-leaflet/core": "3.0.0",
     "@reactour/tour": "^3.8.0",
+    "@resvg/resvg-wasm": "^2.6.2",
     "@turf/area": "^7.3.5",
     "@turf/helpers": "^7.3.5",
     "@turf/kinks": "^7.3.5",

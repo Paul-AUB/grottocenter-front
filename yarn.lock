@@ -2447,6 +2447,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9.7.0"
     "@react-leaflet/core": "npm:3.0.0"
     "@reactour/tour": "npm:^3.8.0"
+    "@resvg/resvg-wasm": "npm:^2.6.2"
     "@storybook/addon-links": "npm:^10.4.4"
     "@storybook/react-vite": "npm:^10.4.4"
     "@testing-library/dom": "npm:^10.4.1"
@@ -3641,6 +3642,13 @@ __metadata:
   peerDependencies:
     react: 16.x || 17.x || 18.x || 19.x
   checksum: 10/84330cac1c68d0ed69b6d57730f9aeda9b412382fed86429f0071380b626aa169a0afd2b57a353c8cd1b540a0c4b85e308085661e608a7dbe162515d66bad98f
+  languageName: node
+  linkType: hard
+
+"@resvg/resvg-wasm@npm:^2.6.2":
+  version: 2.6.2
+  resolution: "@resvg/resvg-wasm@npm:2.6.2"
+  checksum: 10/11f9619e65de2248b1cd5e241cc71848fff7e3eb83f57c3fa36091956daa0146b804b5cf105d4804b77099062f89be09105271e57b67b390cd589f49f097aba4
   languageName: node
   linkType: hard
 
