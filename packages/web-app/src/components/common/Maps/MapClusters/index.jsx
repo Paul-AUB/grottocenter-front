@@ -123,7 +123,10 @@ const HydratedMap = ({
   // Temporary navigation waypoint (mobile/touch only). Persisted so it survives
   // a reload in the field. The live position watch lives in WaypointNavigation,
   // mounted only while a waypoint exists.
-  const [waypoint, setWaypoint] = useLocalStorage('grottocenter_waypoint', null);
+  const [waypoint, setWaypoint] = useLocalStorage(
+    'grottocenter_waypoint',
+    null
+  );
   // Dev-only: when mocking, drop a reference point at the current map center so
   // the full waypoint UI renders without placing one (see waypointMock.js).
   const mockWaypoint = useMemo(() => {
@@ -157,9 +160,12 @@ const HydratedMap = ({
     DEFAULT_SELECTED_LAYERS,
     { merge: true }
   );
-  const toggleLayer = useCallback(type => {
-    setSelectedLayers(prev => ({ ...prev, [type]: !prev[type] }));
-  }, [setSelectedLayers]);
+  const toggleLayer = useCallback(
+    type => {
+      setSelectedLayers(prev => ({ ...prev, [type]: !prev[type] }));
+    },
+    [setSelectedLayers]
+  );
   const [activeEntranceFilters, setActiveEntranceFilters] = useLocalStorage(
     'grottocenter_activeEntranceFilters',
     Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true])),
@@ -375,10 +381,30 @@ const HydratedMap = ({
   // networks, ...) are stable Redux references that only change when new tile
   // data arrives, so useCluster's kD-tree isn't rebuilt on unrelated renders.
   const clusterConfigs = [
-    { type: 'entrance', layer: layerTypes.ENTRANCES, data: entrances, off: isMarkersMode },
-    { type: 'network', layer: layerTypes.NETWORKS, data: networks, off: isMarkersMode },
-    { type: 'massif', layer: layerTypes.MASSIFS, data: massifs, off: isMassifPolygonMode },
-    { type: 'organization', layer: layerTypes.ORGANIZATIONS, data: organizations, off: isMarkersMode }
+    {
+      type: 'entrance',
+      layer: layerTypes.ENTRANCES,
+      data: entrances,
+      off: isMarkersMode
+    },
+    {
+      type: 'network',
+      layer: layerTypes.NETWORKS,
+      data: networks,
+      off: isMarkersMode
+    },
+    {
+      type: 'massif',
+      layer: layerTypes.MASSIFS,
+      data: massifs,
+      off: isMassifPolygonMode
+    },
+    {
+      type: 'organization',
+      layer: layerTypes.ORGANIZATIONS,
+      data: organizations,
+      off: isMarkersMode
+    }
   ];
 
   return (
@@ -431,7 +457,9 @@ const HydratedMap = ({
         anchorReference="anchorPosition"
         anchorPosition={contextMenuAnchor}
         PaperProps={{ sx: { minWidth: 260 } }}>
-        <ListSubheader disableSticky sx={{ lineHeight: '32px', fontWeight: 'bold' }}>
+        <ListSubheader
+          disableSticky
+          sx={{ lineHeight: '32px', fontWeight: 'bold' }}>
           {`${formatMessage({ id: 'Point coordinates' })} (${getCRSLabel(preferred, projections)})`}
         </ListSubheader>
         <Box
@@ -504,7 +532,14 @@ const MAP_TOUR_SESSION_KEY = `mapTourSeenThisSession_v${MAP_TOUR_VERSION}`;
 // Set VITE_DISABLE_MAP_TOUR=true in .env.local to prevent the tour from launching in dev.
 const MAP_TOUR_DISABLED = import.meta.env.VITE_DISABLE_MAP_TOUR === 'true';
 
-const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...props }) => {
+const Index = ({
+  center,
+  zoom,
+  isSideMenuOpen,
+  mapRef,
+  popupTarget = null,
+  ...props
+}) => {
   const [runTour, setRunTour] = useState(
     () =>
       !MAP_TOUR_DISABLED &&
@@ -535,8 +570,7 @@ const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...pr
         zoom={zoom}
         isFullscreenAllowed={false}
         isSideMenuOpen={isSideMenuOpen}
-        isLocateControl
-        isCompassControl
+        isLocationControl
         mapRef={mapRef}
         renderer={renderer}>
         <HydratedMap {...props} popupTarget={popupTarget} />
