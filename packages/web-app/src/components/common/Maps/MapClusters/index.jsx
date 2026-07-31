@@ -26,7 +26,7 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material';
-import { ContentCopy, Tune } from '@mui/icons-material';
+import { ContentCopy, LocationOn, Tune } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
@@ -51,6 +51,8 @@ import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import ExploredOverlay from './ExploredOverlay';
 import useExploredEntrances from './useExploredEntrances';
 import PopupTargetHandler from './PopupTargetHandler';
+import WaypointNavigation from './Waypoint/WaypointNavigation';
+import { WAYPOINT_COLOR } from './Waypoint/waypointIcon';
 import CustomMapContainer from '../common/MapContainer';
 import {
   MARKERS_LIMIT,
@@ -116,6 +118,11 @@ const HydratedMap = ({
   const [formatMenuAnchor, setFormatMenuAnchor] = useState(null);
   const [preferred, setPref] = useCoordinatePreference();
   const isTouch = useMediaQuery('(pointer: coarse)');
+
+  // Temporary navigation waypoint (mobile/touch only). Persisted so it survives
+  // a reload in the field. The live position watch lives in WaypointNavigation,
+  // mounted only while a waypoint exists.
+  const [waypoint, setWaypoint] = useLocalStorage('grottocenter_waypoint', null);
 
   const [showExplored, setShowExplored] = useLocalStorage(
     'grottocenter_showExploredCaves',
@@ -332,6 +339,11 @@ const HydratedMap = ({
     }
   }, [contextCoords, isAuth, navigate, dispatch]);
 
+  const handlePlaceWaypoint = useCallback(() => {
+    setWaypoint({ lat: contextCoords.lat, lng: contextCoords.lng });
+    setContextCoords(null);
+  }, [contextCoords, setWaypoint]);
+
   useMapEvent('contextmenu', e => {
     e.originalEvent.preventDefault();
     setContextCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
@@ -398,6 +410,12 @@ const HydratedMap = ({
       />
       <MassifPolygons massifs={showMassifPolygons ? massifPolygons : []} />
       <PopupTargetHandler popupTarget={popupTarget} />
+      {isTouch && waypoint && (
+        <WaypointNavigation
+          waypoint={waypoint}
+          onDelete={() => setWaypoint(null)}
+        />
+      )}
       <Menu
         open={Boolean(contextCoords)}
         onClose={handleContextMenuClose}
@@ -445,6 +463,18 @@ const HydratedMap = ({
             {formatMessage({ id: 'Create an entrance here' })}
           </ListItemText>
         </MenuItem>
+        {isTouch && (
+          <MenuItem onClick={handlePlaceWaypoint}>
+            <ListItemIcon>
+              <LocationOn fontSize="small" sx={{ color: WAYPOINT_COLOR }} />
+            </ListItemIcon>
+            <ListItemText>
+              {formatMessage({
+                id: waypoint ? 'Move waypoint here' : 'Place a waypoint here'
+              })}
+            </ListItemText>
+          </MenuItem>
+        )}
       </Menu>
       <CRSMenu
         anchorEl={formatMenuAnchor}
