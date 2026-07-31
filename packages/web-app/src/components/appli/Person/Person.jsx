@@ -122,7 +122,7 @@ const Person = ({ isLoading, person, error }) => {
         color="secondary"
         sx={{
           ml: 2,
-          fontSize: '1.4rem',
+          fontSize: '0.875rem',
           letterSpacing: 1.5,
           verticalAlign: 'middle',
           color: '#fff',
@@ -137,7 +137,7 @@ const Person = ({ isLoading, person, error }) => {
         variant="outlined"
         sx={{
           ml: 2,
-          fontSize: '1.4rem',
+          fontSize: '0.875rem',
           letterSpacing: 1.5,
           verticalAlign: 'middle',
           fontWeight: 700
