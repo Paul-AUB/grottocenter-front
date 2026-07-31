@@ -187,8 +187,7 @@ const Organization = ({ error, isLoading, organization }) => {
           </Typography>
         }
         alignItems="center"
-        flexWrap="wrap"
-        sx={{ fontSize: { xs: '0.75rem', md: '1.0625rem' } }}>
+        flexWrap="wrap">
         {organization.country && (
           <AppLink
             to={`/ui/countries/${organization.country}`}
