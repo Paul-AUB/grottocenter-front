@@ -1,74 +1,26 @@
 import { useContext, useEffect, useState } from 'react';
-import { useCSVReader, formatFileSize } from 'react-papaparse';
+import { usePapaParse } from 'react-papaparse';
 import { useIntl } from 'react-intl';
+import { Box, Typography } from '@mui/material';
 import Alert from '../../../common/Alert';
+import FileSelectorInput, {
+  REJECTION_REASONS
+} from '../../../common/FileSelectorInput';
 import { ImportPageContentContext } from '../Provider';
 import checkData from '../checkData';
 
-// From https://github.com/Bunlong/react-papaparse/blob/v4.0.0/examples/CSVReaderClickAndDragUpload.tsx
-const GREY = '#CCC';
-const GREY_LIGHT = 'rgba(255, 255, 255, 0.4)';
-const GREY_DIM = '#686868';
+const ACCEPT = { 'text/csv': ['.csv'] };
+const EXTENSIONS = ['.csv'];
 
-const styles = {
-  zone: {
-    alignItems: 'center',
-    border: `2px dashed ${GREY}`,
-    borderRadius: 20,
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    justifyContent: 'center',
-    padding: 20
-  },
-  file: {
-    background: 'linear-gradient(to bottom, #EEE, #DDD)',
-    borderRadius: 20,
-    display: 'flex',
-    height: 120,
-    width: 120,
-    position: 'relative',
-    zIndex: 10,
-    flexDirection: 'column',
-    justifyContent: 'center'
-  },
-  info: {
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    paddingLeft: 10,
-    paddingRight: 10
-  },
-  size: {
-    backgroundColor: GREY_LIGHT,
-    borderRadius: 3,
-    marginBottom: '0.5em',
-    justifyContent: 'center',
-    display: 'flex'
-  },
-  name: {
-    backgroundColor: GREY_LIGHT,
-    borderRadius: 3,
-    fontSize: 12,
-    marginBottom: '0.5em'
-  },
-  progressBar: {
-    bottom: 14,
-    position: 'absolute',
-    width: '100%',
-    paddingLeft: 10,
-    paddingRight: 10
-  },
-  zoneHover: {
-    border: `2px dashed ${GREY_DIM}`
-  },
-  remove: {
-    height: 23,
-    position: 'absolute',
-    right: 6,
-    top: 6,
-    width: 23
-  }
+const formatBytes = bytes => {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const exponent = Math.min(
+    units.length - 1,
+    Math.floor(Math.log(bytes) / Math.log(1024))
+  );
+  const value = bytes / 1024 ** exponent;
+  return `${value.toFixed(exponent === 0 ? 0 : 1)} ${units[exponent]}`;
 };
 
 const Step2 = () => {
@@ -76,114 +28,117 @@ const Step2 = () => {
     ImportPageContentContext
   );
   const { reset: resetImportSession } = importSession;
-
   const { formatMessage } = useIntl();
-  const { CSVReader } = useCSVReader();
+  const { readString } = usePapaParse();
 
   const [rowErrors, setRowErrors] = useState([]);
-  const [zoneHover, setZoneHover] = useState(false);
+  const [rejectionError, setRejectionError] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  // react-papaparse resets its content when we come back to this step; clear
-  // the import session at the same time so any batchId / progress / result
-  // from a previous run does not leak into the next one.
+  // Clear any residual import state whenever the step mounts, so a batchId /
+  // progress / result from a previous run does not leak into the next one.
   useEffect(() => {
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
     resetImportSession();
   }, [updateAttribute, resetImportSession]);
 
-  const handleOnRemove = () => {
+  const clearImportedFile = () => {
+    setSelectedFile(null);
     setRowErrors([]);
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
     resetImportSession();
   };
 
+  const parseFile = async file => {
+    setRejectionError(null);
+    setRowErrors([]);
+    const text = await file.text();
+    readString(text, {
+      transformHeader: header => header.trim(),
+      header: true,
+      skipEmptyLines: true,
+      complete: results => {
+        const errors = [];
+        if (results.errors.length !== 0) {
+          const importErrors = results.errors.map(e => ({
+            errorMessage: `Import error ${e.message}`,
+            row: e.row + 2
+          }));
+          errors.push(...importErrors);
+        }
+        errors.push(...checkData(results.data, selectedType, formatMessage));
+        if (errors.length === 0) {
+          updateAttribute('importData', results.data);
+          updateAttribute('fileImported', true);
+          setRowErrors([]);
+          setSelectedFile(file);
+        } else {
+          setRowErrors(errors);
+          setSelectedFile(file);
+          updateAttribute('importData', undefined);
+          updateAttribute('fileImported', false);
+        }
+      }
+    });
+  };
+
+  const handleFilesAdd = files => {
+    const [file] = files;
+    if (!file) return;
+    parseFile(file);
+  };
+
+  const handleFileRejections = rejections => {
+    const [rejection] = rejections;
+    if (!rejection) return;
+    setSelectedFile(null);
+    updateAttribute('importData', undefined);
+    updateAttribute('fileImported', false);
+    if (rejection.reasons.includes(REJECTION_REASONS.TYPE_NOT_ACCEPTED)) {
+      setRejectionError(
+        formatMessage({
+          id: 'Only CSV files are accepted.',
+          defaultMessage: 'Only CSV files are accepted.'
+        })
+      );
+    } else {
+      setRejectionError(
+        formatMessage({
+          id: 'This file was rejected.',
+          defaultMessage: 'This file was rejected.'
+        })
+      );
+    }
+  };
+
+  const files = selectedFile
+    ? [{ fileName: selectedFile.name, file: selectedFile }]
+    : [];
+
   return (
     <>
-      <CSVReader
-        config={{
-          transformHeader: header => header.trim(),
-          header: true,
-          skipEmptyLines: true
-        }}
-        onUploadAccepted={results => {
-          const errors = [];
-          if (results.errors.length !== 0) {
-            const importErrors = results.errors.map(e => ({
-              errorMessage: `Import error ${e[0].message}`,
-              row: e[0].row + 2
-            }));
-            errors.push(...importErrors);
-          }
-          errors.push(...checkData(results.data, selectedType, formatMessage));
-          if (errors.length === 0) {
-            updateAttribute('importData', results.data);
-            updateAttribute('fileImported', true);
-            setRowErrors([]);
-          } else {
-            setRowErrors(errors);
-          }
-          setZoneHover(false);
-        }}
-        onDragOver={event => {
-          event.preventDefault();
-          setZoneHover(true);
-        }}
-        onDragLeave={event => {
-          event.preventDefault();
-          setZoneHover(false);
-        }}>
-        {({
-          getRootProps,
-          acceptedFile,
-          ProgressBar,
-          getRemoveFileProps,
-          Remove
-        }) => (
-          <div
-            {...getRootProps()}
-            style={{
-              ...styles.zone,
-              ...(zoneHover && styles.zoneHover)
-            }}>
-            {acceptedFile ? (
-              <div style={styles.file}>
-                <div style={styles.info}>
-                  <span style={styles.size}>
-                    {formatFileSize(acceptedFile.size)}
-                  </span>
-                  <span style={styles.name}>{acceptedFile.name}</span>
-                </div>
-                <div style={styles.progressBar}>
-                  <ProgressBar />
-                </div>
-                <div
-                  role="button"
-                  tabIndex="0"
-                  onKeyUp={e => {
-                    handleOnRemove();
-                    getRemoveFileProps().onClick(e);
-                  }}
-                  onClick={e => {
-                    handleOnRemove();
-                    getRemoveFileProps().onClick(e);
-                  }}
-                  style={styles.remove}>
-                  <Remove />
-                </div>
-              </div>
-            ) : (
-              formatMessage({ id: 'Drop CSV file here or click to upload.' })
-            )}
-          </div>
-        )}
-      </CSVReader>
+      <FileSelectorInput
+        files={files}
+        multiple={false}
+        accept={ACCEPT}
+        extensions={EXTENSIONS}
+        onFilesAdd={handleFilesAdd}
+        onFileRemove={clearImportedFile}
+        onFileRejections={handleFileRejections}
+      />
+      {selectedFile && (
+        <Box sx={{ mt: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            {formatBytes(selectedFile.size)}
+          </Typography>
+        </Box>
+      )}
+      {rejectionError && <Alert content={rejectionError} severity="error" />}
       {rowErrors.map(err => (
         <Alert
-          content={`${formatMessage({ id: 'Row' })} ${err.row} : ${
-            err.errorMessage
-          }`}
+          content={`${formatMessage({ id: 'Row' })} ${err.row} : ${err.errorMessage}`}
           key={err.row + err.errorMessage}
           severity="error"
         />
