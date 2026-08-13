@@ -35,20 +35,23 @@ const Step2 = () => {
   const [rejectionError, setRejectionError] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Clear any residual import state whenever the step mounts, so a batchId /
-  // progress / result from a previous run does not leak into the next one.
-  useEffect(() => {
+  const resetImportState = () => {
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
     resetImportSession();
-  }, [updateAttribute, resetImportSession]);
+  };
+
+  // Clear any residual import state whenever the step mounts, so a batchId /
+  // progress / result from a previous run does not leak into the next one.
+  useEffect(() => {
+    resetImportState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const clearImportedFile = () => {
     setSelectedFile(null);
     setRowErrors([]);
-    updateAttribute('importData', undefined);
-    updateAttribute('fileImported', false);
-    resetImportSession();
+    resetImportState();
   };
 
   const parseFile = async file => {
@@ -60,57 +63,33 @@ const Step2 = () => {
       header: true,
       skipEmptyLines: true,
       complete: results => {
-        const errors = [];
-        if (results.errors.length !== 0) {
-          const importErrors = results.errors.map(e => ({
+        const errors = [
+          ...results.errors.map(e => ({
             errorMessage: `Import error ${e.message}`,
             row: e.row + 2
-          }));
-          errors.push(...importErrors);
-        }
-        errors.push(...checkData(results.data, selectedType, formatMessage));
-        if (errors.length === 0) {
-          updateAttribute('importData', results.data);
-          updateAttribute('fileImported', true);
-          setRowErrors([]);
-          setSelectedFile(file);
-        } else {
-          setRowErrors(errors);
-          setSelectedFile(file);
-          updateAttribute('importData', undefined);
-          updateAttribute('fileImported', false);
-        }
+          })),
+          ...checkData(results.data, selectedType, formatMessage)
+        ];
+        const isValid = errors.length === 0;
+        setSelectedFile(file);
+        setRowErrors(errors);
+        updateAttribute('importData', isValid ? results.data : undefined);
+        updateAttribute('fileImported', isValid);
       }
     });
-  };
-
-  const handleFilesAdd = files => {
-    const [file] = files;
-    if (!file) return;
-    parseFile(file);
   };
 
   const handleFileRejections = rejections => {
     const [rejection] = rejections;
     if (!rejection) return;
     setSelectedFile(null);
-    updateAttribute('importData', undefined);
-    updateAttribute('fileImported', false);
-    if (rejection.reasons.includes(REJECTION_REASONS.TYPE_NOT_ACCEPTED)) {
-      setRejectionError(
-        formatMessage({
-          id: 'Only CSV files are accepted.',
-          defaultMessage: 'Only CSV files are accepted.'
-        })
-      );
-    } else {
-      setRejectionError(
-        formatMessage({
-          id: 'This file was rejected.',
-          defaultMessage: 'This file was rejected.'
-        })
-      );
-    }
+    resetImportState();
+    const messageId = rejection.reasons.includes(
+      REJECTION_REASONS.TYPE_NOT_ACCEPTED
+    )
+      ? 'Only CSV files are accepted.'
+      : 'This file was rejected.';
+    setRejectionError(formatMessage({ id: messageId, defaultMessage: messageId }));
   };
 
   const files = selectedFile
@@ -124,7 +103,7 @@ const Step2 = () => {
         multiple={false}
         accept={ACCEPT}
         extensions={EXTENSIONS}
-        onFilesAdd={handleFilesAdd}
+        onFilesAdd={([file]) => file && parseFile(file)}
         onFileRemove={clearImportedFile}
         onFileRejections={handleFileRejections}
       />
@@ -146,7 +125,5 @@ const Step2 = () => {
     </>
   );
 };
-
-Step2.propTypes = {};
 
 export default Step2;

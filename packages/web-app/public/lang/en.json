@@ -906,7 +906,6 @@
   "Draw a polygon": "Draw a polygon",
   "Draw the area covered by the massif using the tools at the right of the map, or import a GeoJSON (.geojson) or Shapefile (.zip) file.": "Draw the area covered by the massif using the tools at the right of the map, or import a GeoJSON (.geojson) or Shapefile (.zip) file.",
   "Drop a file here or click to select": "Drop a file here or click to select",
-  "Drop CSV file here or click to upload.": "Drop CSV file here or click to upload.",
   "Drop files here or click to select": "Drop files here or click to select",
   "Duplicate from database": "Duplicate from database",
   "Duplicate from import": "Duplicate from import",
