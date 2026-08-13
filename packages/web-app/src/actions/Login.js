@@ -17,6 +17,9 @@ export const HIDE_LOGIN_DIALOG = 'HIDE_LOGIN_DIALOG';
 
 export const LOGOUT = 'LOGOUT';
 
+export const SET_IMPERSONATED_ROLE = 'SET_IMPERSONATED_ROLE';
+export const CLEAR_IMPERSONATION = 'CLEAR_IMPERSONATION';
+
 // ==========
 
 export const fetchLogin = () => ({
@@ -68,6 +71,15 @@ export const hideLoginDialog = () => ({
 
 export const logout = () => ({
   type: LOGOUT
+});
+
+export const setImpersonatedRole = roleName => ({
+  type: SET_IMPERSONATED_ROLE,
+  roleName
+});
+
+export const clearImpersonation = () => ({
+  type: CLEAR_IMPERSONATION
 });
 
 export function postLogout() {

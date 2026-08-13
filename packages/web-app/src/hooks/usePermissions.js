@@ -20,6 +20,13 @@ export function usePermissions() {
     isLeader: hasRole(authState, 'Leader'),
     isModerator: hasRole(authState, 'Moderator'),
     isTokenExpired: isTokenExpired(authState),
-    isUser: hasRole(authState, 'User')
+    isUser: hasRole(authState, 'User'),
+    // Ignore-impersonation flag so the ImpersonationBar itself stays visible
+    // when a real admin is currently masquerading as a lower role.
+    isRealAdmin: hasRole(authState, 'Administrator', {
+      ignoreImpersonation: true
+    }),
+    isImpersonating: Boolean(authState.impersonatedRole),
+    impersonatedRole: authState.impersonatedRole ?? null
   };
 }

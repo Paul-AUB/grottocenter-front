@@ -27,6 +27,7 @@ import SideMenu from '../components/common/SideMenu';
 import AppSnackbar from '../components/common/AppSnackbar';
 
 import AppBar from '../components/common/AppBar';
+import ImpersonationSwitcher from '../components/common/ImpersonationSwitcher';
 import LoginDialog from '../components/appli/Login';
 
 async function transitionToReact() {
@@ -145,6 +146,9 @@ const ApplicationLayout = () => {
           `useSideMenuOffset()` hands out exactly that number. */}
       <AppBar />
       <SideMenu />
+      {/* Fixed FAB — no layout footprint and renders null for non-admins, so
+          it stays cheap and out of the way for everyone else. */}
+      <ImpersonationSwitcher />
       <MainWrapper $offset={sideMenuOffset} $transition={transition}>
         <LoginDialog />
 
